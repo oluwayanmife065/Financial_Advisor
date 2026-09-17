@@ -24,7 +24,7 @@ class Settings(BaseSettings):
 
     # --- LLM ---
     ollama_model: str = Field(
-        default="llama3.2:3b",
+        default="qwen2.5:7b",
         description="Ollama model name used for answer generation."
     )
     ollama_base_url: str = Field(
