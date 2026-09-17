@@ -75,6 +75,9 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 | **Phase 1** — Ingestion | Parsers, scrapers, chunker, embedder, LanceDB pipeline | 🔧 In Progress |
 | **Phase 2** — Retrieval + Chat | BaseRetriever interface, LanceDB retriever, CLI chat loop | ⬚ Planned |
 | **Phase 3** — Eval Harness | Golden Q&A set, retrieval & generation metrics, LLM judge | ⬚ Planned |
+| **Phase 1** — Ingestion | Parsers, scrapers, chunker, embedder, LanceDB pipeline | ✅ Complete |
+| **Phase 2** — Retrieval + Chat | BaseRetriever interface, LanceDB retriever, CLI chat loop | ✅ Complete |
+| **Phase 3** — Eval Harness | Golden Q&A set, retrieval & generation metrics, LLM judge | 🔧 In Progress |
 | **Phase 4** — Pinecone Benchmark | Pinecone retriever, side-by-side benchmark vs LanceDB | ⬚ Planned |
 | **Phase 5** — Polish + UI | Streamlit app, full README case study | ⬚ Planned |
 
@@ -141,6 +144,8 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
 | Tag | Milestone |
 |---|---|
 | `v0.0.0-scaffold` | Phase 0 complete — project structure, data models, PDF parser + tests |
+| `v0.1.0-ingestion` | Phase 1 complete — chunker, embedder, pipeline, LanceDB retriever, tests |
+| `v0.2.0-retrieval` | Phase 2 complete — Ollama LLM wrapper, CLI chat loop, query logger, tests |
 
 ---
 
