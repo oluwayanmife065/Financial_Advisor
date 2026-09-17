@@ -35,7 +35,7 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 │   │   └── text_parser.py         # Plain text parser
 │   ├── scrapers/
 │   │   ├── base.py                # Abstract BaseScraper
-│   │   └── robinhood_scraper.py   # Robinhood content scraper
+│   │   └── sec_scraper.py         # SEC/Investor.gov scraper
 │   ├── chunker.py                 # Sentence-aware chunking
 │   ├── document.py                # Document & Chunk dataclasses
 │   ├── embedder.py                # SentenceTransformers wrapper

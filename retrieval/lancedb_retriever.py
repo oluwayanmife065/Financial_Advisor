@@ -11,7 +11,7 @@ Responsibilities:
 
 Why overwrite instead of append?
   doc_id is a hash of url + date_ingested, not a sequential counter.
-  Adding a new source (e.g. Robinhood) would change what gets processed first
+  Adding a new source (e.g. CFPB or FINRA) would change what gets processed first
   and make deduplication unreliable. A full rebuild ensures the DB always
   reflects exactly what's in the source files — clean and predictable.
 """

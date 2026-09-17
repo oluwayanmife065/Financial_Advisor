@@ -7,7 +7,7 @@
 ## 🏗️ System Architecture Overview
 
 ```
-Raw Sources (SEC, FINRA, Fed Reserve, CFPB, Robinhood, Notes)
+Raw Sources (SEC, FINRA, Fed Reserve, CFPB, Notes)
     ↓
 Ingestion Pipeline (scrape → clean → chunk → embed)
     ↓
