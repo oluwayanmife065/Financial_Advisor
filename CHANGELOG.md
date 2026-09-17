@@ -8,22 +8,23 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ## [Unreleased]
 
-### Added
-- Initial project scaffold (Phase 0)
-- PDF parser (`ingestion/parsers/pdf_parser.py`) with metadata extraction
-- Parser unit tests (`tests/test_pdf_parser.py`)
-
 ---
 
-## [v0.1.0-ingestion] — Phase 1 target
+## [v0.1.0-ingestion] — 2026-09-17
 
-### Planned
-- SEC/Investor.gov scraper
-- CFPB scraper
+### Added
 - Sentence-aware chunker (512 tokens, 64-token overlap)
-- `bge-small-en-v1.5` embedder
-- LanceDB ingestion pipeline
-- Hash-based idempotent doc IDs
+- `bge-small-en-v1.5` embedder wrapper via SentenceTransformers
+- End-to-end ingestion pipeline (parse → chunk → embed → store)
+- LanceDB retriever implementation
+- PDF parser with text cleaning and folder batch parsing
+- `Document` & `Chunk` dataclasses with hash-based doc IDs
+- Full test suite (parser, chunker, embedder, pipeline, retriever)
+
+### Phase 0 (included)
+- Initial project scaffold and folder structure
+- `config.py` with Pydantic Settings
+- `.gitignore`, `CHANGELOG.md`, `PROJECT_BRIEF.md`
 
 ---
 
@@ -31,7 +32,6 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ### Planned
 - `BaseRetriever` abstract interface
-- LanceDB retriever implementation
 - Ollama LLM wrapper + grounding prompt
 - CLI chat loop
 - JSON Lines query logger
