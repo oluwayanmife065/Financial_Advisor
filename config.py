@@ -97,6 +97,16 @@ class Settings(BaseSettings):
         default="./eval/eval_report.json",
         description="Path where the eval harness writes its output report."
     )
+    eval_judge_model: str = Field(
+        default="gpt-4o-mini",
+        description="Model used for LLM-as-judge eval scoring. Uses OpenAI API."
+    )
+
+    # --- OpenAI (used for eval judge) ---
+    openai_api_key: str = Field(
+        default="",
+        description="OpenAI API key for LLM judge scoring. Set via .env file."
+    )
 
     model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
 

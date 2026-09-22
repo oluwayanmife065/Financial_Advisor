@@ -1,1 +1,334 @@
-{}
+[
+  {
+    "id": "sec_01",
+    "source": "SEC/Investor.gov",
+    "category": "Debt vs Investing",
+    "question": "Why does the SEC advise paying off high-interest credit card debt before investing?",
+    "relevant_keywords": [
+      "credit card debt",
+      "high interest",
+      "guaranteed returns"
+    ],
+    "reference_answer": "Credit cards charge high interest rates if a balance is carried month-to-month, significantly increasing the purchase cost of goods and stretching debt out for years. According to the SEC Office of Investor Education and Assistance, no investment offers guaranteed returns high enough to reliably outweigh the high interest rates paid on credit card debt, so paying down high-interest debt first is the safest and highest-return financial move."
+  },
+  {
+    "id": "sec_02",
+    "source": "SEC/Investor.gov",
+    "category": "Wealth Building",
+    "question": "What formula does the SEC highlight for building wealth over time, and what two action steps put it into practice?",
+    "relevant_keywords": [
+      "formula",
+      "emergency fund",
+      "wealth",
+      "regular",
+      "unexpected expense"
+    ],
+    "reference_answer": "The SEC highlights the formula: REGULAR INVESTMENTS + TIME = WEALTH, noting that starting earlier provides more time to build wealth through compound growth. To put this formula into action, the SEC recommends two steps: (1) start an emergency fund in a savings account at a bank or credit union with automated deposits each pay period to avoid debt during unexpected expenses, and (2) invest regularly over time (such as 5% to 10% of income) throughout one's entire career."
+  },
+  {
+    "id": "sec_03",
+    "source": "SEC/Investor.gov",
+    "category": "Retirement",
+    "question": "Why does the SEC recommend beginning an investing journey with workplace 401(k) plans and IRAs?",
+    "relevant_keywords": [
+      "401(k)",
+      "employer match",
+      "free money",
+      "individual retirement account",
+      "tax"
+    ],
+    "reference_answer": "The SEC recommends starting with a workplace 401(k) plan because employee contributions provide an upfront tax break and employers often match a portion of contributions, which constitutes free money. Additionally, an Individual Retirement Account (IRA) can be established on one's own for extra tax advantages. The SEC advises automating contributions to both accounts so saving and investing happen consistently every pay period."
+  },
+  {
+    "id": "sec_04",
+    "source": "SEC/Investor.gov",
+    "category": "Investment Strategy",
+    "question": "How does diversification reduce risk according to the SEC, and how does a target date fund work?",
+    "relevant_keywords": [
+      "diversified fund",
+      "target date fund",
+      "spreads your investment",
+      "reduce the risk"
+    ],
+    "reference_answer": "Diversification reduces risk by spreading investments across many companies and market sectors, ensuring that if one company or industry drops in value, holdings in other market segments can offset the loss. A target date fund automates this strategy by targeting a specific future year (such as retirement) and gradually shifting the portfolio from an aggressive, stock-heavy allocation early in a career to a more conservative, income-oriented allocation as the target date approaches."
+  },
+  {
+    "id": "sec_05",
+    "source": "SEC/Investor.gov",
+    "category": "Investor Protection",
+    "question": "How can an investor verify a financial professional and spot potential investment scams using Investor.gov?",
+    "relevant_keywords": [
+      "investor.gov",
+      "licensed and registered",
+      "red flags",
+      "scams",
+      "guaranteed returns"
+    ],
+    "reference_answer": "Investors can visit Investor.gov to verify whether a broker or investment adviser is properly licensed and registered, and to review their employment history for red flags and disciplinary disclosures. Key warning signs of investment scams include unsolicited investment pitches on social media or group chats, promises of high guaranteed returns with no risk, and pressure to make quick money easily."
+  },
+  {
+    "id": "fed_01",
+    "source": "Federal Reserve",
+    "category": "Compound Interest",
+    "question": "What is compound interest and why does the Federal Reserve refer to it as an advantage?",
+    "relevant_keywords": [
+      "compound interest",
+      "compounding",
+      "interest",
+      "wealth"
+    ],
+    "reference_answer": "Compound interest is interest earned not just on the original principal balance deposited, but also on the accumulated interest from prior periods. The Federal Reserve refers to this as the 'compound interest advantage' because savings grow at an exponentially faster rate over time compared to simple interest or uninvested savings, particularly when contributions are made regularly over a multi-decade time horizon."
+  },
+  {
+    "id": "fed_02",
+    "source": "Federal Reserve",
+    "category": "Investment Math",
+    "question": "What is the Rule of 72 and how does it estimate investment doubling time?",
+    "relevant_keywords": [
+      "rule of 72",
+      "double in value",
+      "rate of return"
+    ],
+    "reference_answer": "The Rule of 72 is a mental math shortcut used to estimate how many years it will take for an investment to double in value at a constant annual rate of return. An investor divides 72 by the expected annual rate of return. For example, an investment earning an 8% annual return will double in approximately 9 years (72 / 8 = 9)."
+  },
+  {
+    "id": "fed_03",
+    "source": "Federal Reserve",
+    "category": "Net Worth",
+    "question": "How is personal net worth calculated according to the Federal Reserve's Building Wealth guide?",
+    "relevant_keywords": [
+      "net worth",
+      "assets",
+      "liabilities"
+    ],
+    "reference_answer": "According to the Federal Reserve's Building Wealth guide, personal net worth is calculated using the balance sheet equation: Assets - Liabilities = Net Worth. Assets encompass everything of monetary value that you own (cash, bank accounts, retirement plans, stocks, and home market value), while liabilities comprise all debts owed (mortgages, car loans, student loans, and credit card balances)."
+  },
+  {
+    "id": "fed_04",
+    "source": "Federal Reserve",
+    "category": "Assets",
+    "question": "What distinguishes wealth-creating assets from everyday possessions in the Building Wealth curriculum?",
+    "relevant_keywords": [
+      "wealth-creating assets",
+      "possessions",
+      "drop in value",
+      "assets"
+    ],
+    "reference_answer": "Wealth-creating assets are items or accounts that can earn interest, generate dividends, or increase in market value over time, such as savings accounts, retirement plans, stocks, bonds, and real estate. In contrast, everyday possessions like cars, clothing, and household furniture are depreciating assets that immediately drop in market value once purchased and do not generate income."
+  },
+  {
+    "id": "fed_05",
+    "source": "Federal Reserve",
+    "category": "Risk and Return",
+    "question": "How does the Investment Pyramid illustrate the relationship between financial risk and potential return?",
+    "relevant_keywords": [
+      "investment pyramid",
+      "increasing risk",
+      "decreasing risk",
+      "risk"
+    ],
+    "reference_answer": "The Investment Pyramid illustrates the direct trade-off between risk and potential return. The broad base of the pyramid consists of low-risk, highly secure foundations such as an emergency fund, insured bank deposits, and adequate insurance coverage. As an investor moves up the pyramid toward bonds, stocks, and speculative investments, potential financial returns increase, but so does the risk of losing capital."
+  },
+  {
+    "id": "fed_06",
+    "source": "Federal Reserve",
+    "category": "Securities",
+    "question": "What is the core difference between owning stocks and owning bonds?",
+    "relevant_keywords": [
+      "stocks",
+      "bonds",
+      "shares",
+      "debt"
+    ],
+    "reference_answer": "Stocks represent equity ownership shares in a company, entitling the shareholder to a portion of the company's potential future profits and capital growth, accompanied by higher volatility and risk of loss. Bonds represent debt securities or loans where an investor lends money to a government or corporate borrower in exchange for regular interest payments and the return of the bond's face value principal upon maturity."
+  },
+  {
+    "id": "fed_07",
+    "source": "Federal Reserve",
+    "category": "Investment Vehicles",
+    "question": "What is a mutual fund and why is it beneficial for beginner investors?",
+    "relevant_keywords": [
+      "mutual fund",
+      "pool of money",
+      "diversification",
+      "managed"
+    ],
+    "reference_answer": "A mutual fund is an investment company that pools money from numerous individual investors to purchase a broad collection of stocks, bonds, or other securities. It is beneficial for beginners because it provides instant diversification and professional portfolio management, allowing someone with limited capital to spread risk across dozens or hundreds of holdings rather than betting on single companies."
+  },
+  {
+    "id": "fed_08",
+    "source": "Federal Reserve",
+    "category": "Saving vs Investing",
+    "question": "How does the Federal Reserve distinguish between the primary purposes of saving versus investing?",
+    "relevant_keywords": [
+      "save, invest, or both",
+      "saving and investing",
+      "risk",
+      "time horizon"
+    ],
+    "reference_answer": "Saving focuses on safety, capital preservation, and liquidity, typically placing money into insured bank accounts for short-term goals and sudden emergencies where money must be readily accessible without market risk. Investing focuses on growing capital over a multi-year or multi-decade time horizon to outpace inflation, accepting market fluctuations and risk of loss in exchange for higher expected long-term returns."
+  },
+  {
+    "id": "fed_09",
+    "source": "Federal Reserve",
+    "category": "Inflation",
+    "question": "How does inflation erode purchasing power, and how should investors respond?",
+    "relevant_keywords": [
+      "inflation",
+      "purchasing power",
+      "rate of return"
+    ],
+    "reference_answer": "Inflation is the gradual general rise in the prices of goods and services over time, which reduces the purchasing power of each dollar. If savings sit in accounts earning an interest rate lower than inflation, the real buying power of that money declines over time. To combat inflation, investors allocate funds to growth assets like stocks that historically provide rates of return higher than inflation over long periods."
+  },
+  {
+    "id": "fed_10",
+    "source": "Federal Reserve",
+    "category": "Portfolio Construction",
+    "question": "How do an individual's financial goals, risk tolerance, and time horizon influence their investment portfolio?",
+    "relevant_keywords": [
+      "asset allocation",
+      "portfolio",
+      "time horizon",
+      "risk tolerance",
+      "goals"
+    ],
+    "reference_answer": "An investor's portfolio asset allocation must align with their specific goals, emotional risk tolerance, and investment time horizon. Individuals with long time horizons (such as decades until retirement) can stomach market downturns and allocate a higher percentage to higher-risk, growth-oriented stocks. Those with shorter time horizons or lower risk tolerance must prioritize capital preservation by allocating more heavily to stable bonds and cash equivalents."
+  },
+  {
+    "id": "cfpb_01",
+    "source": "CFPB",
+    "category": "Credit Reports",
+    "question": "What information is collected in a credit report according to the CFPB?",
+    "relevant_keywords": [
+      "credit report",
+      "credit history",
+      "public record",
+      "payment history",
+      "inquiries"
+    ],
+    "reference_answer": "According to the CFPB, a credit report contains: (1) personal identifying information, (2) credit account records including payment history and whether bills were paid on time, (3) credit limits and current credit utilization, (4) public records such as bankruptcies and legal judgments, (5) collection accounts from debt collectors, and (6) inquiries indicating who has recently requested access to the report."
+  },
+  {
+    "id": "cfpb_02",
+    "source": "CFPB",
+    "category": "Credit Scores",
+    "question": "What factors determine a consumer's credit score and why does it matter to lenders?",
+    "relevant_keywords": [
+      "credit score",
+      "credit scores",
+      "payment history",
+      "credit history"
+    ],
+    "reference_answer": "Credit scores are three-digit numbers calculated from credit report data based primarily on: payment history (making on-time payments), amounts owed and credit utilization ratio, length of credit history, types of credit accounts maintained, and new credit applications. Lenders use credit scores to evaluate borrower creditworthiness, decide whether to approve loans, and determine the interest rates offered."
+  },
+  {
+    "id": "cfpb_03",
+    "source": "CFPB",
+    "category": "Debt Collection",
+    "question": "What specific actions are prohibited for debt collectors under the Fair Debt Collection Practices Act (FDCPA)?",
+    "relevant_keywords": [
+      "debt collector",
+      "debt collectors",
+      "harass",
+      "abusive",
+      "mislead",
+      "fair debt"
+    ],
+    "reference_answer": "Under the Fair Debt Collection Practices Act (FDCPA), debt collectors are legally prohibited from harassing or abusing consumers (such as calling repeatedly), using obscene or profane language, threatening actions they cannot legally take or do not intend to take, calling without identifying themselves, lying about or misleading consumers regarding the amount owed, or publicly publishing names of individuals who allegedly owe debts."
+  },
+  {
+    "id": "cfpb_04",
+    "source": "CFPB",
+    "category": "Credit Disputes",
+    "question": "What steps should a consumer take to dispute an error on their credit report?",
+    "relevant_keywords": [
+      "dispute",
+      "credit reporting",
+      "equifax",
+      "experian",
+      "transunion",
+      "inaccurate"
+    ],
+    "reference_answer": "To dispute credit report errors, a consumer should submit a dispute letter or online form to the nationwide credit reporting companies (Equifax, Experian, or TransUnion) displaying the mistake, as well as to the creditor or information furnisher that reported it. The dispute should identify each incorrect item, clearly state the facts and reason for the dispute, enclose copies of supporting documents, and request correction or removal."
+  },
+  {
+    "id": "cfpb_05",
+    "source": "CFPB",
+    "category": "Debt Repayment",
+    "question": "What are the two primary debt repayment strategies outlined in the CFPB Debt Action Plan?",
+    "relevant_keywords": [
+      "debt action plan",
+      "smallest debt",
+      "highest interest",
+      "minimum payments"
+    ],
+    "reference_answer": "The CFPB Debt Action Plan highlights two repayment strategies once all required minimum payments are satisfied: (1) Pay Smallest Debt First (snowball method), where extra money targets the smallest total debt balance to eliminate accounts quickly and gain psychological momentum, and (2) Pay Highest Interest Rate First (avalanche method), where extra money targets the debt carrying the steepest interest rate, minimizing overall interest paid and saving the most money over time."
+  },
+  {
+    "id": "cfpb_06",
+    "source": "CFPB",
+    "category": "Cash Flow & Budgeting",
+    "question": "What is a cash flow budget and how does it prevent financial shortfalls?",
+    "relevant_keywords": [
+      "cash flow",
+      "cash flow budget",
+      "income",
+      "expenses",
+      "bills"
+    ],
+    "reference_answer": "A cash flow budget tracks the exact timing of when income arrives and when bill payments are due across specific weeks of a month. Unlike a general monthly budget, cash flow planning prevents timing shortfalls by identifying weeks when expenses exceed incoming cash, giving consumers advance warning to adjust discretionary spending, shift bill due dates, or tap savings before late fees or overdrafts occur."
+  },
+  {
+    "id": "cfpb_07",
+    "source": "CFPB",
+    "category": "Banking & Overdraft",
+    "question": "What are overdraft fees on checking accounts and how can consumers prevent them?",
+    "relevant_keywords": [
+      "overdraft",
+      "overdraft fee",
+      "checking account",
+      "minimum balance"
+    ],
+    "reference_answer": "An overdraft fee is charged by a bank or credit union when an account balance drops below zero to cover a payment or withdrawal. Consumers can prevent these costly fees by opting out of overdraft programs for debit card and ATM transactions, linking their checking account to a savings account for automatic backup transfers, maintaining a cash buffer, or signing up for low-balance text alerts."
+  },
+  {
+    "id": "cfpb_08",
+    "source": "CFPB",
+    "category": "Emergency Savings",
+    "question": "Why does the CFPB emphasize building emergency savings and how can someone begin with a tight budget?",
+    "relevant_keywords": [
+      "emergency savings",
+      "emergency fund",
+      "unexpected expense",
+      "savings account"
+    ],
+    "reference_answer": "The CFPB emphasizes emergency savings because having money set aside provides a critical buffer against inevitable unexpected expenses (like car repairs or medical bills), preventing people from relying on high-interest debt or falling behind on essential bills. For those on a tight budget, the CFPB recommends starting small (even $10 to $20 per paycheck), using direct deposit to automatically transfer funds into a separate account, and saving tax refunds or cash windfalls."
+  },
+  {
+    "id": "cfpb_09",
+    "source": "CFPB",
+    "category": "Credit Reporting Time Limits",
+    "question": "How long does negative financial information and bankruptcy remain on a credit report according to federal rules?",
+    "relevant_keywords": [
+      "negative information",
+      "seven years",
+      "10 years",
+      "bankruptcy",
+      "credit report"
+    ],
+    "reference_answer": "Under federal credit reporting rules outlined by the CFPB, most negative information—including late payments, delinquent accounts, charge-offs, and debt collection accounts—can remain on a credit report for up to seven years. A personal bankruptcy can stay on a credit report for up to 10 years, and unpaid civil judgments or lawsuits can remain for seven years or until the governing statute of limitations expires."
+  },
+  {
+    "id": "cfpb_10",
+    "source": "CFPB",
+    "category": "Rebuilding Credit",
+    "question": "How does a secured credit card assist an individual in establishing or rebuilding credit?",
+    "relevant_keywords": [
+      "secured credit card",
+      "security deposit",
+      "credit history",
+      "credit limit"
+    ],
+    "reference_answer": "A secured credit card requires the applicant to put down a cash security deposit with the bank, which usually serves as the credit limit for the card. The cardholder uses the card for regular purchases and makes on-time monthly payments. Because the card issuer reports these regular, on-time payments to the credit bureaus, it allows consumers with no credit or damaged credit to build a positive credit history without lender default risk."
+  }
+]
