@@ -1,0 +1,17 @@
+# ── Core ──
+sentence-transformers>=2.7       # Embeddings (bge-small-en-v1.5)
+lancedb>=0.10                    # Local vector store
+ollama>=0.3                      # Local LLM inference
+pydantic-settings>=2.0           # Config management
+loguru>=0.7                      # Structured logging
+
+# ── Eval ──
+openai>=1.0                      # LLM-as-judge scoring (GPT-4o-mini)
+
+# ── Testing ──
+pytest>=8.0                      # Test framework
+
+# ── Future phases ──
+# pinecone-client>=3.0           # Cloud vector store (Phase 4)
+# streamlit>=1.35                # UI (Phase 5)
+

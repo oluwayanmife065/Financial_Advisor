@@ -28,14 +28,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ---
 
-## [v0.2.0-retrieval] — Phase 2 target
 ## [v0.2.0-retrieval] — 2026-09-17
 
-### Planned
-- `BaseRetriever` abstract interface
-- Ollama LLM wrapper + grounding prompt
-- CLI chat loop
-- JSON Lines query logger
 ### Added
 - Ollama LLM wrapper with grounding system prompt and streaming response (`generation/llm.py`)
 - Interactive CLI chat loop with context retrieval and citation display (`main.py`)

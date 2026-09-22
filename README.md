@@ -72,9 +72,6 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 | Phase | Description | Status |
 |---|---|---|
 | **Phase 0** — Scaffolding | Project structure, config, data models | ✅ Complete |
-| **Phase 1** — Ingestion | Parsers, scrapers, chunker, embedder, LanceDB pipeline | 🔧 In Progress |
-| **Phase 2** — Retrieval + Chat | BaseRetriever interface, LanceDB retriever, CLI chat loop | ⬚ Planned |
-| **Phase 3** — Eval Harness | Golden Q&A set, retrieval & generation metrics, LLM judge | ⬚ Planned |
 | **Phase 1** — Ingestion | Parsers, scrapers, chunker, embedder, LanceDB pipeline | ✅ Complete |
 | **Phase 2** — Retrieval + Chat | BaseRetriever interface, LanceDB retriever, CLI chat loop | ✅ Complete |
 | **Phase 3** — Eval Harness | Golden Q&A set, retrieval & generation metrics, LLM judge | 🔧 In Progress |
