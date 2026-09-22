@@ -38,13 +38,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ---
 
-## [v0.3.0-eval] — Phase 3 target
+## [v0.3.0-eval] — 2026-09-22
 
-### Planned
-- Golden Q&A set (20–30 pairs)
-- Precision@k, Recall@k, MRR, Hit Rate metrics
-- Ollama LLM-as-judge (answer relevance + faithfulness)
-- `eval/runner.py` producing `eval_report.json`
+### Added
+- Golden Q&A evaluation dataset with 25 hand-crafted test questions across SEC, CFPB, and Federal Reserve corpora (`eval/golden_set.json`)
+- Retrieval evaluation metrics: Precision@k, Recall@k, Mean Reciprocal Rank (MRR), and Hit Rate using keyword-based relevance matching (`eval/metrics.py`)
+- Independent LLM-as-a-judge scoring Answer Relevance and Context Faithfulness using OpenAI GPT-4o-mini with retry logic and JSON code-fence stripping (`eval/llm_judge.py`)
+- Evaluation runner orchestrator with CLI flags (`--limit`, `--no-judge`, `--retriever`, `--top-k`), terminal table formatting, and detailed JSON report export (`eval/runner.py`)
+- Comprehensive test suites for metrics, judge mocking, and runner orchestration (`tests/test_metrics.py`, `tests/test_llm_judge.py`, `tests/test_runner.py`) bringing repository test suite to 111 passing tests
+- Live benchmark run results meeting all retrieval KPI targets: Precision@3 = 0.84 (target ≥ 0.70), Recall@5 = 1.00 (target ≥ 0.80), MRR = 0.98 (target ≥ 0.75), Hit Rate = 1.00 (target ≥ 0.85)
 
 ---
 
