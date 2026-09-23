@@ -65,13 +65,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ---
 
-## [v0.5.0-polish] — Phase 5 target
 ## [v0.5.0-polish] — 2026-09-23
 
-### Planned
-- Streamlit UI (`app.py`)
-- Full README case study
-- Complete pytest suite
 ### Added
 - Streamlit chat UI (`app.py`) with persistent session-state conversation history, live streaming token output via `st.write_stream()`, collapsible source citation expanders, and retrieval/generation/total latency badges per response
 - Streaming LLM variant `stream_answer()` in `generation/llm.py` using Ollama `stream=True` — yields token strings as they arrive; consumed by Streamlit without blocking
