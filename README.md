@@ -74,9 +74,12 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 | **Phase 0** — Scaffolding | Project structure, config, data models | ✅ Complete |
 | **Phase 1** — Ingestion | Parsers, scrapers, chunker, embedder, LanceDB pipeline | ✅ Complete |
 | **Phase 2** — Retrieval + Chat | BaseRetriever interface, LanceDB retriever, CLI chat loop | ✅ Complete |
+| **Phase 3** — Eval Harness | Golden Q&A set, retrieval & generation metrics, LLM judge | 🔧 In Progress |
+| **Phase 4** — Pinecone Benchmark | Pinecone retriever, side-by-side benchmark vs LanceDB | ⬚ Planned |
 | **Phase 3** — Eval Harness | Golden Q&A set, retrieval & generation metrics, LLM judge | ✅ Complete |
 | **Phase 4** — Pinecone Benchmark | Pinecone retriever, side-by-side benchmark vs LanceDB | ⬚ Next Phase |
 | **Phase 5** — Polish + UI | Streamlit app, full README case study | ⬚ Planned |
+| **Phase 5** — Polish + UI | Streamlit app, streaming chat, source citations, eval badges | ✅ Complete |
 
 ---
 
@@ -87,12 +90,20 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 - `Chunk` dataclass — represents an embeddable text chunk with parent lineage
 - Deterministic `doc_id` via `sha256(url + date_ingested)` — prevents duplicate ingestion
 
+### PDF Parser (`ingestion/parsers/pdf_parser.py`)
 ### PDF Parser & Ingestion Pipeline (`ingestion/`)
 - Extracts clean text from PDFs using PyMuPDF (`fitz`)
+- One `Document` per non-empty page (skips pages with < 50 characters)
+- Text cleaning: hyphenated line-break rejoining, blank line collapsing
+- Folder-level batch parsing with automatic source label inference
+- Source label mapping: `sec` → "SEC/Investor.gov", `cfpb` → "CFPB", `fed` → "Federal Reserve"
 - Sentence-aware chunker (512 tokens, 64-token overlap)
 - `bge-small-en-v1.5` embeddings via SentenceTransformers
 - Automated pipeline indexing 488 chunks into LanceDB across SEC, CFPB, and Federal Reserve
 
+### Test Suite (`tests/test_pdf_parser.py`)
+- Full coverage of `parse_pdf`, `parse_pdf_folder`, `infer_source_label`, and `_clean_text`
+- Tests for edge cases: missing files, empty folders, pages below content threshold
 ### Retrieval & Grounded Generation (`retrieval/`, `generation/`, `main.py`)
 - Embedded vector search via LanceDB
 - Grounded generation using local Ollama LLMs with strict anti-hallucination system prompt
@@ -144,6 +155,13 @@ ingestion/sources/pdfs/
 
 | Component | Technology | Rationale |
 |---|---|---|
+| **Embeddings** | `bge-small-en-v1.5` (SentenceTransformers) | Strong MTEB retrieval scores, lightweight |
+| **Vector DB (local)** | LanceDB | Embedded, zero-infra, fast local dev |
+| **Vector DB (cloud)** | Pinecone | Managed, production feel, benchmark comparison |
+| **LLM** | Ollama (`llama3.2:3b` / `mistral:7b`) | Fully local, private, no API cost |
+| **Config** | Pydantic Settings | Type-safe env var management |
+| **Testing** | pytest | Standard Python test framework |
+| **PDF Parsing** | PyMuPDF (`fitz`) | Fast, reliable text extraction |
 | **Embeddings** | `bge-small-en-v1.5` (SentenceTransformers) | Strong MTEB retrieval scores, lightweight (384-dim) |
 | **Vector DB (local)** | LanceDB | Embedded, zero-infra, fast local vector search |
 | **Vector DB (cloud)** | Pinecone | Managed cloud vector DB for side-by-side benchmark (Phase 4) |
@@ -152,6 +170,32 @@ ingestion/sources/pdfs/
 | **Config** | Pydantic Settings | Type-safe env var management via `.env` |
 | **Testing** | pytest | 111 unit tests with full mocking and isolation |
 | **PDF Parsing** | PyMuPDF (`fitz`) | Fast, reliable text extraction and cleaning |
+
+---
+
+## 🖥️ Running the UI
+
+Make sure Ollama is running and at least one model is pulled:
+```bash
+ollama serve          # in one terminal
+ollama pull qwen2.5:7b
+```
+
+Install Streamlit (if not yet installed):
+```bash
+pip install -r requirements.txt
+```
+
+Launch the app:
+```bash
+streamlit run app.py
+```
+
+The app opens at **http://localhost:8501** with:
+- 💬 **Streaming chat** — tokens appear live as Ollama generates
+- 📚 **Source expanders** — see exactly which SEC/CFPB/Fed chunks grounded each answer
+- ⏱️ **Latency badges** — retrieval ms + generation s + total s per response
+- ⚙️ **Sidebar** — model selector, top-k slider, corpus stats, live eval KPI badges, query log viewer
 
 ---
 
@@ -165,6 +209,7 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
 | `v0.1.0-ingestion` | Phase 1 complete — chunker, embedder, pipeline, LanceDB retriever, tests |
 | `v0.2.0-retrieval` | Phase 2 complete — Ollama LLM wrapper, CLI chat loop, query logger, tests |
 | `v0.3.0-eval` | Phase 3 complete — Golden Q&A benchmark (25 questions), retrieval metrics, LLM judge, eval runner, 111 tests |
+| `v0.5.0-polish` | Phase 5 complete — Streamlit streaming chat UI, source citation expanders, sidebar eval badges |
 
 ---
 

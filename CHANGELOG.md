@@ -38,8 +38,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ---
 
+## [v0.3.0-eval] — Phase 3 target
 ## [v0.3.0-eval] — 2026-09-22
 
+### Planned
+- Golden Q&A set (20–30 pairs)
+- Precision@k, Recall@k, MRR, Hit Rate metrics
+- Ollama LLM-as-judge (answer relevance + faithfulness)
+- `eval/runner.py` producing `eval_report.json`
 ### Added
 - Golden Q&A evaluation dataset with 25 hand-crafted test questions across SEC, CFPB, and Federal Reserve corpora (`eval/golden_set.json`)
 - Retrieval evaluation metrics: Precision@k, Recall@k, Mean Reciprocal Rank (MRR), and Hit Rate using keyword-based relevance matching (`eval/metrics.py`)
@@ -60,10 +66,17 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 ---
 
 ## [v0.5.0-polish] — Phase 5 target
+## [v0.5.0-polish] — 2026-09-23
 
 ### Planned
 - Streamlit UI (`app.py`)
 - Full README case study
 - Complete pytest suite
+### Added
+- Streamlit chat UI (`app.py`) with persistent session-state conversation history, live streaming token output via `st.write_stream()`, collapsible source citation expanders, and retrieval/generation/total latency badges per response
+- Streaming LLM variant `stream_answer()` in `generation/llm.py` using Ollama `stream=True` — yields token strings as they arrive; consumed by Streamlit without blocking
+- Sidebar controls: Ollama model selector (auto-populated from `ollama list`), top-k retrieval slider (1–10), source citation toggle, corpus chunk count, eval KPI metric badges (Precision@3 / Recall@5 / MRR / Hit Rate) from `eval_report.json`, clear-chat button, and last-5 query log viewer
+- Empty-state prompt suggestion buttons for first-time users
+- `streamlit>=1.35` added to `requirements.txt`
 
 ---
