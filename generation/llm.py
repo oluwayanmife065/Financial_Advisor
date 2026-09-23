@@ -122,3 +122,67 @@ def generate_answer(
             f"at {settings.ollama_base_url}: {exc}"
         ) from exc
 
+
+def stream_answer(
+    query: str,
+    chunks: list[Chunk],
+    model: str | None = None,
+    temperature: float = 0.1,
+):
+    """
+    Stream an answer token-by-token from Ollama for the given query and context.
+
+    This is the streaming counterpart to generate_answer(). Instead of blocking
+    until the full response is ready, it yields string tokens as they arrive from
+    the Ollama API. Designed for use with Streamlit's st.write_stream().
+
+    Args:
+        query: User's question string.
+        chunks: List of retrieved Chunk objects to ground the answer.
+        model: Optional model name override. Defaults to settings.ollama_model.
+        temperature: Sampling temperature. Defaults to 0.1.
+
+    Yields:
+        str: Individual token strings from the model response stream.
+
+    Raises:
+        RuntimeError: If Ollama is unreachable or the stream fails.
+
+    Example:
+        # In Streamlit:
+        with st.chat_message("assistant"):
+            answer = st.write_stream(stream_answer(query, chunks))
+    """
+    selected_model = model or settings.ollama_model
+    user_content = build_user_message(query, chunks)
+
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": user_content},
+    ]
+
+    try:
+        client = ollama.Client(host=settings.ollama_base_url)
+        stream = client.chat(
+            model=selected_model,
+            messages=messages,
+            options={"temperature": temperature},
+            stream=True,
+        )
+        for chunk_resp in stream:
+            # Each streamed chunk has message.content with the next token(s)
+            if hasattr(chunk_resp, "message") and hasattr(chunk_resp.message, "content"):
+                token = chunk_resp.message.content
+            elif isinstance(chunk_resp, dict):
+                token = chunk_resp.get("message", {}).get("content", "")
+            else:
+                token = ""
+            if token:
+                yield token
+
+    except Exception as exc:
+        raise RuntimeError(
+            f"Failed to stream answer with Ollama model '{selected_model}' "
+            f"at {settings.ollama_base_url}: {exc}"
+        ) from exc
+
