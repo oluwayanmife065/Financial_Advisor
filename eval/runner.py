@@ -45,6 +45,7 @@ from eval.metrics import (
 from eval.llm_judge import score_relevance, score_faithfulness
 from ingestion.embedder import embed_query
 from retrieval import lancedb_retriever
+from retrieval import pinecone_retriever
 from generation.llm import generate_answer
 
 
@@ -516,6 +517,7 @@ def main():
     parser.add_argument("-k", "--top-k", type=int, default=5, help="Number of chunks to retrieve (default: 5)")
     parser.add_argument("--limit", type=int, default=None, help="Limit evaluation to first N questions (for testing)")
     parser.add_argument("--retriever", default="lancedb", choices=["lancedb", "pinecone"], help="Retriever to evaluate")
+    parser.add_argument("--compare", action="store_true", help="Run both LanceDB and Pinecone and print a side-by-side comparison table")
     parser.add_argument("--no-judge", action="store_true", help="Skip LLM-as-a-judge scoring (retrieval metrics only)")
     parser.add_argument("--judge-model", default=None, help="OpenAI model override for the judge (default: from config)")
     parser.add_argument("--model", default=None, help="Ollama model override for generation")
@@ -525,6 +527,111 @@ def main():
     if args.model:
         settings.ollama_model = args.model
 
+    # ── Build retriever callables ──────────────────────────────────────────────
+    def make_lancedb_retriever():
+        def _fn(q: str, k: int):
+            return lancedb_retriever.search(embed_query(q), k=k)
+        return _fn
+
+    def make_pinecone_retriever():
+        def _fn(q: str, k: int):
+            return pinecone_retriever.search(embed_query(q), k=k)
+        return _fn
+
+    # ── Side-by-side comparison mode ──────────────────────────────────────────
+    if args.compare:
+        stem = Path(args.output).stem
+        parent = Path(args.output).parent
+        suffix = Path(args.output).suffix
+
+        lancedb_output = str(parent / f"{stem}_lancedb{suffix}")
+        pinecone_output = str(parent / f"{stem}_pinecone{suffix}")
+
+        print("\n" + "=" * 70)
+        print("  ⚡ COMPARISON MODE — running LanceDB then Pinecone")
+        print("=" * 70)
+
+        print("\n── 1/2  LanceDB ─────────────────────────────────────")
+        lance_report = run_eval(
+            golden_set_path=args.golden_set,
+            output_path=lancedb_output,
+            k=args.top_k,
+            limit=args.limit,
+            judge_enabled=not args.no_judge,
+            judge_model=args.judge_model,
+            retriever_fn=make_lancedb_retriever(),
+            retriever_name="lancedb",
+        )
+
+        print("\n── 2/2  Pinecone ────────────────────────────────────")
+        pine_report = run_eval(
+            golden_set_path=args.golden_set,
+            output_path=pinecone_output,
+            k=args.top_k,
+            limit=args.limit,
+            judge_enabled=not args.no_judge,
+            judge_model=args.judge_model,
+            retriever_fn=make_pinecone_retriever(),
+            retriever_name="pinecone",
+        )
+
+        # ── Comparison table ──────────────────────────────────────────────────
+        lance_agg = lance_report["aggregate"]["summary_metrics"]
+        pine_agg = pine_report["aggregate"]["summary_metrics"]
+        lance_lat = lance_report["aggregate"]["latency"]
+        pine_lat = pine_report["aggregate"]["latency"]
+
+        print("\n" + "=" * 80)
+        print("  📊 SIDE-BY-SIDE COMPARISON: LanceDB vs Pinecone")
+        print("=" * 80)
+        print(f"{'Metric':<28} {'LanceDB':>10} {'Pinecone':>10} {'Δ':>10}")
+        print("-" * 80)
+
+        for label, key in [
+            ("Precision@3",         "precision_at_3"),
+            ("Recall@5",            "recall_at_5"),
+            ("MRR",                 "mrr"),
+            ("Hit Rate",            "hit_rate"),
+            ("Answer Relevance",    "answer_relevance"),
+            ("Context Faithfulness","faithfulness"),
+        ]:
+            l_val = lance_agg.get(key, {}).get("score")
+            p_val = pine_agg.get(key, {}).get("score")
+            if l_val is None and p_val is None:
+                continue
+            l_str = f"{l_val:.4f}" if l_val is not None else "N/A"
+            p_str = f"{p_val:.4f}" if p_val is not None else "N/A"
+            if l_val is not None and p_val is not None:
+                delta = p_val - l_val
+                sign = "+" if delta >= 0 else ""
+                d_str = f"{sign}{delta:+.4f}"
+            else:
+                d_str = "N/A"
+            print(f"{label:<28} {l_str:>10} {p_str:>10} {d_str:>10}")
+
+        print("-" * 80)
+
+        # Latency rows
+        for label, l_ms, p_ms in [
+            ("Retrieval p50 (ms)", lance_lat["retrieval_ms"]["p50"], pine_lat["retrieval_ms"]["p50"]),
+            ("Retrieval p95 (ms)", lance_lat["retrieval_ms"]["p95"], pine_lat["retrieval_ms"]["p95"]),
+        ]:
+            delta = p_ms - l_ms
+            sign = "+" if delta >= 0 else ""
+            print(f"{label:<28} {l_ms:>10.1f} {p_ms:>10.1f} {sign}{delta:>+9.1f}")
+
+        print("=" * 80)
+        print(f"\n💾 Reports saved:")
+        print(f"   LanceDB  → {lancedb_output}")
+        print(f"   Pinecone → {pinecone_output}")
+        return
+
+    # ── Single-retriever mode ─────────────────────────────────────────────────
+    if args.retriever == "pinecone":
+        retriever_fn = make_pinecone_retriever()
+    else:
+        retriever_fn = make_lancedb_retriever()
+
     run_eval(
         golden_set_path=args.golden_set,
         output_path=args.output,
@@ -532,6 +639,7 @@ def main():
         limit=args.limit,
         judge_enabled=not args.no_judge,
         judge_model=args.judge_model,
+        retriever_fn=retriever_fn,
         retriever_name=args.retriever,
     )
 

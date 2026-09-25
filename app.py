@@ -28,7 +28,7 @@ if str(_PROJECT_ROOT) not in sys.path:
 
 from config import settings
 from ingestion.embedder import embed_query
-from retrieval.lancedb_retriever import search, count
+from retrieval import lancedb_retriever, pinecone_retriever
 from generation.llm import stream_answer
 from query_logging.query_logger import log_query
 
@@ -113,12 +113,12 @@ def _init_session_state():
 # Sidebar
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _render_sidebar() -> tuple[str, int, bool]:
+def _render_sidebar() -> tuple[str, int, bool, str]:
     """
     Render the sidebar and return user-selected controls.
 
     Returns:
-        Tuple of (selected_model, top_k, show_sources).
+        Tuple of (selected_model, top_k, show_sources, selected_retriever).
     """
     with st.sidebar:
         st.title("⚙️ Settings")
@@ -132,12 +132,22 @@ def _render_sidebar() -> tuple[str, int, bool]:
             help="Ollama models available locally. Pull more with `ollama pull <name>`.",
         )
 
+        # Retriever selector
+        retriever_options = ["Pinecone (Cloud)", "LanceDB (Local)"]
+        default_idx = 0 if bool(settings.pinecone_api_key) else 1
+        selected_retriever = st.radio(
+            "Vector Database",
+            options=retriever_options,
+            index=default_idx,
+            help="Choose between Pinecone (AWS serverless cloud) or LanceDB (local embedded vector store).",
+        )
+
         # Retrieval top-k
         top_k = st.slider(
             "Retrieved Chunks (top-k)",
             min_value=1, max_value=10,
             value=settings.top_k,
-            help="How many context chunks to retrieve from LanceDB per query.",
+            help=f"How many context chunks to retrieve from {selected_retriever.split()[0]} per query.",
         )
 
         # Source citation toggle
@@ -151,18 +161,28 @@ def _render_sidebar() -> tuple[str, int, bool]:
 
         # ── Corpus stats ──
         st.subheader("🗄️ Vector Store")
-        chunk_count = count()
+        is_pinecone = "Pinecone" in selected_retriever
+        try:
+            chunk_count = pinecone_retriever.count() if is_pinecone else lancedb_retriever.count()
+        except Exception:
+            chunk_count = 0
+
         if chunk_count > 0:
-            st.metric("Chunks indexed", f"{chunk_count:,}", help="LanceDB (local)")
+            db_label = "Pinecone (Cloud AWS)" if is_pinecone else "LanceDB (Local)"
+            st.metric("Chunks indexed", f"{chunk_count:,}", help=db_label)
         else:
+            target_flag = "--target pinecone --from-lancedb" if is_pinecone else "--target lancedb"
             st.warning(
-                "LanceDB is empty.\n\n"
+                f"{selected_retriever.split()[0]} is empty.\n\n"
                 "Run the ingestion pipeline first:\n"
-                "```\npython3.11 -m ingestion.pipeline\n```"
+                f"```\npython3.11 -m ingestion.pipeline {target_flag}\n```"
             )
 
         st.caption(f"Embedder: `{settings.embedding_model}`")
-        st.caption(f"DB path: `{settings.lancedb_path}`")
+        if is_pinecone:
+            st.caption(f"Pinecone: `{settings.pinecone_index_name}` ({settings.pinecone_cloud}/{settings.pinecone_region})")
+        else:
+            st.caption(f"DB path: `{settings.lancedb_path}`")
 
         st.divider()
 
@@ -257,10 +277,12 @@ def _render_latency_badges(latency: dict):
     r_ms = latency.get("retrieval_ms", 0)
     g_ms = latency.get("generation_ms", 0)
     t_ms = latency.get("total_ms", 0)
+    retriever_name = latency.get("retriever", "").upper()
+    retriever_tag = f" · `{retriever_name}`" if retriever_name else ""
     st.caption(
         f"⏱️ Retrieval **{r_ms:.0f} ms** · "
         f"Generation **{g_ms / 1000:.2f} s** · "
-        f"Total **{t_ms / 1000:.2f} s**"
+        f"Total **{t_ms / 1000:.2f} s**{retriever_tag}"
     )
 
 
@@ -287,15 +309,16 @@ def _handle_query(
     model: str,
     top_k: int,
     show_sources: bool,
+    retriever_choice: str = "Pinecone (Cloud)",
 ):
     """
     Run the full RAG pipeline for a user query and append results to session state.
 
     Pipeline:
-      1. embed_query()        → 384-dim vector
-      2. lancedb search()     → top-k Chunks
-      3. stream_answer()      → token generator → st.write_stream()
-      4. log_query()          → append to query_log.jsonl
+      1. embed_query()                 → 384-dim vector
+      2. Pinecone or LanceDB search()  → top-k Chunks
+      3. stream_answer()               → token generator → st.write_stream()
+      4. log_query()                   → append to query_log.jsonl
       5. Append to session state (user + assistant turns)
     """
     # ── 1. Append user message to chat ──
@@ -303,14 +326,20 @@ def _handle_query(
     with st.chat_message("user"):
         st.markdown(query)
 
+    is_pinecone = "Pinecone" in retriever_choice
+    retriever_name = "pinecone" if is_pinecone else "lancedb"
+
     # ── 2. Retrieval ──
-    with st.spinner("🔍 Searching knowledge base…"):
+    with st.spinner(f"🔍 Searching {retriever_name.title()} knowledge base…"):
         retrieval_start = time.perf_counter()
         try:
             query_vector = embed_query(query)
-            chunks = search(query_vector, k=top_k)
-        except RuntimeError as exc:
-            st.error(f"❌ Retrieval failed: {exc}")
+            if is_pinecone:
+                chunks = pinecone_retriever.search(query_vector, k=top_k)
+            else:
+                chunks = lancedb_retriever.search(query_vector, k=top_k)
+        except Exception as exc:
+            st.error(f"❌ Retrieval failed via {retriever_name}: {exc}")
             return
         retrieval_ms = (time.perf_counter() - retrieval_start) * 1000
 
@@ -334,6 +363,7 @@ def _handle_query(
             "retrieval_ms": round(retrieval_ms, 1),
             "generation_ms": round(generation_ms, 1),
             "total_ms": round(total_ms, 1),
+            "retriever": retriever_name,
         }
 
         _render_latency_badges(latency)
@@ -349,7 +379,7 @@ def _handle_query(
             retrieval_latency_ms=retrieval_ms,
             generation_latency_ms=generation_ms,
             model=model,
-            retriever_name="lancedb",
+            retriever_name=retriever_name,
         )
     except Exception:
         pass  # Never let logging crash the UI
@@ -383,7 +413,7 @@ def main():
     st.divider()
 
     # ── Sidebar ──
-    selected_model, top_k, show_sources = _render_sidebar()
+    selected_model, top_k, show_sources, selected_retriever = _render_sidebar()
 
     # ── Render existing conversation ──
     _render_chat_history(show_sources)
@@ -401,12 +431,24 @@ def main():
         cols = st.columns(2)
         for i, q in enumerate(example_questions):
             if cols[i % 2].button(q, use_container_width=True, key=f"suggestion_{i}"):
-                _handle_query(q, model=selected_model, top_k=top_k, show_sources=show_sources)
+                _handle_query(
+                    q,
+                    model=selected_model,
+                    top_k=top_k,
+                    show_sources=show_sources,
+                    retriever_choice=selected_retriever,
+                )
                 st.rerun()
 
     # ── Chat input ──
     if prompt := st.chat_input("Ask a personal finance question…"):
-        _handle_query(prompt, model=selected_model, top_k=top_k, show_sources=show_sources)
+        _handle_query(
+            prompt,
+            model=selected_model,
+            top_k=top_k,
+            show_sources=show_sources,
+            retriever_choice=selected_retriever,
+        )
 
 
 if __name__ == "__main__":

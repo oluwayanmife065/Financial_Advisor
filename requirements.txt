@@ -13,6 +13,8 @@ pytest>=8.0                      # Test framework
 
 # ── Future phases ──
 # pinecone-client>=3.0           # Cloud vector store (Phase 4)
+# pinecone-client>=3.0           # [old] use 'pinecone' package instead
+pinecone>=3.0                    # Cloud vector store (Phase 4)
 # streamlit>=1.35                # UI (Phase 5)
 streamlit>=1.35                 # UI (Phase 5)
 

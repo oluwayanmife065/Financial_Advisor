@@ -77,9 +77,18 @@ class Settings(BaseSettings):
         default="fin-rag",
         description="Name of the Pinecone index to read from and write to."
     )
+    pinecone_cloud: str = Field(
+        default="aws",
+        description="Cloud provider for the serverless Pinecone index (e.g. 'aws', 'gcp')."
+    )
+    pinecone_region: str = Field(
+        default="us-east-1",
+        description="Region for the serverless Pinecone index (e.g. 'us-east-1')."
+    )
+    # Legacy alias kept for backwards compatibility — not used by the serverless SDK
     pinecone_environment: str = Field(
         default="us-east-1-aws",
-        description="Pinecone cloud region/environment."
+        description="[Legacy] Pinecone pod environment. Use pinecone_cloud + pinecone_region instead."
     )
 
     # --- Logging ---

@@ -56,12 +56,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ---
 
-## [v0.4.0-pinecone] — Phase 4 target
+## [v0.4.0-pinecone] — 2026-09-24
 
-### Planned
-- Pinecone retriever implementing `BaseRetriever`
-- `--retriever [lancedb|pinecone]` CLI flag
-- Side-by-side benchmark table
+### Added
+- `retrieval/base.py` — abstract `BaseRetriever` ABC defining the `write / search / count` interface both retrievers must satisfy
+- `retrieval/pinecone_retriever.py` — full Pinecone serverless implementation using `pinecone>=3.0` SDK: on-demand index creation (`ServerlessSpec`), batch upserts (100/req), metadata-backed `Chunk` reconstruction, cosine-similarity search, mirroring the `lancedb_retriever` module API exactly
+- `ingestion/pipeline.py` — `--target [lancedb|pinecone|both]` CLI flag and `--from-lancedb` fast-path that reads existing embedded chunks from LanceDB and upserts them to Pinecone (no re-parse, no re-embed)
+- `eval/runner.py` — `--retriever pinecone` now routes to the real Pinecone retriever; new `--compare` flag runs both retrievers sequentially and prints a side-by-side benchmark table with Δ column, saving two separate JSON reports (`eval_report_lancedb.json` / `eval_report_pinecone.json`)
+- `config.py` — added `pinecone_cloud` and `pinecone_region` fields for the serverless SDK; legacy `pinecone_environment` kept for backwards compatibility
+- `requirements.txt` — `pinecone>=3.0` activated (was commented out)
+- `tests/test_retrievers.py` — 14 mock-based unit tests covering `write` (batch splitting, index creation, metadata shape, delete-before-upsert, missing-embedding error), `search` (chunk reconstruction, empty results, missing index, default top_k, include_metadata flag), `count`, and `_get_client` error — no live API calls required
 
 ---
 
