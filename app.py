@@ -247,7 +247,7 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
             else:
                 st.caption("No queries logged yet.")
 
-    return selected_model, top_k, show_sources
+    return selected_model, top_k, show_sources, selected_retriever
 
 
 # ─────────────────────────────────────────────────────────────────────────────
