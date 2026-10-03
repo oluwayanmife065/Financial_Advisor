@@ -10,6 +10,30 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ---
 
+## [v0.6.0-hosting] — 2026-10-02
+
+### Added
+- **Groq cloud LLM backend** (`generation/llm.py`) — dual-backend routing via `LLM_BACKEND` env var
+  - `_groq_generate` / `_groq_stream`: Groq SDK, OpenAI-compatible streaming API
+  - `_ollama_generate` / `_ollama_stream`: original Ollama paths preserved unchanged
+  - Public API (`generate_answer`, `stream_answer`) is backend-agnostic — zero changes to callers
+- **`config.py`** — added `llm_backend`, `groq_api_key`, `groq_model` settings fields
+- **`app.py`** — backend-aware model selector in sidebar; Groq Cloud / Ollama Local badge
+- **`Dockerfile`** — multi-stage build (builder + slim runtime) targeting port 7860 for HF Spaces
+- **`.dockerignore`** — excludes `.env`, logs, cache, and git history from the image
+- **`README_HF.md`** — Hugging Face Spaces config with YAML frontmatter (`sdk: docker`, `app_port: 7860`)
+- **`requirements.txt`** — `groq>=0.9` added; stale duplicate comments removed
+
+### Changed
+- Default `LLM_BACKEND` is now `groq` (cloud); set to `ollama` in local `.env` to restore local inference
+- `.env.example` rewritten to document all secrets: `GROQ_API_KEY`, `LLM_BACKEND`, `PINECONE_API_KEY`
+
+### Deployment
+- Target: **Streamlit Community Cloud** (share.streamlit.io) — free, connects to GitHub, no Docker required
+- Dockerfile retained in repo as production-readiness signal for portfolio / future cloud deployments
+
+---
+
 ## [v0.1.0-ingestion] — 2026-09-17
 
 ### Added
