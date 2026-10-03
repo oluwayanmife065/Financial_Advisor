@@ -28,12 +28,18 @@ if str(_PROJECT_ROOT) not in sys.path:
 
 from config import settings
 
-# In Streamlit Cloud, inject st.secrets into settings if present
-if hasattr(st, "secrets"):
-    for key, val in st.secrets.items():
-        attr_name = key.lower()
-        if hasattr(settings, attr_name):
-            setattr(settings, attr_name, val)
+# In Streamlit Cloud, inject st.secrets into environment & settings if present
+try:
+    if hasattr(st, "secrets") and st.secrets:
+        import os
+        for key, val in st.secrets.items():
+            os.environ[key.upper()] = str(val)
+            os.environ[key.lower()] = str(val)
+            attr_name = key.lower()
+            if hasattr(settings, attr_name):
+                setattr(settings, attr_name, val)
+except Exception:
+    pass
 
 from ingestion.embedder import embed_query
 from retrieval import lancedb_retriever, pinecone_retriever
@@ -151,21 +157,31 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
     with st.sidebar:
         st.title("⚙️ Settings")
 
-        # Backend indicator
-        backend = settings.llm_backend.lower()
-        if backend == "groq":
-            st.success("⚡ LLM Backend: **Groq Cloud (Qwen)**", icon="☁️")
+        # Backend selector
+        backend_options = ["Groq Cloud (Hosted)", "Ollama (Local)"]
+        default_backend_idx = 0 if (settings.llm_backend.lower() == "groq" or bool(settings.groq_api_key)) else 1
+        selected_backend_choice = st.radio(
+            "LLM Backend",
+            options=backend_options,
+            index=default_backend_idx,
+            help="Choose between Groq Cloud (fast hosted inference) or Ollama (local dev server).",
+        )
+        is_groq = "Groq" in selected_backend_choice
+        settings.llm_backend = "groq" if is_groq else "ollama"
+
+        if is_groq:
+            st.success("⚡ Backend: **Groq Cloud**", icon="☁️")
         else:
-            st.info("🖥️ LLM Backend: **Ollama (Local)**", icon="💻")
+            st.info("🖥️ Backend: **Ollama Local**", icon="💻")
 
         # Model selector
         available_models = _get_available_models()
-        model_label = "Groq Model" if backend == "groq" else "Ollama Model"
+        model_label = "Groq Model" if is_groq else "Ollama Model"
         selected_model = st.selectbox(
             model_label,
             options=available_models,
             index=0,
-            help="Fast cloud inference" if backend == "groq" else "Local Ollama model",
+            help="Fast cloud inference" if is_groq else "Local Ollama model",
         )
 
         # Retriever selector
