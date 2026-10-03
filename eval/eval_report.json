@@ -1,0 +1,223 @@
+{
+  "timestamp_start": "2026-10-03T05:05:45.252559+00:00",
+  "timestamp_end": "2026-10-03T05:05:51.580794+00:00",
+  "duration_seconds": 6.33,
+  "configuration": {
+    "retriever": "lancedb",
+    "top_k": 5,
+    "ollama_model": "qwen2.5:7b",
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "judge_enabled": false,
+    "judge_model": null,
+    "golden_set_path": "./eval/golden_set.json"
+  },
+  "aggregate": {
+    "total_evaluated": 3,
+    "summary_metrics": {
+      "precision_at_3": {
+        "score": 0.6667,
+        "target": 0.7,
+        "passed": false
+      },
+      "recall_at_5": {
+        "score": 1.0,
+        "target": 0.8,
+        "passed": true
+      },
+      "mrr": {
+        "score": 0.8333,
+        "target": 0.75,
+        "passed": true
+      },
+      "hit_rate": {
+        "score": 1.0,
+        "target": 0.85,
+        "passed": true
+      }
+    },
+    "latency": {
+      "retrieval_ms": {
+        "p50": 74.58,
+        "p95": 2100.79,
+        "mean": 816.08
+      },
+      "generation_ms": {
+        "p50": 987.54,
+        "p95": 2060.49,
+        "mean": 1292.68
+      },
+      "total_ms": {
+        "p50": 2227.44,
+        "p95": 3204.86,
+        "mean": 2108.76
+      }
+    }
+  },
+  "per_query_results": [
+    {
+      "id": "sec_01",
+      "source": "SEC/Investor.gov",
+      "category": "Debt vs Investing",
+      "question": "Why does the SEC advise paying off high-interest credit card debt before investing?",
+      "reference_answer": "Credit cards charge high interest rates if a balance is carried month-to-month, significantly increasing the purchase cost of goods and stretching debt out for years. According to the SEC Office of Investor Education and Assistance, no investment offers guaranteed returns high enough to reliably outweigh the high interest rates paid on credit card debt, so paying down high-interest debt first is the safest and highest-return financial move.",
+      "generated_answer": "According to the SEC Office of Investor Education and Assistance, the primary reason to pay off high-interest credit card debt before investing is that **no investment will give you guaranteed returns that outweigh the high interest rate you pay with a credit card or other high-interest debt.**\n\nThe SEC explains that credit cards charge high interest rates if you cannot pay off your balance at the end of the month. This interest increases the price you pay for items and can stretch your debt over many years. Therefore, the advice is to pay down any credit card debt and live within your means to improve your chances of achieving financial security.\n\n**Source:** SEC/Investor.gov, Section: page_1, Tip #1 \"Be smart about credit card debt.\"",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "6dcee35b4ec7e996_0000",
+          "source": "SEC/Investor.gov",
+          "section": "page_1",
+          "preview": "SEC OFFICE OF INVESTOR EDUCATION AND ASSISTANCE PUBLICATION You can improve your chances to achieve financial security by controlling credit  card deb..."
+        },
+        {
+          "chunk_id": "8072acee04fb5c11_0000",
+          "source": "SEC/Investor.gov",
+          "section": "page_4",
+          "preview": "Find tools and resources that can help you build wealth and avoid  scams on Investor.gov. 4  |  Investor.gov PAID FOR BY THE SEC PUB # 193 (3/2026) Th..."
+        },
+        {
+          "chunk_id": "81d1422761884145_0001",
+          "source": "CFPB",
+          "section": "page_141",
+          "preview": "u must pay the accruing interest during the deferment or it will build up.  140  YOUR MONEY, YOUR GOALS TOOLKIT"
+        },
+        {
+          "chunk_id": "641ddbe033730fd6_0000",
+          "source": "Federal Reserve",
+          "section": "page_21",
+          "preview": "19  Federal Reserve Bank of Dallas \t Building Wealth\t Federal Reserve Bank of Dallas \t Building Wealth\t Doers, like Sonya, are smart about using credi..."
+        },
+        {
+          "chunk_id": "af071ea3dc933421_0000",
+          "source": "Federal Reserve",
+          "section": "page_20",
+          "preview": "Taking on Debt  A big part of building wealth is making wise choices about credit and  debt. Keep in mind your bottom line, your net worth, when makin..."
+        }
+      ],
+      "retrieval_latency_ms": 2325.92,
+      "generation_latency_ms": 987.54,
+      "total_latency_ms": 3313.46,
+      "metrics": {
+        "precision_at_3": 0.3333,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "sec_02",
+      "source": "SEC/Investor.gov",
+      "category": "Wealth Building",
+      "question": "What formula does the SEC highlight for building wealth over time, and what two action steps put it into practice?",
+      "reference_answer": "The SEC highlights the formula: REGULAR INVESTMENTS + TIME = WEALTH, noting that starting earlier provides more time to build wealth through compound growth. To put this formula into action, the SEC recommends two steps: (1) start an emergency fund in a savings account at a bank or credit union with automated deposits each pay period to avoid debt during unexpected expenses, and (2) invest regularly over time (such as 5% to 10% of income) throughout one's entire career.",
+      "generated_answer": "According to the SEC/Investor.gov document (Chunk [4]), the formula highlighted for building wealth is:\n\n**REGULAR INVESTMENTS + TIME = WEALTH**\n\nThe two action steps to put this formula into practice are:\n\n1.  **Start an emergency fund:** Open a savings account at a bank or credit union and automatically deposit a certain amount of money directly into that account each pay period. This helps avoid debt in case of unexpected expenses.\n2.  **Invest regularly over time:** Contribute a fixed percentage of income (e.g., 5% or 10%) or a fixed affordable amount to investments each pay period and continue doing so throughout your career. The document notes that while investing carries more risk than keeping money in the bank, it offers a better chance to create wealth over time.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "1ee2177d156c8479_0000",
+          "source": "Federal Reserve",
+          "section": "page_2",
+          "preview": "KEYS TO FINANCIAL SUCCESS     2  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
+        },
+        {
+          "chunk_id": "e546acf56961eded_0000",
+          "source": "Federal Reserve",
+          "section": "page_1",
+          "preview": "Unit 8  Investing  Lesson 8A:  Managing Risk\u2014Time and Diversification  Rule 8: Grow your wealth safely.  Investing requires three simple steps: (i) sa..."
+        },
+        {
+          "chunk_id": "1c764e67ae769e4f_0000",
+          "source": "Federal Reserve",
+          "section": "page_1",
+          "preview": "Unit 8  Investing  Lesson 8B:  Evaluating Investment Options  Rule 8: Grow your wealth safely.  Investing requires three simple steps: (i) saving a po..."
+        },
+        {
+          "chunk_id": "57deab286077a755_0000",
+          "source": "SEC/Investor.gov",
+          "section": "page_2",
+          "preview": "3.\tStart saving and investing regularly. There is a powerful formula when it comes to building wealth: REGULAR  INVESTMENTS + TIME \uf0da WEALTH. The earli..."
+        },
+        {
+          "chunk_id": "be4fc2af61b44fb6_0000",
+          "source": "Federal Reserve",
+          "section": "page_4",
+          "preview": "KEYS TO FINANCIAL SUCCESS     4  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
+        }
+      ],
+      "retrieval_latency_ms": 74.58,
+      "generation_latency_ms": 710.8,
+      "total_latency_ms": 785.38,
+      "metrics": {
+        "precision_at_3": 0.6667,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "sec_03",
+      "source": "SEC/Investor.gov",
+      "category": "Retirement",
+      "question": "Why does the SEC recommend beginning an investing journey with workplace 401(k) plans and IRAs?",
+      "reference_answer": "The SEC recommends starting with a workplace 401(k) plan because employee contributions provide an upfront tax break and employers often match a portion of contributions, which constitutes free money. Additionally, an Individual Retirement Account (IRA) can be established on one's own for extra tax advantages. The SEC advises automating contributions to both accounts so saving and investing happen consistently every pay period.",
+      "generated_answer": "Based on the provided context chunks, the documents do not explicitly state that the SEC recommends *beginning* an investing journey specifically with workplace 401(k) plans and IRAs.\n\nHowever, the provided texts do highlight the following benefits and characteristics of these specific investment vehicles:\n\n*   **Tax Advantages:** According to the Federal Reserve (Chunk [2]), money in a 401(k) is tax-deferred as long as it remains in the plan. The text notes that \"Take full advantage of the retirement savings programs your company offers\u2014and understand thoroughly how they work. They are great ways to build wealth.\" It also explains that tax-deferred investments can effectively reduce the cost of investing by saving on taxes (e.g., a $3,000 investment at a 15% tax rate effectively costs only $2,550).\n*   **Diversification and Risk Management:** According to the SEC/Investor.gov (Chunk [1]), when choosing an investment option within a 401(k) or IRA, selecting a diversified fund can reduce risk. This is because if one sector loses value, other parts of the market may improve returns.\n*   **Automatic Adjustment:** The SEC/Investor.gov (Chunk [1]) mentions \"target date funds\" as a popular option within these plans, which automatically adjust the investment mix from aggressive to conservative as you approach retirement.\n\nWhile the Federal Reserve (Chunk [2]) encourages taking full advantage of these programs as \"great ways to build wealth,\" the specific recommendation to *start* with them is not explicitly detailed in the provided text. The SEC/Investor.gov text focuses more on how to choose investments *within* these plans and how to protect against scams, rather than prescribing them as the mandatory starting point for all investors.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "97e71e0e220c97ed_0000",
+          "source": "SEC/Investor.gov",
+          "section": "page_3",
+          "preview": "When choosing an investment option within your 401(k), IRA or any other  investment, a diversified fund that spreads your investment across many  comp..."
+        },
+        {
+          "chunk_id": "57bcfcf139cc6088_0000",
+          "source": "Federal Reserve",
+          "section": "page_15",
+          "preview": "As long as the money remains in your 401(k), it\u2019s tax-  deferred. Withdrawals for any purpose are taxable, and  withdrawals before age 59\u00bd are subject..."
+        },
+        {
+          "chunk_id": "8072acee04fb5c11_0000",
+          "source": "SEC/Investor.gov",
+          "section": "page_4",
+          "preview": "Find tools and resources that can help you build wealth and avoid  scams on Investor.gov. 4  |  Investor.gov PAID FOR BY THE SEC PUB # 193 (3/2026) Th..."
+        },
+        {
+          "chunk_id": "be4fc2af61b44fb6_0000",
+          "source": "Federal Reserve",
+          "section": "page_4",
+          "preview": "KEYS TO FINANCIAL SUCCESS     4  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
+        },
+        {
+          "chunk_id": "ed3b54c6971652c3_0000",
+          "source": "Federal Reserve",
+          "section": "page_5",
+          "preview": "KEYS TO FINANCIAL SUCCESS     5  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
+        }
+      ],
+      "retrieval_latency_ms": 47.73,
+      "generation_latency_ms": 2179.71,
+      "total_latency_ms": 2227.44,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    }
+  ]
+}

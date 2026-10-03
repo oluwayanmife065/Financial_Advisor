@@ -65,7 +65,7 @@ logs/
 !eval/golden_set.json
 
 # ── Eval outputs (generated, not source) ───────────────────────
-eval/eval_report.json
+# eval/eval_report.json
 eval/eval_report_*.json
 eval/eval_results_*.json
 

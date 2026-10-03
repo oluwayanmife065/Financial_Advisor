@@ -107,14 +107,19 @@ def _read_report_cached(path_str: str, mtime: float) -> dict | None:
 
 
 def _load_eval_report() -> dict | None:
-    """Load eval_report.json if it exists, automatically refreshing when modified."""
-    report_path = Path(settings.eval_report_path)
-    if report_path.exists():
-        try:
-            mtime = report_path.stat().st_mtime
-            return _read_report_cached(str(report_path), mtime)
-        except Exception:
-            return None
+    """Load latest eval report, falling back to pinecone/lancedb reports if present."""
+    candidate_paths = [
+        Path(settings.eval_report_path),
+        Path("eval/eval_report_pinecone.json"),
+        Path("eval/eval_report_lancedb.json"),
+    ]
+    for p in candidate_paths:
+        if p.exists():
+            try:
+                mtime = p.stat().st_mtime
+                return _read_report_cached(str(p), mtime)
+            except Exception:
+                continue
     return None
 
 
