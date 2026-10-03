@@ -27,6 +27,14 @@ if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
 from config import settings
+
+# In Streamlit Cloud, inject st.secrets into settings if present
+if hasattr(st, "secrets"):
+    for key, val in st.secrets.items():
+        attr_name = key.lower()
+        if hasattr(settings, attr_name):
+            setattr(settings, attr_name, val)
+
 from ingestion.embedder import embed_query
 from retrieval import lancedb_retriever, pinecone_retriever
 from generation.llm import stream_answer
@@ -372,10 +380,11 @@ def _handle_query(
         try:
             token_stream = stream_answer(query, chunks, model=model)
             answer = st.write_stream(token_stream)
-        except RuntimeError as exc:
+        except Exception as exc:
+            hint = "Check Ollama (local) or your GROQ_API_KEY in Streamlit Secrets." if settings.llm_backend == "groq" else "Is Ollama running? `ollama serve` in a terminal."
             st.error(
                 f"❌ Generation failed: {exc}\n\n"
-                "Is Ollama running? `ollama serve` in a terminal."
+                f"💡 {hint}"
             )
             return
 
