@@ -14,7 +14,6 @@ Features:
 """
 
 import json
-import os
 import subprocess
 import sys
 import time
@@ -46,14 +45,6 @@ from ingestion.embedder import embed_query
 from retrieval import lancedb_retriever, pinecone_retriever
 from generation.llm import stream_answer
 from query_logging.query_logger import log_query
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Environment detection
-# ─────────────────────────────────────────────────────────────────────────────
-
-# Streamlit Cloud always sets STREAMLIT_SHARING_MODE=1. Locally it is unset.
-IS_CLOUD = os.getenv("STREAMLIT_SHARING_MODE") == "1"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -166,28 +157,22 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
     with st.sidebar:
         st.title("⚙️ Settings")
 
-        # Backend selector — Ollama is only available when running locally
-        if IS_CLOUD:
-            # On Streamlit Cloud: always Groq, no toggle shown
-            settings.llm_backend = "groq"
-            is_groq = True
+        # Backend selector
+        backend_options = ["Groq Cloud (Hosted)", "Ollama (Local)"]
+        default_backend_idx = 0 if (settings.llm_backend.lower() == "groq" or bool(settings.groq_api_key)) else 1
+        selected_backend_choice = st.radio(
+            "LLM Backend",
+            options=backend_options,
+            index=default_backend_idx,
+            help="Choose between Groq Cloud (fast hosted inference) or Ollama (local dev server).",
+        )
+        is_groq = "Groq" in selected_backend_choice
+        settings.llm_backend = "groq" if is_groq else "ollama"
+
+        if is_groq:
             st.success("⚡ Backend: **Groq Cloud**", icon="☁️")
         else:
-            backend_options = ["Groq Cloud (Hosted)", "Ollama (Local)"]
-            default_backend_idx = 0 if (settings.llm_backend.lower() == "groq" or bool(settings.groq_api_key)) else 1
-            selected_backend_choice = st.radio(
-                "LLM Backend",
-                options=backend_options,
-                index=default_backend_idx,
-                help="Choose between Groq Cloud (fast hosted inference) or Ollama (local dev server).",
-            )
-            is_groq = "Groq" in selected_backend_choice
-            settings.llm_backend = "groq" if is_groq else "ollama"
-
-            if is_groq:
-                st.success("⚡ Backend: **Groq Cloud**", icon="☁️")
-            else:
-                st.info("🖥️ Backend: **Ollama Local**", icon="💻")
+            st.info("🖥️ Backend: **Ollama Local**", icon="💻")
 
         # Model selector
         available_models = _get_available_models()
@@ -326,10 +311,13 @@ def _render_chat_history(show_sources: bool):
     for msg in st.session_state.messages:
         role = msg["role"]
         with st.chat_message(role):
-            st.markdown(msg["content"])
+            if msg.get("error"):
+                st.error(msg["content"])
+            else:
+                st.markdown(msg["content"])
 
             # Source citations and latency — only on assistant turns
-            if role == "assistant":
+            if role == "assistant" and not msg.get("error"):
                 chunks = msg.get("chunks") or []
                 latency = msg.get("latency") or {}
                 _render_latency_badges(latency)
@@ -418,10 +406,13 @@ def _handle_query(
             answer = st.write_stream(token_stream)
         except Exception as exc:
             hint = "Check Ollama (local) or your GROQ_API_KEY in Streamlit Secrets." if settings.llm_backend == "groq" else "Is Ollama running? `ollama serve` in a terminal."
-            st.error(
-                f"❌ Generation failed: {exc}\n\n"
-                f"💡 {hint}"
-            )
+            error_text = f"Generation failed: {exc}\n\n💡 {hint}"
+            st.error(error_text)
+            st.session_state.messages.append({
+                "role": "assistant",
+                "content": error_text,
+                "error": True,
+            })
             return
 
         generation_ms = (time.perf_counter() - generation_start) * 1000
