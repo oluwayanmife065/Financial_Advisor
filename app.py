@@ -39,13 +39,11 @@ from query_logging.query_logger import log_query
 
 APP_TITLE = "📊 Personal Finance Literacy Assistant"
 APP_SUBTITLE = "Grounded answers from SEC, CFPB, and Federal Reserve documents."
-
-# Models available per backend
 GROQ_MODELS = [
-    "llama-3.1-8b-instant",
-    "llama-3.3-70b-versatile",
-    "mixtral-8x7b-32768",
-    "gemma2-9b-it",
+    "qwen/qwen3.8-27b",
+    "allam-2-7b",
+    "openai/gpt-oss-20b",
+    "openai/gpt-oss-120b",
 ]
 OLLAMA_DEFAULT_MODELS = ["qwen2.5:7b", "llama3.2:3b", "mistral:7b", "gemma3:4b"]
 
@@ -64,14 +62,12 @@ def _get_ollama_models() -> list[str]:
         )
         if result.returncode == 0:
             lines = result.stdout.strip().splitlines()
-            # First line is a header (NAME  ID  SIZE  MODIFIED)
             models = [
                 line.split()[0]
                 for line in lines[1:]
                 if line.strip() and not line.startswith("failed")
             ]
             if models:
-                # Ensure default model appears first
                 if settings.ollama_model in models:
                     models.remove(settings.ollama_model)
                     models.insert(0, settings.ollama_model)
@@ -82,14 +78,8 @@ def _get_ollama_models() -> list[str]:
 
 
 def _get_available_models() -> list[str]:
-    """
-    Return available model names for the active LLM backend.
-
-    - groq:  returns the static GROQ_MODELS list (no API call needed).
-    - ollama: queries the local Ollama server; falls back to OLLAMA_DEFAULT_MODELS.
-    """
+    """Return models depending on backend."""
     if settings.llm_backend.lower() == "groq":
-        # Ensure configured default appears first
         models = list(GROQ_MODELS)
         if settings.groq_model in models:
             models.remove(settings.groq_model)
@@ -151,7 +141,7 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
         # Backend indicator
         backend = settings.llm_backend.lower()
         if backend == "groq":
-            st.success("⚡ LLM Backend: **Groq Cloud**", icon="☁️")
+            st.success("⚡ LLM Backend: **Groq Cloud (Qwen)**", icon="☁️")
         else:
             st.info("🖥️ LLM Backend: **Ollama (Local)**", icon="💻")
 
@@ -162,11 +152,7 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
             model_label,
             options=available_models,
             index=0,
-            help=(
-                "Groq cloud models. Fast free-tier inference."
-                if backend == "groq"
-                else "Ollama models available locally. Pull more with `ollama pull <name>`."
-            ),
+            help="Fast cloud inference" if backend == "groq" else "Local Ollama model",
         )
 
         # Retriever selector

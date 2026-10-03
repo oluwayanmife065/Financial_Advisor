@@ -2,7 +2,7 @@
 LLM Generation Module — supports Groq (cloud) and Ollama (local) backends.
 
 Backend is selected via the LLM_BACKEND environment variable:
-  - "groq"   → Groq cloud API (default for HF Spaces hosting)
+  - "groq"   → Groq cloud API (default for Streamlit Cloud hosting)
   - "ollama" → Local Ollama server (local development)
 
 This module handles:
@@ -27,12 +27,12 @@ CRITICAL INSTRUCTIONS:
 5. Provide educational context only; do not provide personalized financial, legal, or investment advice.
 """
 
-# ── Groq models available on free tier ──
+# ── Groq models available on current key ──
 GROQ_MODELS = [
-    "llama-3.1-8b-instant",
-    "llama-3.3-70b-versatile",
-    "mixtral-8x7b-32768",
-    "gemma2-9b-it",
+    "qwen/qwen3.8-27b",
+    "allam-2-7b",
+    "openai/gpt-oss-20b",
+    "openai/gpt-oss-120b",
 ]
 
 
@@ -108,7 +108,7 @@ def _groq_generate(
 
     if not settings.groq_api_key:
         raise RuntimeError(
-            "GROQ_API_KEY is not set. Add it to your .env file or HF Spaces Secrets."
+            "GROQ_API_KEY is not set. Add it to your .env file or Streamlit Cloud Secrets."
         )
 
     try:
@@ -117,6 +117,7 @@ def _groq_generate(
             model=model,
             messages=_build_messages(query, chunks),
             temperature=temperature,
+            max_tokens=1000,
         )
         return response.choices[0].message.content.strip()
     except Exception as exc:
@@ -137,7 +138,7 @@ def _groq_stream(
 
     if not settings.groq_api_key:
         raise RuntimeError(
-            "GROQ_API_KEY is not set. Add it to your .env file or HF Spaces Secrets."
+            "GROQ_API_KEY is not set. Add it to your .env file or Streamlit Cloud Secrets."
         )
 
     try:
@@ -146,6 +147,7 @@ def _groq_stream(
             model=model,
             messages=_build_messages(query, chunks),
             temperature=temperature,
+            max_tokens=1000,
             stream=True,
         )
         for chunk_resp in stream:

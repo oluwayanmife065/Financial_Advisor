@@ -17,9 +17,9 @@ Vector Store: LanceDB (local) | Pinecone (cloud)
     ↓
 Retrieval Engine (semantic search + metadata filters)
     ↓
-LLM Layer (Groq cloud ☁️ | Ollama local 🖥️ — switchable via LLM_BACKEND)
+LLM Layer (Ollama — local inference)
     ↓
-Chat Interface (CLI + Streamlit)
+Chat Interface (CLI → Streamlit)
     ↓
 Eval Harness (golden Q&A set, precision/recall/MRR)
 ```
@@ -74,10 +74,12 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 | **Phase 0** — Scaffolding | Project structure, config, data models | ✅ Complete |
 | **Phase 1** — Ingestion | Parsers, scrapers, chunker, embedder, LanceDB pipeline | ✅ Complete |
 | **Phase 2** — Retrieval + Chat | BaseRetriever interface, LanceDB retriever, CLI chat loop | ✅ Complete |
+| **Phase 3** — Eval Harness | Golden Q&A set, retrieval & generation metrics, LLM judge | 🔧 In Progress |
+| **Phase 4** — Pinecone Benchmark | Pinecone retriever, side-by-side benchmark vs LanceDB | ⬚ Planned |
 | **Phase 3** — Eval Harness | Golden Q&A set, retrieval & generation metrics, LLM judge | ✅ Complete |
-| **Phase 4** — Pinecone Benchmark | Pinecone retriever, side-by-side benchmark vs LanceDB | ✅ Complete |
-| **Phase 5** — Polish + UI | Streamlit streaming chat, source citations, eval badges | ✅ Complete |
-| **Phase 6** — Hosting | Groq cloud LLM backend, Docker, Streamlit Community Cloud | ✅ Complete |
+| **Phase 4** — Pinecone Benchmark | Pinecone retriever, side-by-side benchmark vs LanceDB | ⬚ Next Phase |
+| **Phase 5** — Polish + UI | Streamlit app, full README case study | ⬚ Planned |
+| **Phase 5** — Polish + UI | Streamlit app, streaming chat, source citations, eval badges | ✅ Complete |
 
 ---
 
@@ -153,36 +155,47 @@ ingestion/sources/pdfs/
 
 | Component | Technology | Rationale |
 |---|---|---|
+| **Embeddings** | `bge-small-en-v1.5` (SentenceTransformers) | Strong MTEB retrieval scores, lightweight |
+| **Vector DB (local)** | LanceDB | Embedded, zero-infra, fast local dev |
+| **Vector DB (cloud)** | Pinecone | Managed, production feel, benchmark comparison |
+| **LLM** | Ollama (`llama3.2:3b` / `mistral:7b`) | Fully local, private, no API cost |
+| **Config** | Pydantic Settings | Type-safe env var management |
+| **Testing** | pytest | Standard Python test framework |
+| **PDF Parsing** | PyMuPDF (`fitz`) | Fast, reliable text extraction |
 | **Embeddings** | `bge-small-en-v1.5` (SentenceTransformers) | Strong MTEB retrieval scores, lightweight (384-dim) |
 | **Vector DB (local)** | LanceDB | Embedded, zero-infra, fast local vector search |
-| **Vector DB (cloud)** | Pinecone | Managed cloud vector DB for benchmark + production |
-| **LLM (hosted)** | Groq (`llama-3.1-8b-instant`) | ~300 tok/s free tier inference, OpenAI-compatible API |
-| **LLM (local dev)** | Ollama (`qwen2.5:7b`) | Fully local, private, no inference cost |
+| **Vector DB (cloud)** | Pinecone | Managed cloud vector DB for side-by-side benchmark (Phase 4) |
+| **LLM (local)** | Ollama (`qwen2.5:7b` / `llama3.2:3b`) | Fully local, private, no inference cost |
 | **Eval Judge** | OpenAI GPT-4o-mini | Independent judge avoids self-evaluation bias |
 | **Config** | Pydantic Settings | Type-safe env var management via `.env` |
 | **Testing** | pytest | 111 unit tests with full mocking and isolation |
 | **PDF Parsing** | PyMuPDF (`fitz`) | Fast, reliable text extraction and cleaning |
-| **Deployment** | Streamlit Community Cloud | Free hosting; Dockerfile included for cloud portability |
 
 ---
 
-## 🖥️ Running Locally
+## 🖥️ Running the UI
 
+Make sure Ollama is running and at least one model is pulled:
 ```bash
-git clone https://github.com/your-username/financial-advisor
-cd financial-advisor
+ollama serve          # in one terminal
+ollama pull qwen2.5:7b
+```
+
+Install Streamlit (if not yet installed):
+```bash
 pip install -r requirements.txt
-cp .env.example .env   # fill in GROQ_API_KEY and PINECONE_API_KEY
+```
+
+Launch the app:
+```bash
 streamlit run app.py
 ```
 
 The app opens at **http://localhost:8501** with:
-- 💬 **Streaming chat** — tokens stream live from Groq (or Ollama locally)
+- 💬 **Streaming chat** — tokens appear live as Ollama generates
 - 📚 **Source expanders** — see exactly which SEC/CFPB/Fed chunks grounded each answer
 - ⏱️ **Latency badges** — retrieval ms + generation s + total s per response
-- ⚙️ **Sidebar** — backend badge, model selector, top-k slider, corpus stats, eval KPI badges, query log viewer
-
-> **Local dev with Ollama**: set `LLM_BACKEND=ollama` in `.env`, run `ollama serve` and `ollama pull qwen2.5:7b`.
+- ⚙️ **Sidebar** — model selector, top-k slider, corpus stats, live eval KPI badges, query log viewer
 
 ---
 
@@ -195,10 +208,8 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
 | `v0.0.0-scaffold` | Phase 0 complete — project structure, data models, PDF parser + tests |
 | `v0.1.0-ingestion` | Phase 1 complete — chunker, embedder, pipeline, LanceDB retriever, tests |
 | `v0.2.0-retrieval` | Phase 2 complete — Ollama LLM wrapper, CLI chat loop, query logger, tests |
-| `v0.3.0-eval` | Phase 3 complete — Golden Q&A benchmark (25 questions), retrieval metrics, LLM judge, 111 tests |
-| `v0.4.0-pinecone` | Phase 4 complete — Pinecone retriever, side-by-side LanceDB benchmark |
-| `v0.5.0-polish` | Phase 5 complete — Streamlit streaming chat UI, source citations, sidebar eval badges |
-| `v0.6.0-hosting` | Phase 6 complete — Groq cloud backend, Docker, Streamlit Community Cloud deployment |
+| `v0.3.0-eval` | Phase 3 complete — Golden Q&A benchmark (25 questions), retrieval metrics, LLM judge, eval runner, 111 tests |
+| `v0.5.0-polish` | Phase 5 complete — Streamlit streaming chat UI, source citation expanders, sidebar eval badges |
 
 ---
 

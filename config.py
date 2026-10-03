@@ -4,38 +4,31 @@ Centralized configuration using pydantic-settings.
 All hyperparameters, paths, and API keys live here.
 Override any value by setting the corresponding environment variable
 or by creating a .env file in the project root.
-
-Example:
-    export OLLAMA_MODEL=mistral:7b
-    export TOP_K=3
 """
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic import Field
 
 
 class Settings(BaseSettings):
     """
     Application-wide settings loaded from environment variables or .env file.
-
-    All fields have sensible defaults so the project runs out of the box
-    without any configuration. Override only what you need to change.
     """
 
     # --- LLM Backend ---
     llm_backend: str = Field(
         default="groq",
-        description="LLM backend to use: 'groq' (cloud, hosted default) or 'ollama' (local dev)."
+        description="LLM backend: 'groq' (cloud, hosted default) or 'ollama' (local dev)."
     )
 
-    # --- Groq (cloud LLM — default for hosted/HF Spaces) ---
+    # --- Groq (cloud LLM — default for hosted/Streamlit Cloud) ---
     groq_api_key: str = Field(
         default="",
-        description="Groq API key for cloud LLM inference. Get one at console.groq.com."
+        description="Groq API key. Get one at console.groq.com."
     )
     groq_model: str = Field(
-        default="llama-3.1-8b-instant",
-        description="Groq model name. Options: llama-3.1-8b-instant, llama-3.3-70b-versatile, mixtral-8x7b-32768."
+        default="qwen/qwen3.8-27b",
+        description="Groq model name."
     )
 
     # --- Ollama (local LLM — optional, local dev only) ---
@@ -95,16 +88,15 @@ class Settings(BaseSettings):
     )
     pinecone_cloud: str = Field(
         default="aws",
-        description="Cloud provider for the serverless Pinecone index (e.g. 'aws', 'gcp')."
+        description="Cloud provider for the serverless Pinecone index."
     )
     pinecone_region: str = Field(
         default="us-east-1",
-        description="Region for the serverless Pinecone index (e.g. 'us-east-1')."
+        description="Region for the serverless Pinecone index."
     )
-    # Legacy alias kept for backwards compatibility — not used by the serverless SDK
     pinecone_environment: str = Field(
         default="us-east-1-aws",
-        description="[Legacy] Pinecone pod environment. Use pinecone_cloud + pinecone_region instead."
+        description="[Legacy] Pinecone pod environment."
     )
 
     # --- Logging ---
@@ -124,19 +116,20 @@ class Settings(BaseSettings):
     )
     eval_judge_model: str = Field(
         default="gpt-4o-mini",
-        description="Model used for LLM-as-judge eval scoring. Uses OpenAI API."
+        description="Model used for LLM-as-judge eval scoring."
     )
 
     # --- OpenAI (used for eval judge) ---
     openai_api_key: str = Field(
         default="",
-        description="OpenAI API key for LLM judge scoring. Set via .env file."
+        description="OpenAI API key for LLM judge scoring."
     )
 
-    model_config = {"env_file": ".env", "env_file_encoding": "utf-8"}
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore"
+    )
 
 
-# Module-level singleton — import this anywhere in the project.
-# Example: from config import settings; print(settings.top_k)
 settings = Settings()
-
