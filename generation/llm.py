@@ -1,14 +1,17 @@
 """
-LLM Generation Module — interfaces with local Ollama instance for RAG answers.
+LLM Generation Module — supports Groq (cloud) and Ollama (local) backends.
+
+Backend is selected via the LLM_BACKEND environment variable:
+  - "groq"   → Groq cloud API (default for HF Spaces hosting)
+  - "ollama" → Local Ollama server (local development)
 
 This module handles:
   1. Grounding system prompt definition
   2. Context formatting from retrieved Chunks
   3. Prompt construction with strict anti-hallucination instructions
-  4. Ollama chat completion API call
+  4. Backend-routed chat completion (streaming and non-streaming)
 """
 
-import ollama
 from ingestion.document import Chunk
 from config import settings
 
@@ -23,6 +26,14 @@ CRITICAL INSTRUCTIONS:
 4. Where helpful, reference the source and section (e.g. "According to CFPB...") so the user knows where the information originated.
 5. Provide educational context only; do not provide personalized financial, legal, or investment advice.
 """
+
+# ── Groq models available on free tier ──
+GROQ_MODELS = [
+    "llama-3.1-8b-instant",
+    "llama-3.3-70b-versatile",
+    "mixtral-8x7b-32768",
+    "gemma2-9b-it",
+]
 
 
 def format_context(chunks: list[Chunk]) -> str:
@@ -71,6 +82,153 @@ def build_user_message(query: str, chunks: list[Chunk]) -> str:
     )
 
 
+def _build_messages(query: str, chunks: list[Chunk]) -> list[dict]:
+    """Build the standard messages list for either backend."""
+    return [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": build_user_message(query, chunks)},
+    ]
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Groq backend
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _groq_generate(
+    query: str,
+    chunks: list[Chunk],
+    model: str,
+    temperature: float,
+) -> str:
+    """Generate a full answer via the Groq cloud API."""
+    try:
+        from groq import Groq
+    except ImportError as exc:
+        raise RuntimeError("groq package not installed. Run: pip install groq>=0.9") from exc
+
+    if not settings.groq_api_key:
+        raise RuntimeError(
+            "GROQ_API_KEY is not set. Add it to your .env file or HF Spaces Secrets."
+        )
+
+    try:
+        client = Groq(api_key=settings.groq_api_key)
+        response = client.chat.completions.create(
+            model=model,
+            messages=_build_messages(query, chunks),
+            temperature=temperature,
+        )
+        return response.choices[0].message.content.strip()
+    except Exception as exc:
+        raise RuntimeError(f"Groq generation failed with model '{model}': {exc}") from exc
+
+
+def _groq_stream(
+    query: str,
+    chunks: list[Chunk],
+    model: str,
+    temperature: float,
+):
+    """Stream tokens from the Groq cloud API."""
+    try:
+        from groq import Groq
+    except ImportError as exc:
+        raise RuntimeError("groq package not installed. Run: pip install groq>=0.9") from exc
+
+    if not settings.groq_api_key:
+        raise RuntimeError(
+            "GROQ_API_KEY is not set. Add it to your .env file or HF Spaces Secrets."
+        )
+
+    try:
+        client = Groq(api_key=settings.groq_api_key)
+        stream = client.chat.completions.create(
+            model=model,
+            messages=_build_messages(query, chunks),
+            temperature=temperature,
+            stream=True,
+        )
+        for chunk_resp in stream:
+            token = chunk_resp.choices[0].delta.content
+            if token:
+                yield token
+    except Exception as exc:
+        raise RuntimeError(f"Groq streaming failed with model '{model}': {exc}") from exc
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Ollama backend
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _ollama_generate(
+    query: str,
+    chunks: list[Chunk],
+    model: str,
+    temperature: float,
+) -> str:
+    """Generate a full answer via the local Ollama server."""
+    try:
+        import ollama
+    except ImportError as exc:
+        raise RuntimeError("ollama package not installed. Run: pip install ollama>=0.3") from exc
+
+    try:
+        client = ollama.Client(host=settings.ollama_base_url)
+        response = client.chat(
+            model=model,
+            messages=_build_messages(query, chunks),
+            options={"temperature": temperature},
+        )
+        if hasattr(response, "message") and hasattr(response.message, "content"):
+            return response.message.content.strip()
+        elif isinstance(response, dict) and "message" in response:
+            return response["message"].get("content", "").strip()
+        return str(response).strip()
+    except Exception as exc:
+        raise RuntimeError(
+            f"Ollama generation failed with model '{model}' at {settings.ollama_base_url}: {exc}"
+        ) from exc
+
+
+def _ollama_stream(
+    query: str,
+    chunks: list[Chunk],
+    model: str,
+    temperature: float,
+):
+    """Stream tokens from the local Ollama server."""
+    try:
+        import ollama
+    except ImportError as exc:
+        raise RuntimeError("ollama package not installed. Run: pip install ollama>=0.3") from exc
+
+    try:
+        client = ollama.Client(host=settings.ollama_base_url)
+        stream = client.chat(
+            model=model,
+            messages=_build_messages(query, chunks),
+            options={"temperature": temperature},
+            stream=True,
+        )
+        for chunk_resp in stream:
+            if hasattr(chunk_resp, "message") and hasattr(chunk_resp.message, "content"):
+                token = chunk_resp.message.content
+            elif isinstance(chunk_resp, dict):
+                token = chunk_resp.get("message", {}).get("content", "")
+            else:
+                token = ""
+            if token:
+                yield token
+    except Exception as exc:
+        raise RuntimeError(
+            f"Ollama streaming failed with model '{model}' at {settings.ollama_base_url}: {exc}"
+        ) from exc
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Public API — backend-routed
+# ─────────────────────────────────────────────────────────────────────────────
+
 def generate_answer(
     query: str,
     chunks: list[Chunk],
@@ -78,49 +236,34 @@ def generate_answer(
     temperature: float = 0.1,
 ) -> str:
     """
-    Generate an answer to the query given retrieved context chunks using Ollama.
+    Generate an answer to the query given retrieved context chunks.
+
+    Routes to Groq or Ollama based on settings.llm_backend.
 
     Args:
         query: User's question string.
         chunks: List of retrieved Chunk objects to ground the answer.
-        model: Optional model name override. Defaults to settings.ollama_model.
+        model: Optional model name override. Defaults to the active backend's default model.
         temperature: Sampling temperature. Defaults to 0.1 for consistent, grounded output.
 
     Returns:
         The generated answer string.
 
     Raises:
-        RuntimeError: If Ollama is unreachable or generation fails.
+        RuntimeError: If the backend is unreachable or generation fails.
     """
-    selected_model = model or settings.ollama_model
-    user_content = build_user_message(query, chunks)
+    backend = settings.llm_backend.lower()
 
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": user_content},
-    ]
-
-    try:
-        client = ollama.Client(host=settings.ollama_base_url)
-        response = client.chat(
-            model=selected_model,
-            messages=messages,
-            options={"temperature": temperature},
-        )
-
-        # Handle both dict-like and object responses across client versions
-        if hasattr(response, "message") and hasattr(response.message, "content"):
-            return response.message.content.strip()
-        elif isinstance(response, dict) and "message" in response:
-            return response["message"].get("content", "").strip()
-        else:
-            return str(response).strip()
-
-    except Exception as exc:
+    if backend == "groq":
+        selected_model = model or settings.groq_model
+        return _groq_generate(query, chunks, selected_model, temperature)
+    elif backend == "ollama":
+        selected_model = model or settings.ollama_model
+        return _ollama_generate(query, chunks, selected_model, temperature)
+    else:
         raise RuntimeError(
-            f"Failed to generate answer with Ollama model '{selected_model}' "
-            f"at {settings.ollama_base_url}: {exc}"
-        ) from exc
+            f"Unknown LLM_BACKEND '{backend}'. Set to 'groq' or 'ollama' in your .env file."
+        )
 
 
 def stream_answer(
@@ -130,59 +273,37 @@ def stream_answer(
     temperature: float = 0.1,
 ):
     """
-    Stream an answer token-by-token from Ollama for the given query and context.
+    Stream an answer token-by-token for the given query and context.
 
-    This is the streaming counterpart to generate_answer(). Instead of blocking
-    until the full response is ready, it yields string tokens as they arrive from
-    the Ollama API. Designed for use with Streamlit's st.write_stream().
+    Routes to Groq or Ollama based on settings.llm_backend. Designed for
+    use with Streamlit's st.write_stream().
 
     Args:
         query: User's question string.
         chunks: List of retrieved Chunk objects to ground the answer.
-        model: Optional model name override. Defaults to settings.ollama_model.
+        model: Optional model name override. Defaults to the active backend's default model.
         temperature: Sampling temperature. Defaults to 0.1.
 
     Yields:
         str: Individual token strings from the model response stream.
 
     Raises:
-        RuntimeError: If Ollama is unreachable or the stream fails.
+        RuntimeError: If the backend is unreachable or the stream fails.
 
     Example:
         # In Streamlit:
         with st.chat_message("assistant"):
             answer = st.write_stream(stream_answer(query, chunks))
     """
-    selected_model = model or settings.ollama_model
-    user_content = build_user_message(query, chunks)
+    backend = settings.llm_backend.lower()
 
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": user_content},
-    ]
-
-    try:
-        client = ollama.Client(host=settings.ollama_base_url)
-        stream = client.chat(
-            model=selected_model,
-            messages=messages,
-            options={"temperature": temperature},
-            stream=True,
-        )
-        for chunk_resp in stream:
-            # Each streamed chunk has message.content with the next token(s)
-            if hasattr(chunk_resp, "message") and hasattr(chunk_resp.message, "content"):
-                token = chunk_resp.message.content
-            elif isinstance(chunk_resp, dict):
-                token = chunk_resp.get("message", {}).get("content", "")
-            else:
-                token = ""
-            if token:
-                yield token
-
-    except Exception as exc:
+    if backend == "groq":
+        selected_model = model or settings.groq_model
+        yield from _groq_stream(query, chunks, selected_model, temperature)
+    elif backend == "ollama":
+        selected_model = model or settings.ollama_model
+        yield from _ollama_stream(query, chunks, selected_model, temperature)
+    else:
         raise RuntimeError(
-            f"Failed to stream answer with Ollama model '{selected_model}' "
-            f"at {settings.ollama_base_url}: {exc}"
-        ) from exc
-
+            f"Unknown LLM_BACKEND '{backend}'. Set to 'groq' or 'ollama' in your .env file."
+        )

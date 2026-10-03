@@ -39,7 +39,15 @@ from query_logging.query_logger import log_query
 
 APP_TITLE = "📊 Personal Finance Literacy Assistant"
 APP_SUBTITLE = "Grounded answers from SEC, CFPB, and Federal Reserve documents."
-DEFAULT_MODELS = ["qwen2.5:7b", "llama3.2:3b", "mistral:7b", "gemma3:4b"]
+
+# Models available per backend
+GROQ_MODELS = [
+    "llama-3.1-8b-instant",
+    "llama-3.3-70b-versatile",
+    "mixtral-8x7b-32768",
+    "gemma2-9b-it",
+]
+OLLAMA_DEFAULT_MODELS = ["qwen2.5:7b", "llama3.2:3b", "mistral:7b", "gemma3:4b"]
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -70,7 +78,24 @@ def _get_ollama_models() -> list[str]:
                 return models
     except Exception:
         pass
-    return DEFAULT_MODELS
+    return OLLAMA_DEFAULT_MODELS
+
+
+def _get_available_models() -> list[str]:
+    """
+    Return available model names for the active LLM backend.
+
+    - groq:  returns the static GROQ_MODELS list (no API call needed).
+    - ollama: queries the local Ollama server; falls back to OLLAMA_DEFAULT_MODELS.
+    """
+    if settings.llm_backend.lower() == "groq":
+        # Ensure configured default appears first
+        models = list(GROQ_MODELS)
+        if settings.groq_model in models:
+            models.remove(settings.groq_model)
+            models.insert(0, settings.groq_model)
+        return models
+    return _get_ollama_models()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -123,13 +148,25 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
     with st.sidebar:
         st.title("⚙️ Settings")
 
+        # Backend indicator
+        backend = settings.llm_backend.lower()
+        if backend == "groq":
+            st.success("⚡ LLM Backend: **Groq Cloud**", icon="☁️")
+        else:
+            st.info("🖥️ LLM Backend: **Ollama (Local)**", icon="💻")
+
         # Model selector
-        available_models = _get_ollama_models()
+        available_models = _get_available_models()
+        model_label = "Groq Model" if backend == "groq" else "Ollama Model"
         selected_model = st.selectbox(
-            "LLM Model",
+            model_label,
             options=available_models,
             index=0,
-            help="Ollama models available locally. Pull more with `ollama pull <name>`.",
+            help=(
+                "Groq cloud models. Fast free-tier inference."
+                if backend == "groq"
+                else "Ollama models available locally. Pull more with `ollama pull <name>`."
+            ),
         )
 
         # Retriever selector

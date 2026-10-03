@@ -22,14 +22,30 @@ class Settings(BaseSettings):
     without any configuration. Override only what you need to change.
     """
 
-    # --- LLM ---
+    # --- LLM Backend ---
+    llm_backend: str = Field(
+        default="groq",
+        description="LLM backend to use: 'groq' (cloud, hosted default) or 'ollama' (local dev)."
+    )
+
+    # --- Groq (cloud LLM — default for hosted/HF Spaces) ---
+    groq_api_key: str = Field(
+        default="",
+        description="Groq API key for cloud LLM inference. Get one at console.groq.com."
+    )
+    groq_model: str = Field(
+        default="llama-3.1-8b-instant",
+        description="Groq model name. Options: llama-3.1-8b-instant, llama-3.3-70b-versatile, mixtral-8x7b-32768."
+    )
+
+    # --- Ollama (local LLM — optional, local dev only) ---
     ollama_model: str = Field(
         default="qwen2.5:7b",
-        description="Ollama model name used for answer generation."
+        description="Ollama model name used for answer generation (local dev only)."
     )
     ollama_base_url: str = Field(
         default="http://localhost:11434",
-        description="Base URL of the local Ollama server."
+        description="Base URL of the local Ollama server (local dev only)."
     )
 
     # --- Embeddings ---
