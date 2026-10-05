@@ -419,11 +419,15 @@ def _handle_query(
             token_stream = stream_answer(query, chunks, model=model)
             answer = st.write_stream(token_stream)
         except Exception as exc:
-            hint = "Check Ollama (local) or your GROQ_API_KEY in Streamlit Secrets." if settings.llm_backend == "groq" else "Is Ollama running? `ollama serve` in a terminal."
-            st.error(
-                f"❌ Generation failed: {exc}\n\n"
-                f"💡 {hint}"
-            )
+            err_msg = str(exc)
+            if "localhost:11434" in err_msg or "Errno 99" in err_msg or "Connection refused" in err_msg or "Cannot assign requested address" in err_msg:
+                st.warning(
+                    "⚠️ **Ollama is not reachable in this environment.**\n\n"
+                    "👉 Switch **LLM Backend** in the sidebar to **Groq Cloud (Hosted)** to get your answer!\n\n"
+                    "*(If running locally, start Ollama with `ollama serve`)*"
+                )
+            else:
+                st.error(f"❌ **Generation failed**: {exc}")
             return
 
         generation_ms = (time.perf_counter() - generation_start) * 1000
