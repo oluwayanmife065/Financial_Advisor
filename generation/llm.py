@@ -117,7 +117,7 @@ def _groq_generate(
             model=model,
             messages=_build_messages(query, chunks),
             temperature=temperature,
-            max_tokens=1000,
+            max_tokens=4096,
         )
         return response.choices[0].message.content.strip()
     except Exception as exc:
@@ -141,21 +141,31 @@ def _groq_stream(
             "GROQ_API_KEY is not set. Add it to your .env file or Streamlit Cloud Secrets."
         )
 
+    client = Groq(api_key=settings.groq_api_key)
     try:
-        client = Groq(api_key=settings.groq_api_key)
         stream = client.chat.completions.create(
             model=model,
             messages=_build_messages(query, chunks),
             temperature=temperature,
-            max_tokens=1000,
+            max_tokens=4096,   # Increased: qwen3 thinking models consume tokens before answering
             stream=True,
         )
-        for chunk_resp in stream:
-            token = chunk_resp.choices[0].delta.content
-            if token:
-                yield token
     except Exception as exc:
         raise RuntimeError(f"Groq streaming failed with model '{model}': {exc}") from exc
+
+    in_think_block = False
+    for chunk_resp in stream:
+        token = chunk_resp.choices[0].delta.content
+        if not token:
+            continue
+        # Filter out <think>...</think> reasoning tokens emitted by qwen3-series models
+        if "<think>" in token:
+            in_think_block = True
+        if in_think_block:
+            if "</think>" in token:
+                in_think_block = False
+            continue
+        yield token
 
 
 # ─────────────────────────────────────────────────────────────────────────────

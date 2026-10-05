@@ -10,6 +10,16 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ---
 
+## [v0.6.1-hosting] — 2026-10-05
+
+### Fixed
+- **`generation/llm.py`** — increased `max_tokens` from `1000` → `4096` in both `_groq_stream` and `_groq_generate`; `qwen/qwen3.8-27b` is a thinking model that burns tokens on internal reasoning before answering, silently exhausting the budget and returning an empty response on Streamlit Cloud
+- **`generation/llm.py`** — added `<think>…</think>` block filter in `_groq_stream` to strip qwen3 reasoning tokens from the streamed output so users see only the clean answer
+- **`generation/llm.py`** — restructured `try/except` in `_groq_stream` to wrap stream *creation* only (not the yield loop); exceptions now surface correctly in `st.write_stream()` instead of being silently swallowed
+- **`app.py`** — replaced `allam-2-7b` (niche/preview model) with `llama-3.3-70b-versatile` and `llama-3.1-8b-instant` (confirmed Groq production models); `qwen/qwen3.8-27b` retained as default
+
+---
+
 ## [v0.6.0-hosting] — 2026-10-02
 
 ### Added

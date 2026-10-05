@@ -311,13 +311,10 @@ def _render_chat_history(show_sources: bool):
     for msg in st.session_state.messages:
         role = msg["role"]
         with st.chat_message(role):
-            if msg.get("error"):
-                st.error(msg["content"])
-            else:
-                st.markdown(msg["content"])
+            st.markdown(msg["content"])
 
             # Source citations and latency — only on assistant turns
-            if role == "assistant" and not msg.get("error"):
+            if role == "assistant":
                 chunks = msg.get("chunks") or []
                 latency = msg.get("latency") or {}
                 _render_latency_badges(latency)
@@ -406,13 +403,10 @@ def _handle_query(
             answer = st.write_stream(token_stream)
         except Exception as exc:
             hint = "Check Ollama (local) or your GROQ_API_KEY in Streamlit Secrets." if settings.llm_backend == "groq" else "Is Ollama running? `ollama serve` in a terminal."
-            error_text = f"Generation failed: {exc}\n\n💡 {hint}"
-            st.error(error_text)
-            st.session_state.messages.append({
-                "role": "assistant",
-                "content": error_text,
-                "error": True,
-            })
+            st.error(
+                f"❌ Generation failed: {exc}\n\n"
+                f"💡 {hint}"
+            )
             return
 
         generation_ms = (time.perf_counter() - generation_start) * 1000
