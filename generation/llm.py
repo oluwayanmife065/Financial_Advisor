@@ -283,39 +283,23 @@ def stream_answer(
     chunks: list[Chunk],
     model: str | None = None,
     temperature: float = 0.1,
+    backend: str | None = None,
 ):
     """
     Stream an answer token-by-token for the given query and context.
 
-    Routes to Groq or Ollama based on settings.llm_backend. Designed for
+    Routes to Groq or Ollama based on backend (or settings.llm_backend). Designed for
     use with Streamlit's st.write_stream().
-
-    Args:
-        query: User's question string.
-        chunks: List of retrieved Chunk objects to ground the answer.
-        model: Optional model name override. Defaults to the active backend's default model.
-        temperature: Sampling temperature. Defaults to 0.1.
-
-    Yields:
-        str: Individual token strings from the model response stream.
-
-    Raises:
-        RuntimeError: If the backend is unreachable or the stream fails.
-
-    Example:
-        # In Streamlit:
-        with st.chat_message("assistant"):
-            answer = st.write_stream(stream_answer(query, chunks))
     """
-    backend = settings.llm_backend.lower()
+    active_backend = (backend or settings.llm_backend).lower()
 
-    if backend == "groq":
+    if active_backend == "groq":
         selected_model = model or settings.groq_model
         yield from _groq_stream(query, chunks, selected_model, temperature)
-    elif backend == "ollama":
+    elif active_backend == "ollama":
         selected_model = model or settings.ollama_model
         yield from _ollama_stream(query, chunks, selected_model, temperature)
     else:
         raise RuntimeError(
-            f"Unknown LLM_BACKEND '{backend}'. Set to 'groq' or 'ollama' in your .env file."
+            f"Unknown LLM_BACKEND '{active_backend}'. Set to 'groq' or 'ollama' in your .env file."
         )

@@ -420,15 +420,18 @@ def _handle_query(
             answer = st.write_stream(token_stream)
         except Exception as exc:
             err_msg = str(exc)
-            if "localhost:11434" in err_msg or "Errno 99" in err_msg or "Connection refused" in err_msg or "Cannot assign requested address" in err_msg:
-                st.warning(
-                    "⚠️ **Ollama is not reachable in this environment.**\n\n"
-                    "👉 Switch **LLM Backend** in the sidebar to **Groq Cloud (Hosted)** to get your answer!\n\n"
-                    "*(If running locally, start Ollama with `ollama serve`)*"
-                )
+            # If Ollama failed to connect, seamlessly fallback to Groq Cloud
+            if settings.llm_backend == "ollama" and bool(settings.groq_api_key):
+                st.info("ℹ️ Local Ollama server unreachable — automatically answering via **Groq Cloud**.")
+                try:
+                    fallback_stream = stream_answer(query, chunks, model=settings.groq_model, backend="groq")
+                    answer = st.write_stream(fallback_stream)
+                except Exception as fallback_exc:
+                    st.error(f"❌ Fallback generation failed: {fallback_exc}")
+                    return
             else:
-                st.error(f"❌ **Generation failed**: {exc}")
-            return
+                st.error(f"❌ Generation failed: {exc}")
+                return
 
         generation_ms = (time.perf_counter() - generation_start) * 1000
         total_ms = retrieval_ms + generation_ms
