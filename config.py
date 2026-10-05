@@ -20,6 +20,10 @@ class Settings(BaseSettings):
         default="groq",
         description="LLM backend: 'groq' (cloud, hosted default) or 'ollama' (local dev)."
     )
+    allow_ollama: bool = Field(
+        default=False,
+        description="Enable local Ollama backend toggle. Keep False on cloud deployment."
+    )
 
     # --- Groq (cloud LLM — default for hosted/Streamlit Cloud) ---
     groq_api_key: str = Field(

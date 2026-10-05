@@ -91,22 +91,13 @@ def _get_ollama_models() -> list[str]:
     return OLLAMA_DEFAULT_MODELS
 
 
-@st.cache_data(ttl=60)
 def _is_ollama_available() -> bool:
-    """Return True if running locally AND local Ollama server is reachable."""
-    import os
-    # If running on Streamlit Cloud or containerized hosting, Ollama is never available
-    is_cloud = (
-        bool(os.environ.get("STREAMLIT_SERVER_PORT"))
-        or bool(os.environ.get("STREAMLIT_SHARING_MODE"))
-        or (hasattr(st, "secrets") and len(st.secrets) > 0)
-    )
-    if is_cloud:
+    """Return True if local Ollama backend is explicitly enabled via config and reachable."""
+    if not getattr(settings, "allow_ollama", False):
         return False
-
     try:
         import urllib.request
-        urllib.request.urlopen(settings.ollama_base_url, timeout=1.5)
+        urllib.request.urlopen(settings.ollama_base_url, timeout=1.0)
         return True
     except Exception:
         return False
@@ -178,7 +169,7 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
     with st.sidebar:
         st.title("⚙️ Settings")
 
-        # Backend selector — Ollama option only shown when running locally with Ollama active
+        # Backend selector — only shown when allow_ollama is True and reachable
         ollama_available = _is_ollama_available()
         if ollama_available:
             backend_options = ["Groq Cloud (Hosted)", "Ollama (Local)"]
@@ -196,7 +187,6 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
             else:
                 st.info("🖥️ Backend: **Ollama Local**", icon="💻")
         else:
-            # Streamlit Cloud / Deployed — lock completely to Groq
             is_groq = True
             settings.llm_backend = "groq"
             st.success("⚡ Backend: **Groq Cloud**", icon="☁️")
