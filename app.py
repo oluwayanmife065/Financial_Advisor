@@ -419,19 +419,12 @@ def _handle_query(
             token_stream = stream_answer(query, chunks, model=model)
             answer = st.write_stream(token_stream)
         except Exception as exc:
-            err_msg = str(exc)
-            # If Ollama failed to connect, seamlessly fallback to Groq Cloud
-            if settings.llm_backend == "ollama" and bool(settings.groq_api_key):
-                st.info("ℹ️ Local Ollama server unreachable — automatically answering via **Groq Cloud**.")
-                try:
-                    fallback_stream = stream_answer(query, chunks, model=settings.groq_model, backend="groq")
-                    answer = st.write_stream(fallback_stream)
-                except Exception as fallback_exc:
-                    st.error(f"❌ Fallback generation failed: {fallback_exc}")
-                    return
-            else:
-                st.error(f"❌ Generation failed: {exc}")
-                return
+            hint = "Check Ollama (local) or your GROQ_API_KEY in Streamlit Secrets." if settings.llm_backend == "groq" else "Is Ollama running? `ollama serve` in a terminal."
+            st.error(
+                f"❌ Generation failed: {exc}\n\n"
+                f"💡 {hint}"
+            )
+            return
 
         generation_ms = (time.perf_counter() - generation_start) * 1000
         total_ms = retrieval_ms + generation_ms

@@ -111,17 +111,30 @@ def _groq_generate(
             "GROQ_API_KEY is not set. Add it to your .env file or Streamlit Cloud Secrets."
         )
 
-    try:
-        client = Groq(api_key=settings.groq_api_key)
-        response = client.chat.completions.create(
-            model=model,
-            messages=_build_messages(query, chunks),
-            temperature=temperature,
-            max_tokens=4096,
-        )
-        return response.choices[0].message.content.strip()
-    except Exception as exc:
-        raise RuntimeError(f"Groq generation failed with model '{model}': {exc}") from exc
+    import re
+    import time
+
+    client = Groq(api_key=settings.groq_api_key)
+    max_retries = 4
+    for attempt in range(max_retries):
+        try:
+            response = client.chat.completions.create(
+                model=model,
+                messages=_build_messages(query, chunks),
+                temperature=temperature,
+                max_tokens=4096,
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as exc:
+            err_str = str(exc)
+            if ("429" in err_str or "Rate limit" in err_str or "rate_limit_exceeded" in err_str) and attempt < max_retries - 1:
+                # Extract suggested wait time from error message if available (e.g. "try again in 23.1s")
+                match = re.search(r"try again in ([\d\.]+)s", err_str)
+                wait_sec = float(match.group(1)) + 1.0 if match else (2 ** attempt) * 5.0
+                print(f"\n⏳ Groq rate limit hit. Pausing {wait_sec:.1f}s before retry ({attempt+1}/{max_retries})...")
+                time.sleep(wait_sec)
+                continue
+            raise RuntimeError(f"Groq generation failed with model '{model}': {exc}") from exc
 
 
 def _groq_stream(
@@ -283,23 +296,39 @@ def stream_answer(
     chunks: list[Chunk],
     model: str | None = None,
     temperature: float = 0.1,
-    backend: str | None = None,
 ):
     """
     Stream an answer token-by-token for the given query and context.
 
-    Routes to Groq or Ollama based on backend (or settings.llm_backend). Designed for
+    Routes to Groq or Ollama based on settings.llm_backend. Designed for
     use with Streamlit's st.write_stream().
-    """
-    active_backend = (backend or settings.llm_backend).lower()
 
-    if active_backend == "groq":
+    Args:
+        query: User's question string.
+        chunks: List of retrieved Chunk objects to ground the answer.
+        model: Optional model name override. Defaults to the active backend's default model.
+        temperature: Sampling temperature. Defaults to 0.1.
+
+    Yields:
+        str: Individual token strings from the model response stream.
+
+    Raises:
+        RuntimeError: If the backend is unreachable or the stream fails.
+
+    Example:
+        # In Streamlit:
+        with st.chat_message("assistant"):
+            answer = st.write_stream(stream_answer(query, chunks))
+    """
+    backend = settings.llm_backend.lower()
+
+    if backend == "groq":
         selected_model = model or settings.groq_model
         yield from _groq_stream(query, chunks, selected_model, temperature)
-    elif active_backend == "ollama":
+    elif backend == "ollama":
         selected_model = model or settings.ollama_model
         yield from _ollama_stream(query, chunks, selected_model, temperature)
     else:
         raise RuntimeError(
-            f"Unknown LLM_BACKEND '{active_backend}'. Set to 'groq' or 'ollama' in your .env file."
+            f"Unknown LLM_BACKEND '{backend}'. Set to 'groq' or 'ollama' in your .env file."
         )

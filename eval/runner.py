@@ -454,20 +454,38 @@ def run_eval(
     total = len(items)
     print(f"   Loaded {total} evaluation question(s).\n")
 
+    # Check for existing partial progress to allow resuming without restarting
+    completed_results = {}
+    out_p = Path(output_path)
+    if out_p.exists():
+        try:
+            with open(out_p, "r", encoding="utf-8") as f:
+                prev_data = json.load(f)
+                for r in prev_data.get("per_query_results", []):
+                    completed_results[r["id"]] = r
+        except Exception:
+            pass
+
     results = []
     for i, item in enumerate(items, 1):
         q_id = item["id"]
         q_text = item["question"]
-        print(f"[{i}/{total}] Evaluating {q_id}: \"{q_text[:50]}...\"")
 
-        res = evaluate_single_query(
-            item=item,
-            k=k,
-            retriever_fn=retriever_fn,
-            generator_fn=generator_fn,
-            judge_enabled=judge_enabled,
-            judge_model=judge_model,
-        )
+        if q_id in completed_results:
+            print(f"[{i}/{total}] Reusing completed {q_id}: \"{q_text[:50]}...\"")
+            res = completed_results[q_id]
+        else:
+            print(f"[{i}/{total}] Evaluating {q_id}: \"{q_text[:50]}...\"")
+            res = evaluate_single_query(
+                item=item,
+                k=k,
+                retriever_fn=retriever_fn,
+                generator_fn=generator_fn,
+                judge_enabled=judge_enabled,
+                judge_model=judge_model,
+            )
+            time.sleep(0.5)  # Gentle pacing to avoid burst rate limits
+
         results.append(res)
 
         # Quick inline feedback
