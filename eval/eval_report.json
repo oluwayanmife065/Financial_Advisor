@@ -1,9 +1,9 @@
 {
-  "timestamp_start": "2026-10-03T05:05:45.252559+00:00",
-  "timestamp_end": "2026-10-03T05:05:51.580794+00:00",
-  "duration_seconds": 6.33,
+  "timestamp_start": "2026-10-05T22:08:05.682969+00:00",
+  "timestamp_end": "2026-10-05T22:19:18.192045+00:00",
+  "duration_seconds": 672.51,
   "configuration": {
-    "retriever": "lancedb",
+    "retriever": "pinecone",
     "top_k": 5,
     "ollama_model": "qwen2.5:7b",
     "embedding_model": "BAAI/bge-small-en-v1.5",
@@ -12,12 +12,12 @@
     "golden_set_path": "./eval/golden_set.json"
   },
   "aggregate": {
-    "total_evaluated": 3,
+    "total_evaluated": 25,
     "summary_metrics": {
       "precision_at_3": {
-        "score": 0.6667,
+        "score": 0.84,
         "target": 0.7,
-        "passed": false
+        "passed": true
       },
       "recall_at_5": {
         "score": 1.0,
@@ -25,7 +25,7 @@
         "passed": true
       },
       "mrr": {
-        "score": 0.8333,
+        "score": 0.96,
         "target": 0.75,
         "passed": true
       },
@@ -37,19 +37,19 @@
     },
     "latency": {
       "retrieval_ms": {
-        "p50": 74.58,
-        "p95": 2100.79,
-        "mean": 816.08
+        "p50": 813.89,
+        "p95": 1103.1,
+        "mean": 856.95
       },
       "generation_ms": {
-        "p50": 987.54,
-        "p95": 2060.49,
-        "mean": 1292.68
+        "p50": 12548.1,
+        "p95": 17838.66,
+        "mean": 11361.56
       },
       "total_ms": {
-        "p50": 2227.44,
-        "p95": 3204.86,
-        "mean": 2108.76
+        "p50": 13506.18,
+        "p95": 18440.85,
+        "mean": 12218.51
       }
     }
   },
@@ -60,7 +60,7 @@
       "category": "Debt vs Investing",
       "question": "Why does the SEC advise paying off high-interest credit card debt before investing?",
       "reference_answer": "Credit cards charge high interest rates if a balance is carried month-to-month, significantly increasing the purchase cost of goods and stretching debt out for years. According to the SEC Office of Investor Education and Assistance, no investment offers guaranteed returns high enough to reliably outweigh the high interest rates paid on credit card debt, so paying down high-interest debt first is the safest and highest-return financial move.",
-      "generated_answer": "According to the SEC Office of Investor Education and Assistance, the primary reason to pay off high-interest credit card debt before investing is that **no investment will give you guaranteed returns that outweigh the high interest rate you pay with a credit card or other high-interest debt.**\n\nThe SEC explains that credit cards charge high interest rates if you cannot pay off your balance at the end of the month. This interest increases the price you pay for items and can stretch your debt over many years. Therefore, the advice is to pay down any credit card debt and live within your means to improve your chances of achieving financial security.\n\n**Source:** SEC/Investor.gov, Section: page_1, Tip #1 \"Be smart about credit card debt.\"",
+      "generated_answer": "The SEC advises paying off high-interest credit card debt before investing because credit cards charge high interest rates, which can significantly increase the cost of items purchased. According to the provided documents, \"Credit cards charge high interest rates if you can\u2019t pay off your balance at the end of the month. That interest increases the price you pay for the items you buy and may stretch your debt over many years.\" (Source: SEC/Investor.gov)\n\nPaying down credit card debt reduces the overall cost of purchases, freeing up more money that could be used for other financial goals such as saving or investing. The high-interest rates on credit cards can make it difficult to achieve long-term financial security and build wealth effectively. Therefore, prioritizing the reduction of high-interest debt is recommended before starting an investment strategy.",
       "retrieved_chunks": [
         {
           "chunk_id": "6dcee35b4ec7e996_0000",
@@ -93,9 +93,9 @@
           "preview": "Taking on Debt  A big part of building wealth is making wise choices about credit and  debt. Keep in mind your bottom line, your net worth, when makin..."
         }
       ],
-      "retrieval_latency_ms": 2325.92,
-      "generation_latency_ms": 987.54,
-      "total_latency_ms": 3313.46,
+      "retrieval_latency_ms": 1923.3,
+      "generation_latency_ms": 8053.36,
+      "total_latency_ms": 9976.65,
       "metrics": {
         "precision_at_3": 0.3333,
         "recall_at_5": 1.0,
@@ -115,7 +115,7 @@
       "category": "Wealth Building",
       "question": "What formula does the SEC highlight for building wealth over time, and what two action steps put it into practice?",
       "reference_answer": "The SEC highlights the formula: REGULAR INVESTMENTS + TIME = WEALTH, noting that starting earlier provides more time to build wealth through compound growth. To put this formula into action, the SEC recommends two steps: (1) start an emergency fund in a savings account at a bank or credit union with automated deposits each pay period to avoid debt during unexpected expenses, and (2) invest regularly over time (such as 5% to 10% of income) throughout one's entire career.",
-      "generated_answer": "According to the SEC/Investor.gov document (Chunk [4]), the formula highlighted for building wealth is:\n\n**REGULAR INVESTMENTS + TIME = WEALTH**\n\nThe two action steps to put this formula into practice are:\n\n1.  **Start an emergency fund:** Open a savings account at a bank or credit union and automatically deposit a certain amount of money directly into that account each pay period. This helps avoid debt in case of unexpected expenses.\n2.  **Invest regularly over time:** Contribute a fixed percentage of income (e.g., 5% or 10%) or a fixed affordable amount to investments each pay period and continue doing so throughout your career. The document notes that while investing carries more risk than keeping money in the bank, it offers a better chance to create wealth over time.",
+      "generated_answer": "The SEC highlights a powerful formula for building wealth: REGULAR INVESTMENTS + TIME = WEALTH. To put this formula into practice, the user should take at least two action steps:\n\n1. Start an emergency fund in a savings account and automatically deposit a certain amount of money directly into that account each pay period.\n2. Invest regularly over time (for example, 5% or 10% of your income or some fixed amount you can afford to contribute each pay period) and continue to invest over your entire career.\n\nThese steps help ensure consistent savings and investments, which the SEC emphasizes as crucial for long-term wealth accumulation.",
       "retrieved_chunks": [
         {
           "chunk_id": "1ee2177d156c8479_0000",
@@ -148,9 +148,9 @@
           "preview": "KEYS TO FINANCIAL SUCCESS     4  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
         }
       ],
-      "retrieval_latency_ms": 74.58,
-      "generation_latency_ms": 710.8,
-      "total_latency_ms": 785.38,
+      "retrieval_latency_ms": 793.34,
+      "generation_latency_ms": 5799.6,
+      "total_latency_ms": 6592.94,
       "metrics": {
         "precision_at_3": 0.6667,
         "recall_at_5": 1.0,
@@ -170,7 +170,7 @@
       "category": "Retirement",
       "question": "Why does the SEC recommend beginning an investing journey with workplace 401(k) plans and IRAs?",
       "reference_answer": "The SEC recommends starting with a workplace 401(k) plan because employee contributions provide an upfront tax break and employers often match a portion of contributions, which constitutes free money. Additionally, an Individual Retirement Account (IRA) can be established on one's own for extra tax advantages. The SEC advises automating contributions to both accounts so saving and investing happen consistently every pay period.",
-      "generated_answer": "Based on the provided context chunks, the documents do not explicitly state that the SEC recommends *beginning* an investing journey specifically with workplace 401(k) plans and IRAs.\n\nHowever, the provided texts do highlight the following benefits and characteristics of these specific investment vehicles:\n\n*   **Tax Advantages:** According to the Federal Reserve (Chunk [2]), money in a 401(k) is tax-deferred as long as it remains in the plan. The text notes that \"Take full advantage of the retirement savings programs your company offers\u2014and understand thoroughly how they work. They are great ways to build wealth.\" It also explains that tax-deferred investments can effectively reduce the cost of investing by saving on taxes (e.g., a $3,000 investment at a 15% tax rate effectively costs only $2,550).\n*   **Diversification and Risk Management:** According to the SEC/Investor.gov (Chunk [1]), when choosing an investment option within a 401(k) or IRA, selecting a diversified fund can reduce risk. This is because if one sector loses value, other parts of the market may improve returns.\n*   **Automatic Adjustment:** The SEC/Investor.gov (Chunk [1]) mentions \"target date funds\" as a popular option within these plans, which automatically adjust the investment mix from aggressive to conservative as you approach retirement.\n\nWhile the Federal Reserve (Chunk [2]) encourages taking full advantage of these programs as \"great ways to build wealth,\" the specific recommendation to *start* with them is not explicitly detailed in the provided text. The SEC/Investor.gov text focuses more on how to choose investments *within* these plans and how to protect against scams, rather than prescribing them as the mandatory starting point for all investors.",
+      "generated_answer": "The SEC/Investor.gov recommends starting your investing journey with workplace 401(k) plans and IRAs because these retirement savings programs offer tax-deferred growth, meaning you won't pay taxes on investment earnings until withdrawal. Additionally, they are convenient as contributions can be automatically deducted from your paycheck, making it easier to save consistently over time. According to the Federal Reserve, qualified plans like 401(k)s and IRAs are great ways to build wealth through tax-deferred investments.\n\nFor more detailed information on how these retirement savings programs work and maximize tax benefits, you can refer to resources provided by Investor.gov or the IRS.",
       "retrieved_chunks": [
         {
           "chunk_id": "97e71e0e220c97ed_0000",
@@ -197,17 +197,1227 @@
           "preview": "KEYS TO FINANCIAL SUCCESS     4  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
         },
         {
+          "chunk_id": "a81bd2adba2233f8_0001",
+          "source": "Federal Reserve",
+          "section": "page_4",
+          "preview": "rn, such as corporate bonds, income stocks,  growth stocks, real estate, commodities, collectibles, or mutual funds.  2.  Investor 2 hopes to retire i..."
+        }
+      ],
+      "retrieval_latency_ms": 669.26,
+      "generation_latency_ms": 6890.93,
+      "total_latency_ms": 7560.19,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "sec_04",
+      "source": "SEC/Investor.gov",
+      "category": "Investment Strategy",
+      "question": "How does diversification reduce risk according to the SEC, and how does a target date fund work?",
+      "reference_answer": "Diversification reduces risk by spreading investments across many companies and market sectors, ensuring that if one company or industry drops in value, holdings in other market segments can offset the loss. A target date fund automates this strategy by targeting a specific future year (such as retirement) and gradually shifting the portfolio from an aggressive, stock-heavy allocation early in a career to a more conservative, income-oriented allocation as the target date approaches.",
+      "generated_answer": "According to the SEC/Investor.gov:\n\nDiversification reduces risk by spreading your investment across various companies or securities. This approach can mitigate losses if one or a few stocks or industry sectors underperform during any given period, as other parts of the market may perform better and improve overall returns (Source: SEC/Investor.gov, page 3).\n\nA target date fund works by automatically adjusting its investments from more aggressive, stock-heavy portfolios to a more conservative mix as you approach your retirement date. This helps manage risk according to your age and when you need access to the funds (Source: SEC/Investor.gov, page 3).",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "97e71e0e220c97ed_0000",
+          "source": "SEC/Investor.gov",
+          "section": "page_3",
+          "preview": "When choosing an investment option within your 401(k), IRA or any other  investment, a diversified fund that spreads your investment across many  comp..."
+        },
+        {
+          "chunk_id": "9df1ef93bf3d8486_0001",
+          "source": "Federal Reserve",
+          "section": "page_5",
+          "preview": "conditions, interest rates,  company performance, new information, and investor demand.  6. When making diversification and asset allocation decisions..."
+        },
+        {
           "chunk_id": "ed3b54c6971652c3_0000",
+          "source": "Federal Reserve",
+          "section": "page_5",
+          "preview": "KEYS TO FINANCIAL SUCCESS     5  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
+        },
+        {
+          "chunk_id": "dcc276c14ec461bb_0000",
+          "source": "Federal Reserve",
+          "section": "page_6",
+          "preview": "Unit 8: Investing  Lesson 8A: Managing Risk\u2014Time and Diversification  18. Explain that as the demonstration showed, time tends to lower the difference..."
+        },
+        {
+          "chunk_id": "e546acf56961eded_0000",
+          "source": "Federal Reserve",
+          "section": "page_1",
+          "preview": "Unit 8  Investing  Lesson 8A:  Managing Risk\u2014Time and Diversification  Rule 8: Grow your wealth safely.  Investing requires three simple steps: (i) sa..."
+        }
+      ],
+      "retrieval_latency_ms": 529.15,
+      "generation_latency_ms": 6010.07,
+      "total_latency_ms": 6539.22,
+      "metrics": {
+        "precision_at_3": 0.3333,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "sec_05",
+      "source": "SEC/Investor.gov",
+      "category": "Investor Protection",
+      "question": "How can an investor verify a financial professional and spot potential investment scams using Investor.gov?",
+      "reference_answer": "Investors can visit Investor.gov to verify whether a broker or investment adviser is properly licensed and registered, and to review their employment history for red flags and disciplinary disclosures. Key warning signs of investment scams include unsolicited investment pitches on social media or group chats, promises of high guaranteed returns with no risk, and pressure to make quick money easily.",
+      "generated_answer": "To verify a financial professional and spot potential investment scams, investors can use resources provided by Investor.gov. According to the SEC/Investor.gov:\n\n1. **Research the Professional**: Ensure that any unlicensed or unregistered investment professionals are legitimate. You can check their credentials through official channels.\n\n2. **Watch Out for Red Flags of Investment Fraud**:\n   - Be wary of guaranteed high returns with little risk.\n   - Verify if the professional is licensed and registered, as unlicensed individuals may be involved in scams.\n   - Be cautious about investment pitches from group chats or social media.\n   - Check for fake claims of SEC registration or endorsements.\n\n3. **Consult Additional Resources**: For more detailed information on taxation and investments, consult a tax advisor or visit IRS.gov (as mentioned in the SEC/Investor.gov document).\n\nAdditionally, the CFPB provides further guidance:\n\n- **Ask Questions**: When dealing with financial products or services, ask questions to fully understand what you are buying. Ensure that any financial counselor or adviser is interested in helping you rather than just selling a product.\n- **Verify Information**: Be cautious of unsolicited offers and verify information through official channels before providing personal or financial details.\n\nBy following these steps, investors can better protect themselves from potential scams and ensure they work with legitimate professionals.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "8072acee04fb5c11_0000",
+          "source": "SEC/Investor.gov",
+          "section": "page_4",
+          "preview": "Find tools and resources that can help you build wealth and avoid  scams on Investor.gov. 4  |  Investor.gov PAID FOR BY THE SEC PUB # 193 (3/2026) Th..."
+        },
+        {
+          "chunk_id": "eb9002060c7462f8_0000",
+          "source": "CFPB",
+          "section": "page_233",
+          "preview": "You can start by looking up your state\u2019s consumer protection office at  usa.gov/state-consumer.  \u2022  Don\u2019t invest in anything unless you fully understa..."
+        },
+        {
+          "chunk_id": "b3d72e3026f98191_0000",
+          "source": "CFPB",
+          "section": "page_231",
+          "preview": "Knowing what your rights are can help prevent you from being taken advantage  of during financial negotiations and transactions. And understanding you..."
+        },
+        {
+          "chunk_id": "6f671d0ac51a4c9d_0000",
+          "source": "CFPB",
+          "section": "page_232",
+          "preview": "If you run across an amazing-sounding opportunity, job, or product, do your  research with a critical eye, especially if you\u2019re receiving the \u201copportu..."
+        },
+        {
+          "chunk_id": "eb9002060c7462f8_0001",
+          "source": "CFPB",
+          "section": "page_233",
+          "preview": "iated the call to a number that you know  is from the company. For example, if it\u2019s printed on your statement or the back of  your credit card.  Scamm..."
+        }
+      ],
+      "retrieval_latency_ms": 641.37,
+      "generation_latency_ms": 13376.69,
+      "total_latency_ms": 14018.06,
+      "metrics": {
+        "precision_at_3": 0.6667,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "fed_01",
+      "source": "Federal Reserve",
+      "category": "Compound Interest",
+      "question": "What is compound interest and why does the Federal Reserve refer to it as an advantage?",
+      "reference_answer": "Compound interest is interest earned not just on the original principal balance deposited, but also on the accumulated interest from prior periods. The Federal Reserve refers to this as the 'compound interest advantage' because savings grow at an exponentially faster rate over time compared to simple interest or uninvested savings, particularly when contributions are made regularly over a multi-decade time horizon.",
+      "generated_answer": "Compound interest is interest that is paid on previously earned interest, in addition to the original principal amount. According to the Federal Reserve Bank of Dallas, this type of interest helps you build wealth faster because it allows your investment or savings to grow at a faster rate over time.\n\nThe Federal Reserve refers to compound interest as an advantage due to its ability to significantly increase the value of investments and savings over longer periods. For example, Gabby's $125 monthly deposits for 30 years would grow substantially more when compounded monthly compared to simply keeping the money in a shoebox (Federal Reserve, page 10). This is because compound interest not only earns interest on the initial principal but also on any accumulated interest from previous periods.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "41cb2eef4eb4313f_0000",
+          "source": "Federal Reserve",
+          "section": "page_10",
+          "preview": "8  Building Wealth\t Federal Reserve Bank of Dallas The Compound Interest Advantage 0 50,000 100,000 150,000 200,000 $250,000 No interest 8 percent 6 p..."
+        },
+        {
+          "chunk_id": "41cb2eef4eb4313f_0001",
+          "source": "Federal Reserve",
+          "section": "page_10",
+          "preview": "savings is compounded monthly.  The chart to the left shows how compound interest at  various rates would increase Gabby\u2019s savings compared with  simp..."
+        },
+        {
+          "chunk_id": "56efa320bb5c50a1_0000",
+          "source": "Federal Reserve",
+          "section": "page_29",
+          "preview": "27  Federal Reserve Bank of Dallas \t Building Wealth\t Glossary Federal Reserve Bank of Dallas \t Building Wealth\t An investment in  knowledge always pa..."
+        },
+        {
+          "chunk_id": "4e89e976be329df3_0000",
+          "source": "Federal Reserve",
+          "section": "page_31",
+          "preview": "29  Federal Reserve Bank of Dallas \t Building Wealth\t Glossary Maturity The time when a note, bond or  other investment option comes due for  payment ..."
+        },
+        {
+          "chunk_id": "731777cfcb104dda_0000",
+          "source": "Federal Reserve",
+          "section": "page_8",
+          "preview": "KEYS TO FINANCIAL SUCCESS     8  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
+        }
+      ],
+      "retrieval_latency_ms": 901.31,
+      "generation_latency_ms": 8582.13,
+      "total_latency_ms": 9483.44,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "fed_02",
+      "source": "Federal Reserve",
+      "category": "Investment Math",
+      "question": "What is the Rule of 72 and how does it estimate investment doubling time?",
+      "reference_answer": "The Rule of 72 is a mental math shortcut used to estimate how many years it will take for an investment to double in value at a constant annual rate of return. An investor divides 72 by the expected annual rate of return. For example, an investment earning an 8% annual return will double in approximately 9 years (72 / 8 = 9).",
+      "generated_answer": "The Rule of 72 is a method used to estimate the number of years required to double the invested money at a given annual rate of return. According to the Federal Reserve's document, if you want to find out how long it will take for your investment to double, you can divide 72 by the expected annual rate of return.\n\nFor example, if you have an investment with an average rate of return of 7.2%, using the Rule of 72, you would calculate the doubling time as follows:\n\\[ \\text{Doubling Time} = \\frac{72}{\\text{Rate of Return}} = \\frac{72}{7.2} = 10 \\text{ years} \\]\n\nThis means it will take approximately 10 years for your initial investment to double at an average rate of return of 7.2%. According to the source, \"The Rule of 72 also works if you want to find out the rate of return you need to make your money double.\" This indicates that you can use the same rule in reverse to determine the required rate of return needed to double your investment within a specific time frame.\n\nReference: Federal Reserve, page_13",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "8347d78b1b715d3b_0002",
+          "source": "Federal Reserve",
+          "section": "page_13",
+          "preview": "ut $10,000, in 18 years about $20,000 and in 27  years, $40,000. The Rule of 72 also works if you want to find out the rate of  return you need to mak..."
+        },
+        {
+          "chunk_id": "dcc276c14ec461bb_0000",
+          "source": "Federal Reserve",
+          "section": "page_6",
+          "preview": "Unit 8: Investing  Lesson 8A: Managing Risk\u2014Time and Diversification  18. Explain that as the demonstration showed, time tends to lower the difference..."
+        },
+        {
+          "chunk_id": "e546acf56961eded_0000",
+          "source": "Federal Reserve",
+          "section": "page_1",
+          "preview": "Unit 8  Investing  Lesson 8A:  Managing Risk\u2014Time and Diversification  Rule 8: Grow your wealth safely.  Investing requires three simple steps: (i) sa..."
+        },
+        {
+          "chunk_id": "cd4b070c0fda7c96_0000",
+          "source": "Federal Reserve",
+          "section": "page_5",
+          "preview": "Lesson 8A: Managing Risk\u2014Time and Diversification  Unit 8: Investing  \u2022  There will be several rounds of investing, with each round representing 1 yea..."
+        },
+        {
+          "chunk_id": "9d79a15ae2cf76d9_0000",
+          "source": "Federal Reserve",
+          "section": "page_4",
+          "preview": "Unit 8: Investing  Lesson 8A: Managing Risk\u2014Time and Diversification  9.  Explain that since these options all have the same expected return, but diff..."
+        }
+      ],
+      "retrieval_latency_ms": 1108.0,
+      "generation_latency_ms": 15172.42,
+      "total_latency_ms": 16280.42,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "fed_03",
+      "source": "Federal Reserve",
+      "category": "Net Worth",
+      "question": "How is personal net worth calculated according to the Federal Reserve's Building Wealth guide?",
+      "reference_answer": "According to the Federal Reserve's Building Wealth guide, personal net worth is calculated using the balance sheet equation: Assets - Liabilities = Net Worth. Assets encompass everything of monetary value that you own (cash, bank accounts, retirement plans, stocks, and home market value), while liabilities comprise all debts owed (mortgages, car loans, student loans, and credit card balances).",
+      "generated_answer": "Personal net worth is calculated by subtracting total liabilities from total assets, as stated in the Federal Reserve Bank of Dallas' \"Building Wealth\" guide. Specifically, it mentions:\n\n\"ASSETS \u2013 LIABILITIES = NET WORTH\"\n\nThis formula helps individuals determine their net worth by accounting for all their assets (such as cash, savings accounts, stocks, bonds, real estate, and vehicles) and subtracting any liabilities or debts they have (like mortgages, car loans, credit card balances, and student loans).",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "7c522cb78282e1ed_0000",
+          "source": "Federal Reserve",
+          "section": "page_35",
+          "preview": "33  Federal Reserve Bank of Dallas \t Building Wealth\t Federal Reserve Bank of Dallas \t Building Wealth\t ASSETS (MINUS) LIABILITIES (EQUALS) NET WORTH ..."
+        },
+        {
+          "chunk_id": "c42f16ef11b6a5ae_0000",
+          "source": "Federal Reserve",
+          "section": "page_4",
+          "preview": "2  Building Wealth\t Federal Reserve Bank of Dallas i $24,000 You want to create personal wealth, right? So does Anthony.  Anthony is 35 and works for ..."
+        },
+        {
+          "chunk_id": "293ac4a35ce51bf4_0000",
+          "source": "Federal Reserve",
+          "section": "page_3",
+          "preview": "1  Federal Reserve Bank of Dallas \t Building Wealth\t You can create personal wealth. It\u2019s possible to meet your financial  goals. By choosing to budge..."
+        },
+        {
+          "chunk_id": "4a4dd38515c3e731_0000",
+          "source": "Federal Reserve",
+          "section": "page_28",
+          "preview": "26 Building Wealth\t Federal Reserve Bank of Dallas Has your definition of wealth changed? Now that you\u2019ve read this workbook and thought about the inf..."
+        },
+        {
+          "chunk_id": "8160a19301dce48c_0000",
+          "source": "Federal Reserve",
+          "section": "page_32",
+          "preview": "30 Building Wealth\t Federal Reserve Bank of Dallas Wealth-Building Resource Guide Introduction The following resources can be used  to learn more abou..."
+        }
+      ],
+      "retrieval_latency_ms": 1083.5,
+      "generation_latency_ms": 5569.31,
+      "total_latency_ms": 6652.82,
+      "metrics": {
+        "precision_at_3": 0.6667,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "fed_04",
+      "source": "Federal Reserve",
+      "category": "Assets",
+      "question": "What distinguishes wealth-creating assets from everyday possessions in the Building Wealth curriculum?",
+      "reference_answer": "Wealth-creating assets are items or accounts that can earn interest, generate dividends, or increase in market value over time, such as savings accounts, retirement plans, stocks, bonds, and real estate. In contrast, everyday possessions like cars, clothing, and household furniture are depreciating assets that immediately drop in market value once purchased and do not generate income.",
+      "generated_answer": "In the Building Wealth curriculum, wealth-creating assets are distinguished from everyday possessions by their potential to increase in value or provide a return. Specifically:\n\n1. **Wealth-Creating Assets**:\n   - Include savings accounts.\n   - Include retirement plans.\n   - Include stocks and bonds.\n   - Include a house.\n\n2. **Everyday Possessions (that aren't wealth-creating assets)**:\n   - Such as your car, household furnishings, and clothes.\n   - These items do not earn money or rise in value; for example, a new car loses value immediately after purchase.\n\nAccording to the Federal Reserve Bank of Dallas, \"A wealth-creating asset is a possession that generally increases in value or provides a return.\" This distinction highlights why focusing on assets like savings and investments can contribute more effectively to building long-term financial wealth compared to simply accumulating non-investing possessions.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "4a4dd38515c3e731_0000",
+          "source": "Federal Reserve",
+          "section": "page_28",
+          "preview": "26 Building Wealth\t Federal Reserve Bank of Dallas Has your definition of wealth changed? Now that you\u2019ve read this workbook and thought about the inf..."
+        },
+        {
+          "chunk_id": "c42f16ef11b6a5ae_0000",
+          "source": "Federal Reserve",
+          "section": "page_4",
+          "preview": "2  Building Wealth\t Federal Reserve Bank of Dallas i $24,000 You want to create personal wealth, right? So does Anthony.  Anthony is 35 and works for ..."
+        },
+        {
+          "chunk_id": "293ac4a35ce51bf4_0000",
+          "source": "Federal Reserve",
+          "section": "page_3",
+          "preview": "1  Federal Reserve Bank of Dallas \t Building Wealth\t You can create personal wealth. It\u2019s possible to meet your financial  goals. By choosing to budge..."
+        },
+        {
+          "chunk_id": "6937470af55fd166_0000",
+          "source": "Federal Reserve",
+          "section": "page_2",
+          "preview": "Introduction: Building Wealth\t 1 \t Learn the Language\t 2 \t Budget to Save\t 4 \t Save and Invest\t 8 \t Build Credit and Control Debt\t 16 \t Protect Your W..."
+        },
+        {
+          "chunk_id": "9df1ef93bf3d8486_0000",
           "source": "Federal Reserve",
           "section": "page_5",
           "preview": "KEYS TO FINANCIAL SUCCESS     5  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
         }
       ],
-      "retrieval_latency_ms": 47.73,
-      "generation_latency_ms": 2179.71,
-      "total_latency_ms": 2227.44,
+      "retrieval_latency_ms": 1059.14,
+      "generation_latency_ms": 8880.98,
+      "total_latency_ms": 9940.12,
+      "metrics": {
+        "precision_at_3": 0.6667,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "fed_05",
+      "source": "Federal Reserve",
+      "category": "Risk and Return",
+      "question": "How does the Investment Pyramid illustrate the relationship between financial risk and potential return?",
+      "reference_answer": "The Investment Pyramid illustrates the direct trade-off between risk and potential return. The broad base of the pyramid consists of low-risk, highly secure foundations such as an emergency fund, insured bank deposits, and adequate insurance coverage. As an investor moves up the pyramid toward bonds, stocks, and speculative investments, potential financial returns increase, but so does the risk of losing capital.",
+      "generated_answer": "The Investment Pyramid illustrates that as you move up the pyramid, investments generally offer the potential for higher returns but also carry greater risk of loss (Source: Federal Reserve, page 10-11). Investments at the bottom of the pyramid are safer and typically earn lower returns over time. This visual representation helps students understand that there is a trade-off between risk and return in investing.\n\nFor example:\n- At the bottom of the pyramid, you have financial foundation elements like savings accounts and bonds, which offer lower risk but also lower potential returns.\n- Moving up to stocks represents higher risk investments with potentially higher returns.\n\nThis structure emphasizes that investors must consider their tolerance for risk when making investment choices.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "0bade6bb25554256_0000",
+          "source": "Federal Reserve",
+          "section": "page_4",
+          "preview": "KEYS TO FINANCIAL SUCCESS     4  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
+        },
+        {
+          "chunk_id": "6f8fce21fc823c70_0000",
+          "source": "Federal Reserve",
+          "section": "page_11",
+          "preview": "9          \t   \t         \t   \t STOCK $ $ $ $ $ The Investment Pyramid: How Much Risk Do You Want to Take? $ $ BOND STOCK Increasing Risk Decreasing Ri..."
+        },
+        {
+          "chunk_id": "982a738de1226ecf_0000",
+          "source": "Federal Reserve",
+          "section": "page_10",
+          "preview": "Unit 8: Investing  Lesson 8B: Evaluating Investment Options  Standards and Benchmarks  National Standards for Financial Literacy  Standard 5: Financia..."
+        },
+        {
+          "chunk_id": "9d79a15ae2cf76d9_0000",
+          "source": "Federal Reserve",
+          "section": "page_4",
+          "preview": "Unit 8: Investing  Lesson 8A: Managing Risk\u2014Time and Diversification  9.  Explain that since these options all have the same expected return, but diff..."
+        },
+        {
+          "chunk_id": "7ffcf05aafd1c557_0000",
+          "source": "Federal Reserve",
+          "section": "page_14",
+          "preview": "Unit 8: Investing  Lesson 8A: Managing Risk\u2014Time and Diversification  Standards and Benchmarks  National Standards for Financial Literacy  Standard 5:..."
+        }
+      ],
+      "retrieval_latency_ms": 856.45,
+      "generation_latency_ms": 6049.41,
+      "total_latency_ms": 6905.86,
       "metrics": {
         "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "fed_06",
+      "source": "Federal Reserve",
+      "category": "Securities",
+      "question": "What is the core difference between owning stocks and owning bonds?",
+      "reference_answer": "Stocks represent equity ownership shares in a company, entitling the shareholder to a portion of the company's potential future profits and capital growth, accompanied by higher volatility and risk of loss. Bonds represent debt securities or loans where an investor lends money to a government or corporate borrower in exchange for regular interest payments and the return of the bond's face value principal upon maturity.",
+      "generated_answer": "The core differences between owning stocks and owning bonds, as described in the provided context, lie primarily in their nature, risk profile, and potential returns:\n\n1. **Nature of Ownership**:\n   - **Stocks**: When you buy common stock, you become a part owner (shareholder) of the company. This ownership comes with certain rights, such as voting on corporate matters.\n   - **Bonds**: Owning bonds means lending money to the issuer (government or corporation). In return, you receive interest payments and get your principal back at maturity.\n\n2. **Risk Profile**:\n   - **Stocks**: Generally considered riskier than bonds because stock prices can fluctuate significantly based on company performance, market conditions, and other factors.\n   - **Bonds**: Typically seen as less risky compared to stocks since bondholders have a higher claim on assets in case of bankruptcy (seniority over shareholders).\n\n3. **Potential Returns**:\n   - **Stocks**: Offer the potential for higher returns through capital appreciation and dividends. However, these are not guaranteed.\n   - **Bonds**: Provide more predictable income from interest payments but usually offer lower returns compared to stocks.\n\n4. **Government Backing**:\n   - **U.S. Treasury Bonds**: These bonds are backed by the full faith and credit of the U.S. government, making them one of the safest investments.\n   - **Corporate Bonds**: Not insured; there is a risk of default if the company fails to pay interest or return principal.\n\n5. **Tax Considerations**:\n   - Both stocks and bonds can offer tax advantages, but they differ in how these benefits are realized. For instance, municipal bond interest is often exempt from federal income tax, while dividends on stocks may be subject to taxes.\n\nIn summary, the key differences lie in ownership rights, risk levels, potential returns, government backing, and tax implications. Stocks represent equity investment with higher risks but potentially greater rewards, whereas bonds are debt instruments offering more stability and predictable income streams.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "8347d78b1b715d3b_0000",
+          "source": "Federal Reserve",
+          "section": "page_13",
+          "preview": "11          \t   \t i Treasury notes are interest-bearing securities with maturities ranging from two to 10 years. Interest payments  are made every six..."
+        },
+        {
+          "chunk_id": "09a0ea1dccae86a6_0001",
+          "source": "Federal Reserve",
+          "section": "page_8",
+          "preview": "can purchase a bond for as little as $25. Bonds are backed by the full faith  and credit of the U.S. government, making them one of the safest investm..."
+        },
+        {
+          "chunk_id": "731777cfcb104dda_0001",
+          "source": "Federal Reserve",
+          "section": "page_8",
+          "preview": "very safe and offer a greater return than savings accounts, but  access carries a penalty if money is withdrawn before the specified time.   \u25cf  U.S. s..."
+        },
+        {
+          "chunk_id": "7dc76144bed6b6d3_0002",
+          "source": "Federal Reserve",
+          "section": "page_30",
+          "preview": "se to the borrower  and revenue to the lender. Also, money  earned on a savings account.  Interest rate The percentage charged  for a loan, usually a ..."
+        },
+        {
+          "chunk_id": "1432db33cb912a07_0002",
+          "source": "Federal Reserve",
+          "section": "page_12",
+          "preview": "re  short-term securities with maturities of three months,  six months or one year. They are sold at a discount  from their face value, and the differ..."
+        }
+      ],
+      "retrieval_latency_ms": 607.12,
+      "generation_latency_ms": 17978.66,
+      "total_latency_ms": 18585.79,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "fed_07",
+      "source": "Federal Reserve",
+      "category": "Investment Vehicles",
+      "question": "What is a mutual fund and why is it beneficial for beginner investors?",
+      "reference_answer": "A mutual fund is an investment company that pools money from numerous individual investors to purchase a broad collection of stocks, bonds, or other securities. It is beneficial for beginners because it provides instant diversification and professional portfolio management, allowing someone with limited capital to spread risk across dozens or hundreds of holdings rather than betting on single companies.",
+      "generated_answer": "A mutual fund is an investment that pools money from multiple investors to buy a diverse portfolio of assets, such as stocks, bonds, or other securities. According to the Federal Reserve (page 13), \"Mutual funds are established to invest many people\u2019s money in many firms.\" By investing in a mutual fund, you become part of a larger investment that spreads risk across numerous companies rather than relying on just one.\n\nFor beginner investors, mutual funds can be beneficial for several reasons. First, they offer diversification, which means your investments aren't tied to the performance of a single company or asset class. This helps reduce overall risk because if one investment performs poorly, others may perform well and balance out the losses. Second, mutual funds are managed by professionals who make decisions on behalf of investors, which can be advantageous for those new to investing.\n\nAdditionally, as mentioned in Chunk [3], \"A popular investment option is called a \u2018target date fund,\u2019 where you can choose a date in the future (your target date, often retirement) when you will need your money. Target date funds will automatically adjust the way your money is invested from a more aggressive, stock-heavy portfolio earlier in your career to a more conservative mix of investments as you approach retirement.\" This feature can be particularly helpful for beginners who might not know how to rebalance their portfolios or manage risk effectively.\n\nAccording to CFPB and other sources, mutual funds have varying degrees of risk and associated costs such as management fees. However, they provide an accessible way for beginner investors to start building a diversified portfolio without having to research and purchase individual securities.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "8347d78b1b715d3b_0001",
+          "source": "Federal Reserve",
+          "section": "page_13",
+          "preview": "ast. Learn what the experts say about the  company and the relationship of its financial performance  and stock price. Successful investors are well i..."
+        },
+        {
+          "chunk_id": "731777cfcb104dda_0002",
+          "source": "Federal Reserve",
+          "section": "page_8",
+          "preview": "ancial assets such as stocks and/or bonds that provide a means of  diversification. Some funds are riskier than others because they have a more uncert..."
+        },
+        {
+          "chunk_id": "97e71e0e220c97ed_0000",
+          "source": "SEC/Investor.gov",
+          "section": "page_3",
+          "preview": "When choosing an investment option within your 401(k), IRA or any other  investment, a diversified fund that spreads your investment across many  comp..."
+        },
+        {
+          "chunk_id": "731777cfcb104dda_0001",
+          "source": "Federal Reserve",
+          "section": "page_8",
+          "preview": "very safe and offer a greater return than savings accounts, but  access carries a penalty if money is withdrawn before the specified time.   \u25cf  U.S. s..."
+        },
+        {
+          "chunk_id": "ed3b54c6971652c3_0001",
+          "source": "Federal Reserve",
+          "section": "page_5",
+          "preview": "s? (Diversifying means spreading  your money across different investments instead of putting it all in one place. If one  investment loses value, othe..."
+        }
+      ],
+      "retrieval_latency_ms": 951.2,
+      "generation_latency_ms": 14209.21,
+      "total_latency_ms": 15160.42,
+      "metrics": {
+        "precision_at_3": 0.6667,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "fed_08",
+      "source": "Federal Reserve",
+      "category": "Saving vs Investing",
+      "question": "How does the Federal Reserve distinguish between the primary purposes of saving versus investing?",
+      "reference_answer": "Saving focuses on safety, capital preservation, and liquidity, typically placing money into insured bank accounts for short-term goals and sudden emergencies where money must be readily accessible without market risk. Investing focuses on growing capital over a multi-year or multi-decade time horizon to outpace inflation, accepting market fluctuations and risk of loss in exchange for higher expected long-term returns.",
+      "generated_answer": "The Federal Reserve distinguishes between the primary purposes of saving and investing by highlighting key differences in risk, return, and accessibility:\n\n- **Saving** generally offers lower risk and easier access to money but typically earns a lower return. (Source: Chunk [4], point 6.a)\n\n- **Investing**, on the other hand, offers the potential for higher returns but involves greater risk, including the possibility of losing money. (Source: Chunk [4], point 6.a)\n\nThese distinctions are further illustrated through examples in the provided context:\n\n- Savings accounts and certificates of deposit (CDs) are described as very safe with a guaranteed return, though they offer lower potential gains compared to other investment options. (Chunk [2])\n\n- Investments like stocks, real estate, commodities, and mutual funds are noted for their higher risk but also greater potential returns. For instance, while stocks can be riskier due to fluctuating prices, they generally provide higher returns than bonds or insured savings accounts to compensate for the increased risk. (Chunk [2])\n\nBy understanding these trade-offs, individuals can better align their financial decisions with their goals and risk tolerance when choosing between saving and investing.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "e4b0120b70500238_0000",
+          "source": "Federal Reserve",
+          "section": "page_1",
+          "preview": "KEYS TO FINANCIAL SUCCESS     1  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
+        },
+        {
+          "chunk_id": "731777cfcb104dda_0001",
+          "source": "Federal Reserve",
+          "section": "page_8",
+          "preview": "very safe and offer a greater return than savings accounts, but  access carries a penalty if money is withdrawn before the specified time.   \u25cf  U.S. s..."
+        },
+        {
+          "chunk_id": "1395ba1d7bcdadd7_0000",
+          "source": "Federal Reserve",
+          "section": "page_20",
+          "preview": "KEYS TO FINANCIAL SUCCESS     20  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education..."
+        },
+        {
+          "chunk_id": "4023b83869e06af9_0000",
+          "source": "Federal Reserve",
+          "section": "page_3",
+          "preview": "KEYS TO FINANCIAL SUCCESS     3  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
+        },
+        {
+          "chunk_id": "56efa320bb5c50a1_0000",
+          "source": "Federal Reserve",
+          "section": "page_29",
+          "preview": "27  Federal Reserve Bank of Dallas \t Building Wealth\t Glossary Federal Reserve Bank of Dallas \t Building Wealth\t An investment in  knowledge always pa..."
+        }
+      ],
+      "retrieval_latency_ms": 695.63,
+      "generation_latency_ms": 15003.54,
+      "total_latency_ms": 15699.17,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "fed_09",
+      "source": "Federal Reserve",
+      "category": "Inflation",
+      "question": "How does inflation erode purchasing power, and how should investors respond?",
+      "reference_answer": "Inflation is the gradual general rise in the prices of goods and services over time, which reduces the purchasing power of each dollar. If savings sit in accounts earning an interest rate lower than inflation, the real buying power of that money declines over time. To combat inflation, investors allocate funds to growth assets like stocks that historically provide rates of return higher than inflation over long periods.",
+      "generated_answer": "Inflation can erode purchasing power because as prices of goods and services rise, each unit of currency buys less than it did before. For example, if an item costs $1 today and next year its price increases due to inflation, you will need more dollars to buy the same item in the future.\n\nAccording to the provided context (Federal Reserve, page 11), \"Inflation risk reflects savings' and investments' sensitivity to the inflation rate.\" This means that even if an investment offers a fixed interest rate, if inflation rises above that rate, the real value of your returns decreases. For instance, if you have a savings account with a 5% interest rate but inflation is at 6%, your purchasing power has effectively decreased.\n\nTo respond to inflation risk, investors should consider diversifying their investments and choosing those that can outpace inflation. According to the Federal Reserve's lesson on investing (page 4), \"Investments with greater risk usually have higher expected rates of return.\" While high-risk options may offer better returns, they also come with increased volatility.\n\nA balanced approach might involve a mix of low-risk assets like U.S. Treasury bonds that are less sensitive to inflation but provide stable returns, and higher-risk investments such as stocks or real estate that historically have had the potential for growth that can outpace inflation over time.\n\nIt's important to note that while diversification can help manage risk, it does not eliminate it entirely. Investors should also consider their personal financial situation, including their ability to tolerate losses if necessary (financial risk tolerance) and how long they plan to keep their money invested (time horizon).",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "81d1422761884145_0001",
+          "source": "CFPB",
+          "section": "page_141",
+          "preview": "u must pay the accruing interest during the deferment or it will build up.  140  YOUR MONEY, YOUR GOALS TOOLKIT"
+        },
+        {
+          "chunk_id": "9d79a15ae2cf76d9_0000",
+          "source": "Federal Reserve",
+          "section": "page_4",
+          "preview": "Unit 8: Investing  Lesson 8A: Managing Risk\u2014Time and Diversification  9.  Explain that since these options all have the same expected return, but diff..."
+        },
+        {
+          "chunk_id": "57dd12497ea889ce_0000",
+          "source": "Federal Reserve",
+          "section": "page_2",
+          "preview": "Unit 8: Investing  Lesson 8A: Managing Risk\u2014Time and Diversification  Compelling Question  How can investors reduce risk?  Objectives  Students will b..."
+        },
+        {
+          "chunk_id": "9e581c5dc15caa31_0000",
+          "source": "Federal Reserve",
+          "section": "page_4",
+          "preview": "KEYS TO FINANCIAL SUCCESS     4  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
+        },
+        {
+          "chunk_id": "6f8fce21fc823c70_0001",
+          "source": "Federal Reserve",
+          "section": "page_11",
+          "preview": "? Your investment decisions  should reflect your wealth-creation goals. Time horizon. How long can you leave your money  invested? If you will need yo..."
+        }
+      ],
+      "retrieval_latency_ms": 813.89,
+      "generation_latency_ms": 20857.59,
+      "total_latency_ms": 21671.47,
+      "metrics": {
+        "precision_at_3": 0.6667,
+        "recall_at_5": 1.0,
+        "mrr": 0.5,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "fed_10",
+      "source": "Federal Reserve",
+      "category": "Portfolio Construction",
+      "question": "How do an individual's financial goals, risk tolerance, and time horizon influence their investment portfolio?",
+      "reference_answer": "An investor's portfolio asset allocation must align with their specific goals, emotional risk tolerance, and investment time horizon. Individuals with long time horizons (such as decades until retirement) can stomach market downturns and allocate a higher percentage to higher-risk, growth-oriented stocks. Those with shorter time horizons or lower risk tolerance must prioritize capital preservation by allocating more heavily to stable bonds and cash equivalents.",
+      "generated_answer": "An individual\u2019s financial goals, risk tolerance, and time horizon significantly influence their investment portfolio. Here\u2019s how each factor impacts investment decisions:\n\n1. **Financial Goals**: Financial goals that require your money to grow more may necessitate investments with higher potential returns (Source: Federal Reserve, page 11). For example, someone saving for retirement might be willing to take on more risk in hopes of achieving a higher return over the long term.\n\n2. **Risk Tolerance**: Your ability and willingness to accept financial losses influences your investment choices. If you cannot afford to lose money or see its value fall, you should generally opt for less risky investments (Source: Federal Reserve, page 19). This is because riskier assets can lead to greater potential returns but also higher volatility.\n\n3. **Time Horizon**: The length of time you plan to leave your money invested affects the level of risk you are willing to take. If you need the money soon, taking less risk may be appropriate as you will have less time to recover from losses (Source: Federal Reserve, page 19). Conversely, longer-term goals like retirement allow for more risk because there is a longer period to potentially earn higher returns and recover from market downturns.\n\nThese factors collectively shape an individual\u2019s investment strategy. For instance, someone saving for retirement might choose investments with moderate to high risk in pursuit of higher long-term gains, while another person needing funds within a few years may prefer safer, lower-risk options (Source: Federal Reserve, page 19).\n\nIn summary, understanding and balancing these three factors is crucial when making investment decisions. According to the Federal Reserve\u2019s guidelines, investors should consider their financial goals, risk tolerance, and time horizon when diversifying and allocating assets in their portfolio (Source: Federal Reserve, page 6).",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "cf7446d7e0ee3fc4_0001",
+          "source": "Federal Reserve",
+          "section": "page_7",
+          "preview": "12  1.  A person\u2019s investment risk tolerance depends on factors such as personality, \ufb01nancial  resources, investment experiences, and life circumstanc..."
+        },
+        {
+          "chunk_id": "9df1ef93bf3d8486_0001",
+          "source": "Federal Reserve",
+          "section": "page_5",
+          "preview": "conditions, interest rates,  company performance, new information, and investor demand.  6. When making diversification and asset allocation decisions..."
+        },
+        {
+          "chunk_id": "6f8fce21fc823c70_0001",
+          "source": "Federal Reserve",
+          "section": "page_11",
+          "preview": "? Your investment decisions  should reflect your wealth-creation goals. Time horizon. How long can you leave your money  invested? If you will need yo..."
+        },
+        {
+          "chunk_id": "ed3b54c6971652c3_0000",
+          "source": "Federal Reserve",
+          "section": "page_5",
+          "preview": "KEYS TO FINANCIAL SUCCESS     5  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
+        },
+        {
+          "chunk_id": "be4fc2af61b44fb6_0000",
+          "source": "Federal Reserve",
+          "section": "page_4",
+          "preview": "KEYS TO FINANCIAL SUCCESS     4  \u00a9 2010, 2012, 2015, 2018, 2020, 2026 Federal Reserve Bank of Philadelphia and Delaware Council on Economic Education...."
+        }
+      ],
+      "retrieval_latency_ms": 905.81,
+      "generation_latency_ms": 15611.55,
+      "total_latency_ms": 16517.37,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "cfpb_01",
+      "source": "CFPB",
+      "category": "Credit Reports",
+      "question": "What information is collected in a credit report according to the CFPB?",
+      "reference_answer": "According to the CFPB, a credit report contains: (1) personal identifying information, (2) credit account records including payment history and whether bills were paid on time, (3) credit limits and current credit utilization, (4) public records such as bankruptcies and legal judgments, (5) collection accounts from debt collectors, and (6) inquiries indicating who has recently requested access to the report.",
+      "generated_answer": "According to the CFPB, a credit report may include several types of information such as:\n\n- Bill payment history\n- Public record information \n- A record of how often you have applied for credit\n- How much available credit you have\n- How much of your available credit you're using\n- Whether you've made your payments on time\n- If debt collectors are attempting to collect any debts that you owe\n\nThe CFPB notes that the specific information included can vary by credit reporting company and their format. Additionally, a credit report is used to create credit scores which many lenders use to decide loan terms.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "0d620205a387ed2f_0000",
+          "source": "CFPB",
+          "section": "page_155",
+          "preview": "credit reports. Since credit scores are calculated based on the information in the  reports, take the time at least once a year to make sure the infor..."
+        },
+        {
+          "chunk_id": "5a7cad2d878fdff0_0000",
+          "source": "CFPB",
+          "section": "page_166",
+          "preview": "Here\u2019s how it works:  \u2022 File your dispute with the information furnisher or the credit  reporting company.  \u2022 They generally have 30 days to investiga..."
+        },
+        {
+          "chunk_id": "fb7e812ebee23bea_0000",
+          "source": "CFPB",
+          "section": "page_164",
+          "preview": "DEFINITIONS OF TERMS CREDIT REPORTING COMPANIES USE  Information  provider or  furnisher  A business or individual that reports information to a credi..."
+        },
+        {
+          "chunk_id": "001911cad88809db_0001",
+          "source": "CFPB",
+          "section": "page_156",
+          "preview": "reports. It\u2019s an example credit  report and isn\u2019t based on the format of any one specific credit reporting company.  Each company\u2019s format varies in l..."
+        },
+        {
+          "chunk_id": "e57ecdfc2e6954aa_0000",
+          "source": "CFPB",
+          "section": "page_154",
+          "preview": "When you take out a credit card or other loan, you create (or add to) your credit  history. Sometimes when people talk about their financial situation..."
+        }
+      ],
+      "retrieval_latency_ms": 694.79,
+      "generation_latency_ms": 9928.88,
+      "total_latency_ms": 10623.66,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "cfpb_02",
+      "source": "CFPB",
+      "category": "Credit Scores",
+      "question": "What factors determine a consumer's credit score and why does it matter to lenders?",
+      "reference_answer": "Credit scores are three-digit numbers calculated from credit report data based primarily on: payment history (making on-time payments), amounts owed and credit utilization ratio, length of credit history, types of credit accounts maintained, and new credit applications. Lenders use credit scores to evaluate borrower creditworthiness, decide whether to approve loans, and determine the interest rates offered.",
+      "generated_answer": "A consumer's credit score is determined by several key factors as outlined in the provided documents:\n\n1. **Payment History**: This is the most important factor, accounting for about 35% of your score. It shows whether payments were made on time or late (recent delinquent payments are more damaging than those from many years past).\n\n2. **Amount Owed**: Also known as credit utilization rate, this accounts for around 30% of the score. Experts advise keeping it below 30% of your total available credit.\n\n3. **Length of Credit History**: While not directly mentioned in the provided context, the age of your oldest account and overall average age can influence your score (about 15%).\n\n4. **New Credit**: This includes new accounts opened or inquiries for new credit, which make up about 10% of the score.\n\n5. **Types of Credit Used**: Having a mix of different types of credit (e.g., mortgage, auto loan, and credit cards) can positively impact your score.\n\nThese factors matter to lenders because they help predict the likelihood that you will repay debts on time. Higher credit scores indicate lower risk for lenders, which often results in better terms for borrowers, such as lower interest rates or higher credit limits.\n\nAccording to CFPB (Consumer Financial Protection Bureau), \"The information in your credit report is used to create credit scores. Many lenders use credit scores to decide how much money they can lend you and how much interest to charge.\" Higher credit scores generally lead to better loan terms, while lower scores may result in higher interest rates or even rejection for loans.\n\nAdditionally, as mentioned by the CFPB, \"Having a poor credit history or low credit scores can create obstacles for you, such as costing you more money in terms of the price you will pay for loans, credit cards, and other services.\" This underscores why maintaining good credit practices is important beyond just borrowing.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "d43047a508f2b954_0000",
+          "source": "Federal Reserve",
+          "section": "page_19",
+          "preview": "17          \t   \t         \t   \t i The information in your credit report is used to create  your credit score. (For a small fee, you can get your  cred..."
+        },
+        {
+          "chunk_id": "ee4426fa729b58a8_0000",
+          "source": "CFPB",
+          "section": "page_169",
+          "preview": "3 GETTING YOUR CREDIT SCORES  Usually, you have to pay for a credit score. Some lenders, such as credit card  companies, may provide you a credit scor..."
+        },
+        {
+          "chunk_id": "e57ecdfc2e6954aa_0000",
+          "source": "CFPB",
+          "section": "page_154",
+          "preview": "When you take out a credit card or other loan, you create (or add to) your credit  history. Sometimes when people talk about their financial situation..."
+        },
+        {
+          "chunk_id": "5a7cad2d878fdff0_0001",
+          "source": "CFPB",
+          "section": "page_166",
+          "preview": "panies,  and lenders may use different credit scores to make decisions about offering  you credit.  165  YOUR MONEY, YOUR GOALS TOOLKIT"
+        },
+        {
+          "chunk_id": "2b52a55b26a1df1b_0000",
+          "source": "CFPB",
+          "section": "page_168",
+          "preview": "2 New credit is tracked by measuring credit inquiries about you made by creditors  and others. If there are too many inquiries, it may signal that you..."
+        }
+      ],
+      "retrieval_latency_ms": 564.57,
+      "generation_latency_ms": 16962.49,
+      "total_latency_ms": 17527.06,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "cfpb_03",
+      "source": "CFPB",
+      "category": "Debt Collection",
+      "question": "What specific actions are prohibited for debt collectors under the Fair Debt Collection Practices Act (FDCPA)?",
+      "reference_answer": "Under the Fair Debt Collection Practices Act (FDCPA), debt collectors are legally prohibited from harassing or abusing consumers (such as calling repeatedly), using obscene or profane language, threatening actions they cannot legally take or do not intend to take, calling without identifying themselves, lying about or misleading consumers regarding the amount owed, or publicly publishing names of individuals who allegedly owe debts.",
+      "generated_answer": "According to the CFPB information provided, debt collectors are prohibited from:\n\n- Calling repeatedly to harass you or abuse you\n- Using abusive or obscene language \n- Threatening you by saying they\u2019ll take action they can\u2019t or don\u2019t intend to take\n- Calling you without telling you who they are\n- Lying to or misleading you\n- Publishing your name for not paying a debt\n\nThese actions are specifically outlined as being against the Fair Debt Collection Practices Act (FDCPA) when a debt collector is trying to get you to pay a debt.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "989208d1c406d98a_0000",
+          "source": "CFPB",
+          "section": "page_144",
+          "preview": "\ue601 GETTING STARTED  When debt collectors call  Learn about your rights concerning debt collectors and what to  do if they contact you.  When companies ..."
+        },
+        {
+          "chunk_id": "b45b95c2a149643e_0000",
+          "source": "CFPB",
+          "section": "page_124",
+          "preview": "You should avoid doing business with any company that promises to settle the debt  if the company:  \u2022  Charges any fees before it settles your debts  ..."
+        },
+        {
+          "chunk_id": "109dc1bfdf095c7b_0000",
+          "source": "CFPB",
+          "section": "page_146",
+          "preview": "Resolve issues with debt collectors  If the debt is not legitimate (if it's not yours or you already paid  it), don't delay in disputing it.  Use the ..."
+        },
+        {
+          "chunk_id": "261b8ed975b2f6df_0000",
+          "source": "CFPB",
+          "section": "page_150",
+          "preview": "I am responding to your contact about collecting a  debt. I do not have any responsibility for the debt you\u2019re  trying to collect.  If you have good r..."
+        },
+        {
+          "chunk_id": "7dc76144bed6b6d3_0000",
+          "source": "Federal Reserve",
+          "section": "page_30",
+          "preview": "28 Building Wealth\t Federal Reserve Bank of Dallas Glossary Debit card A plastic card similar to a  credit card that allows money to be  withdrawn or ..."
+        }
+      ],
+      "retrieval_latency_ms": 670.34,
+      "generation_latency_ms": 5128.25,
+      "total_latency_ms": 5798.59,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "cfpb_04",
+      "source": "CFPB",
+      "category": "Credit Disputes",
+      "question": "What steps should a consumer take to dispute an error on their credit report?",
+      "reference_answer": "To dispute credit report errors, a consumer should submit a dispute letter or online form to the nationwide credit reporting companies (Equifax, Experian, or TransUnion) displaying the mistake, as well as to the creditor or information furnisher that reported it. The dispute should identify each incorrect item, clearly state the facts and reason for the dispute, enclose copies of supporting documents, and request correction or removal.",
+      "generated_answer": "To dispute an error on your credit report, follow these steps:\n\n1. **Prepare Your Dispute**:\n   - Review any mistakes identified using tools provided by organizations like the CFPB.\n   - Gather supporting documents such as copies of bills, cleared checks, or personal identity information if needed.\n\n2. **Submit the Dispute**:\n   - You can submit a dispute through phone, mail, or online with the credit reporting company (Equifax, Experian, or TransUnion).\n   - Use any provided forms or write a letter explaining the error and what you want changed.\n   - Clearly identify each mistake separately, state the facts, explain why you are disputing the information, and request that it be removed or corrected.\n\n3. **Include Supporting Documentation**:\n   - Attach copies of all supporting documents to your dispute submission.\n   - Keep your originals for your records.\n\n4. **Notify the Furnisher (if applicable)**:\n   - You can also send a copy of the dispute letter to the furnisher, which is usually found on your credit report.\n\n5. **Follow Up**:\n   - The credit reporting company has 30 calendar days (or up to 45 in some cases) to investigate.\n   - They must notify you within five business days after completing their investigation.\n   - If necessary, they will inform the furnisher of any changes and update your credit report.\n\n6. **Review Results**:\n   - If you disagree with the results, you can send a letter stating so.\n   - You may also file a complaint with the CFPB if needed.\n\nThese steps are detailed in the CFPB's guidelines for disputing errors on credit reports.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "5faac279b471ca61_0000",
+          "source": "CFPB",
+          "section": "page_177",
+          "preview": ". Disputing errors on your  credit reports  If you find mistakes on your  credit reports, you should  dispute them. Here\u2019s how you  can dispute errors..."
+        },
+        {
+          "chunk_id": "628dd29ec9487bc4_0000",
+          "source": "CFPB",
+          "section": "page_178",
+          "preview": "WAITING FOR MISTAKES TO GET FIXED  The credit reporting company generally has  30 calendar days (45 days in some cases) to  investigate your dispute. ..."
+        },
+        {
+          "chunk_id": "5a7cad2d878fdff0_0000",
+          "source": "CFPB",
+          "section": "page_166",
+          "preview": "Here\u2019s how it works:  \u2022 File your dispute with the information furnisher or the credit  reporting company.  \u2022 They generally have 30 days to investiga..."
+        },
+        {
+          "chunk_id": "e5ab0f7903360928_0000",
+          "source": "CFPB",
+          "section": "page_175",
+          "preview": "Monitor and find errors by Reviewing  your credit reports regularly.  1. Make a copy of this tool, one for each of the three nationwide credit reporti..."
+        },
+        {
+          "chunk_id": "5faac279b471ca61_0001",
+          "source": "CFPB",
+          "section": "page_177",
+          "preview": "provide a dispute form you can use. You\u2019ll also  want to send a letter explaining the mistake(s)\u2014  there\u2019s a letter template you can use on the  next ..."
+        }
+      ],
+      "retrieval_latency_ms": 620.53,
+      "generation_latency_ms": 15652.24,
+      "total_latency_ms": 16272.77,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "cfpb_05",
+      "source": "CFPB",
+      "category": "Debt Repayment",
+      "question": "What are the two primary debt repayment strategies outlined in the CFPB Debt Action Plan?",
+      "reference_answer": "The CFPB Debt Action Plan highlights two repayment strategies once all required minimum payments are satisfied: (1) Pay Smallest Debt First (snowball method), where extra money targets the smallest total debt balance to eliminate accounts quickly and gain psychological momentum, and (2) Pay Highest Interest Rate First (avalanche method), where extra money targets the debt carrying the steepest interest rate, minimizing overall interest paid and saving the most money over time.",
+      "generated_answer": "The two primary debt repayment strategies outlined in the CFPB Debt Action Plan are:\n\n1. Paying off debts from smallest to largest.\n2. Focusing on repaying debts with the highest interest rate first.\n\nAccording to CFPB, these strategies have their own advantages and disadvantages, but choosing one over the other depends on what motivates you most to keep paying down your debt.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "959f1d04d0531d22_0000",
+          "source": "CFPB",
+          "section": "page_132",
+          "preview": "\ue601 GETTING STARTED  Debt action plan  Picking a strategy to repay your debt can help you start  reducing it and make progress toward achieving your goa..."
+        },
+        {
+          "chunk_id": "e22e10b93c86b9fb_0000",
+          "source": "CFPB",
+          "section": "page_133",
+          "preview": "Start reducing your debt by making a  Debt action plan . 1. Review the pros and cons of each strategy for paying down debt.  2. List your top three de..."
+        },
+        {
+          "chunk_id": "734eb40864e6c4f6_0000",
+          "source": "CFPB",
+          "section": "page_139",
+          "preview": "If you have federal student loans, you may have options when it  comes to how and when you repay them.  The government offers different repayment  opt..."
+        },
+        {
+          "chunk_id": "81d1422761884145_0000",
+          "source": "CFPB",
+          "section": "page_141",
+          "preview": "Plan name  Payments  Loan period  Terms  Forgiveness  Availability  Incomebased  repayment (IBR)  Payment  based on up  to 10 or 15  percent of  your ..."
+        },
+        {
+          "chunk_id": "188298f0395d7dc5_0000",
+          "source": "CFPB",
+          "section": "page_138",
+          "preview": "You may have options for Repaying  student loans if you're struggling  1. Check the box that best describes where you are with your monthly student lo..."
+        }
+      ],
+      "retrieval_latency_ms": 953.5,
+      "generation_latency_ms": 3515.8,
+      "total_latency_ms": 4469.3,
+      "metrics": {
+        "precision_at_3": 0.6667,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "cfpb_06",
+      "source": "CFPB",
+      "category": "Cash Flow & Budgeting",
+      "question": "What is a cash flow budget and how does it prevent financial shortfalls?",
+      "reference_answer": "A cash flow budget tracks the exact timing of when income arrives and when bill payments are due across specific weeks of a month. Unlike a general monthly budget, cash flow planning prevents timing shortfalls by identifying weeks when expenses exceed incoming cash, giving consumers advance warning to adjust discretionary spending, shift bill due dates, or tap savings before late fees or overdrafts occur.",
+      "generated_answer": "A cash flow budget projects your expected income and expenses week by week, helping you manage your finances more precisely than a monthly budget. It's particularly useful for those with irregular or seasonal incomes (Chunk [1], page_99).\n\nBy tracking when money comes in and out, a cash flow budget can help prevent financial shortfalls in several ways:\n\n1. **Identifying Shortfalls**: The budget helps you see where you might fall short each week by comparing your income to your expenses (Chunk [1], page_99). This allows you to plan ahead.\n\n2. **Prioritizing Expenses**: You can use the information from a cash flow budget to prioritize essential expenses, such as rent or mortgage payments, ensuring these are covered even if other expenses need to be postponed or reduced (Chunk [1], page_99).\n\n3. **Planning for Irregular Income**: For those with irregular income, a cash flow budget helps in planning how to spread the income received over future weeks when there might not be incoming funds (Chunk [1], page_99).\n\n4. **Strategies for Improvement**: If you find that your expenses exceed your income during certain weeks, tools like \"Improving cash flow\" can help brainstorm strategies such as cutting back on non-essential spending or adjusting the timing of payments to improve your weekly cash flow (Chunk [3], page_100).\n\nTo create a cash flow budget, start by tracking your income and expenses for at least one month using provided tools like \"Income and benefits tracker\" and \"Spending tracker\". Then, use these tools to analyze your financial situation week by week. Adjustments can be made based on the insights gained from this analysis (Chunk [2], page_101; Chunk [3], page_100).",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "bd70d94588814423_0000",
+          "source": "CFPB",
+          "section": "page_99",
+          "preview": "Making a cash flow budget  A cash flow budget projects what money you expect to come in and how much  you think you\u2019ll spend each week and when you ex..."
+        },
+        {
+          "chunk_id": "c2737fc9feefa8c1_0000",
+          "source": "CFPB",
+          "section": "page_101",
+          "preview": "\ue601 GETTING STARTED  Creating a cash flow budget  A cash flow budget is all about tracking the timing of your  income and expenses to make sure you have..."
+        },
+        {
+          "chunk_id": "17c329486a63f464_0000",
+          "source": "CFPB",
+          "section": "page_100",
+          "preview": "expenses requires major changes, such as moving or selling your car. Sometimes  you can work with your landlord or lender to adjust when these expense..."
+        },
+        {
+          "chunk_id": "24fca04acf1f2579_0000",
+          "source": "CFPB",
+          "section": "page_102",
+          "preview": "Consider expense and income timing  by Creating a cash flow budget  1. Enter your starting balance for the month under Week 1. This is the total amoun..."
+        },
+        {
+          "chunk_id": "1ffb13e4e0b2b4eb_0000",
+          "source": "CFPB",
+          "section": "page_98",
+          "preview": "MODULE 5  Getting through  the Month  Tracking when your money comes in and goes out can  help you understand if you\u2019ll have enough each week   or mon..."
+        }
+      ],
+      "retrieval_latency_ms": 582.44,
+      "generation_latency_ms": 17278.66,
+      "total_latency_ms": 17861.11,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "cfpb_07",
+      "source": "CFPB",
+      "category": "Banking & Overdraft",
+      "question": "What are overdraft fees on checking accounts and how can consumers prevent them?",
+      "reference_answer": "An overdraft fee is charged by a bank or credit union when an account balance drops below zero to cover a payment or withdrawal. Consumers can prevent these costly fees by opting out of overdraft programs for debit card and ATM transactions, linking their checking account to a savings account for automatic backup transfers, maintaining a cash buffer, or signing up for low-balance text alerts.",
+      "generated_answer": "Overdraft fees occur when a consumer does not have enough money in their checking account to cover a transaction such as a check, debit card purchase, ATM withdrawal, or automatic bill payment. When this happens, the bank pays for the transaction anyway, and the consumer is charged an overdraft fee.\n\nTo prevent these fees, consumers can take several steps:\n\n1. **Maintain Sufficient Funds**: Always ensure that your checking account has enough funds to cover transactions.\n2. **Overdraft Protection Services**:\n   - Link your checking account to a savings account for automatic transfers if needed (overdraft protection).\n   - Opt out of services that allow ATM withdrawals and debit card purchases to overdraw the account, as these can result in overdraft fees.\n3. **Monitor Your Account**: Regularly check your balance online or through mobile banking apps to avoid spending more than you have available.\n4. **Set Up Alerts**: Use low-balance alerts from your bank to notify you when your account is running low on funds.\n5. **Choose Low-Fee Accounts**: Consider opening a checking account with lower fees, such as those offered by senior accounts, student accounts, or basic checking accounts.\n\nBy following these strategies, consumers can reduce the likelihood of incurring overdraft fees and manage their finances more effectively.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "3dbd7c9e7ab41bff_0000",
+          "source": "CFPB",
+          "section": "page_189",
+          "preview": "OVERDRAFT FEES  Banks and credit unions often offer several types of overdraft services. These  services usually have fees associated with them. An ov..."
+        },
+        {
+          "chunk_id": "3f87dbfe2c5be2e4_0000",
+          "source": "CFPB",
+          "section": "page_219",
+          "preview": "STRATEGY  TIPS FOR AVOIDING FEES  NEXT STEPS  I will see if I can get  a low-fee or free  checking account.  \u2022 Get monthly service fees waived  by mai..."
+        },
+        {
+          "chunk_id": "7058a4b72f963105_0000",
+          "source": "CFPB",
+          "section": "page_218",
+          "preview": ". Save money by Avoiding checking  account fees  1. Read the different strategies for reducing or avoiding checking account fees.  2. Check the box of..."
+        },
+        {
+          "chunk_id": "3dbd7c9e7ab41bff_0001",
+          "source": "CFPB",
+          "section": "page_189",
+          "preview": "edit union will generally decline your card  (without charging a fee) if you attempt to withdraw cash or make a purchase that  costs more than what yo..."
+        },
+        {
+          "chunk_id": "e40c07918b5907f0_0001",
+          "source": "CFPB",
+          "section": "page_187",
+          "preview": "you\u2019re allowed to open a new checking or savings account, even if those  fees are from another institution. Many banks and credit unions offer checkin..."
+        }
+      ],
+      "retrieval_latency_ms": 749.7,
+      "generation_latency_ms": 13507.4,
+      "total_latency_ms": 14257.1,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "cfpb_08",
+      "source": "CFPB",
+      "category": "Emergency Savings",
+      "question": "Why does the CFPB emphasize building emergency savings and how can someone begin with a tight budget?",
+      "reference_answer": "The CFPB emphasizes emergency savings because having money set aside provides a critical buffer against inevitable unexpected expenses (like car repairs or medical bills), preventing people from relying on high-interest debt or falling behind on essential bills. For those on a tight budget, the CFPB recommends starting small (even $10 to $20 per paycheck), using direct deposit to automatically transfer funds into a separate account, and saving tax refunds or cash windfalls.",
+      "generated_answer": "The CFPB emphasizes building emergency savings because unexpected expenses and emergencies can arise at any time. These situations can lead to financial strain if not properly prepared for, such as missing bill payments or incurring additional costs from borrowing money.\n\nTo begin with a tight budget, someone can follow these steps:\n\n1. **Identify the Goal**: Start by deciding on an emergency fund goal, like $500 or $1,000 initially (as suggested), which can help cover common emergencies.\n2. **Break It Down**: Divide the total amount needed by the number of weeks available to save. For example, saving $500 over 40 weeks would mean setting aside $12.50 per week.\n3. **Find Savings Opportunities**: Look for ways to reduce expenses or increase income. This could include cutting back on non-essential spending (like eating out less) or finding additional sources of income.\n\nBy following these steps, even with a tight budget, you can start building an emergency fund that will provide financial security when unexpected costs arise. According to the CFPB, having this kind of savings is crucial for handling emergencies without disrupting other financial obligations or incurring additional fees and interest from borrowing.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "3e139c27a41bedc5_0000",
+          "source": "CFPB",
+          "section": "page_40",
+          "preview": "\u2022  To pay for their own goals, like a new TV, appliances, a car, a home, their  children\u2019s education, or retirement  Reasons to save  Everyone has the..."
+        },
+        {
+          "chunk_id": "3e139c27a41bedc5_0001",
+          "source": "CFPB",
+          "section": "page_40",
+          "preview": "s goals. Once you have this set up, it\u2019s easier to focus on saving for other  things without worrying about how you would handle an emergency expense...."
+        },
+        {
+          "chunk_id": "ef1b1d525441454a_0000",
+          "source": "CFPB",
+          "section": "page_46",
+          "preview": "\ue601 GETTING STARTED  Savings plan  Making a weekly savings target helps make saving easier by  breaking it up into manageable pieces. This can help you ..."
+        },
+        {
+          "chunk_id": "4045eecbac7397dc_0000",
+          "source": "CFPB",
+          "section": "page_47",
+          "preview": ". CATEGORY CATEGORY Creating a Savings plan can make it  easier to save  1. Write down the goal you're saving toward.  2. Figure out the total amount ..."
+        },
+        {
+          "chunk_id": "b517360bae7d4861_0001",
+          "source": "CFPB",
+          "section": "page_42",
+          "preview": "re\u2019s also the challenge of where to actually  store your savings so you aren\u2019t tempted to spend it. If you don\u2019t have a place to  set savings aside, i..."
+        }
+      ],
+      "retrieval_latency_ms": 1012.87,
+      "generation_latency_ms": 13417.67,
+      "total_latency_ms": 14430.54,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "cfpb_09",
+      "source": "CFPB",
+      "category": "Credit Reporting Time Limits",
+      "question": "How long does negative financial information and bankruptcy remain on a credit report according to federal rules?",
+      "reference_answer": "Under federal credit reporting rules outlined by the CFPB, most negative information\u2014including late payments, delinquent accounts, charge-offs, and debt collection accounts\u2014can remain on a credit report for up to seven years. A personal bankruptcy can stay on a credit report for up to 10 years, and unpaid civil judgments or lawsuits can remain for seven years or until the governing statute of limitations expires.",
+      "generated_answer": "According to federal rules as described in the provided documents:\n\n- Negative information like late payments or bankruptcies can generally stay on your credit report for specific periods. Most negative items are typically removed after 7 years, except:\n  - Bankruptcy stays on your credit report for up to 10 years.\n  - Civil suits and judgments, such as back child support, may remain longer depending on the statute of limitations, but they generally do not exceed 7 years.\n\nFor more precise details or specific circumstances, it's recommended to check directly with one of the nationwide credit reporting companies (Equifax, Experian, TransUnion) or consult the Federal Trade Commission (FTC).",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "001911cad88809db_0000",
+          "source": "CFPB",
+          "section": "page_156",
+          "preview": "Remove your name from mailed pre-screened credit offers by opting out at   (888) 567-8688 or online at optoutprescreen.com.  Choose the \u201c5-year\u201d remov..."
+        },
+        {
+          "chunk_id": "5a7cad2d878fdff0_0000",
+          "source": "CFPB",
+          "section": "page_166",
+          "preview": "Here\u2019s how it works:  \u2022 File your dispute with the information furnisher or the credit  reporting company.  \u2022 They generally have 30 days to investiga..."
+        },
+        {
+          "chunk_id": "e40c07918b5907f0_0000",
+          "source": "CFPB",
+          "section": "page_187",
+          "preview": "Another potential barrier is negative information from checking account reporting  companies such as ChexSystems, Early Warning, and TeleCheck. These ..."
+        },
+        {
+          "chunk_id": "a99ac94d2f7aa918_0000",
+          "source": "CFPB",
+          "section": "page_163",
+          "preview": "DEFINITIONS OF TERMS CREDIT REPORTING COMPANIES USE  Authorized user  A person permitted to use a credit card account, but who is not  responsible for..."
+        },
+        {
+          "chunk_id": "6530555f2c3b7630_0000",
+          "source": "CFPB",
+          "section": "page_239",
+          "preview": "INITIAL FRAUD ALERT  An initial fraud alert requires creditors to verify  your identity before opening a new account,  issuing an additional card, or ..."
+        }
+      ],
+      "retrieval_latency_ms": 1078.47,
+      "generation_latency_ms": 8054.11,
+      "total_latency_ms": 9132.58,
+      "metrics": {
+        "precision_at_3": 1.0,
+        "recall_at_5": 1.0,
+        "mrr": 1.0,
+        "hit_rate": 1.0,
+        "answer_relevance": null,
+        "answer_relevance_raw": null,
+        "answer_relevance_reasoning": null,
+        "faithfulness": null,
+        "faithfulness_raw": null,
+        "faithfulness_reasoning": null
+      }
+    },
+    {
+      "id": "cfpb_10",
+      "source": "CFPB",
+      "category": "Rebuilding Credit",
+      "question": "How does a secured credit card assist an individual in establishing or rebuilding credit?",
+      "reference_answer": "A secured credit card requires the applicant to put down a cash security deposit with the bank, which usually serves as the credit limit for the card. The cardholder uses the card for regular purchases and makes on-time monthly payments. Because the card issuer reports these regular, on-time payments to the credit bureaus, it allows consumers with no credit or damaged credit to build a positive credit history without lender default risk.",
+      "generated_answer": "A secured credit card assists an individual in establishing or rebuilding credit by requiring a deposit that typically equals the credit limit. This type of card can help build a positive credit history, especially for those who are new to using credit. By responsibly using the secured credit card\u2014such as not maxing out the credit and always paying on time\u2014the cardholder may eventually be offered an unsecured card with higher credit limits.\n\nAccording to the Federal Reserve (page 19) and CFPB (pages 112, 183), a secured credit card can help establish or rebuild credit. The process involves using the card responsibly over a period of time, which can lead to better credit standing in the future. Additionally, maintaining an account with older dates can be beneficial as it shows a longer history of responsible financial behavior.\n\nIt's important to note that some secured credit cards come with annual fees and may charge interest if balances are not paid off in full each month. Therefore, careful management is necessary to avoid additional costs while building credit.",
+      "retrieved_chunks": [
+        {
+          "chunk_id": "d43047a508f2b954_0001",
+          "source": "Federal Reserve",
+          "section": "page_19",
+          "preview": "mation to them to correct the mistake. Beware of credit repair services that claim they can  erase your bad credit. Many of these are scams. There\u2019s  ..."
+        },
+        {
+          "chunk_id": "a9101e1b9055d2f9_0000",
+          "source": "CFPB",
+          "section": "page_205",
+          "preview": "Consider this option  Where it\u2019s  How it works  if you want...  offered  Secured  credit card  \u2022   To build a credit  history  \u2022   Borrow money up to ..."
+        },
+        {
+          "chunk_id": "2316b8643b089a6f_0001",
+          "source": "CFPB",
+          "section": "page_113",
+          "preview": "rd. Your credit limit will generally equal your  deposit. For example, if you deposit $300, your credit limit will be $300. If you  don\u2019t pay back the..."
+        },
+        {
+          "chunk_id": "3053048e355eb277_0000",
+          "source": "CFPB",
+          "section": "page_183",
+          "preview": "HABIT  TIPS FOR IMPROVING YOUR CREDIT   I'll only apply for credit  that I need.  Credit scoring formulas look at your recent credit activity as  a si..."
+        },
+        {
+          "chunk_id": "490db1f6c72b3678_0001",
+          "source": "CFPB",
+          "section": "page_114",
+          "preview": "But they are still able  to use the credit card. Be careful when adding authorized users to your account,  because they can create added debt that you..."
+        }
+      ],
+      "retrieval_latency_ms": 958.08,
+      "generation_latency_ms": 12548.1,
+      "total_latency_ms": 13506.18,
+      "metrics": {
+        "precision_at_3": 0.6667,
         "recall_at_5": 1.0,
         "mrr": 1.0,
         "hit_rate": 1.0,
