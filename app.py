@@ -91,6 +91,16 @@ def _get_ollama_models() -> list[str]:
     return OLLAMA_DEFAULT_MODELS
 
 
+@st.cache_data(ttl=60)
+def _is_ollama_available() -> bool:
+    """Return True if the local Ollama server is reachable (local dev only)."""
+    try:
+        import urllib.request
+        urllib.request.urlopen(settings.ollama_base_url, timeout=2)
+        return True
+    except Exception:
+        return False
+
 
 def _get_available_models() -> list[str]:
     """Return models depending on backend."""
@@ -158,16 +168,22 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
     with st.sidebar:
         st.title("⚙️ Settings")
 
-        # Backend selector — always offer both Groq Cloud and Ollama Local
-        backend_options = ["Groq Cloud (Hosted)", "Ollama (Local)"]
-        default_backend_idx = 0 if (settings.llm_backend.lower() == "groq" or bool(settings.groq_api_key)) else 1
-        selected_backend_choice = st.radio(
-            "LLM Backend",
-            options=backend_options,
-            index=default_backend_idx,
-            help="Choose between Groq Cloud (fast hosted inference) or Ollama (local dev server).",
-        )
-        is_groq = "Groq" in selected_backend_choice
+        # Backend selector — Ollama option only shown when locally reachable
+        ollama_available = _is_ollama_available()
+        if ollama_available:
+            backend_options = ["Groq Cloud (Hosted)", "Ollama (Local)"]
+            default_backend_idx = 0 if (settings.llm_backend.lower() == "groq" or bool(settings.groq_api_key)) else 1
+            selected_backend_choice = st.radio(
+                "LLM Backend",
+                options=backend_options,
+                index=default_backend_idx,
+                help="Choose between Groq Cloud (fast hosted inference) or Ollama (local dev server).",
+            )
+            is_groq = "Groq" in selected_backend_choice
+        else:
+            # Streamlit Cloud / Ollama not running — lock silently to Groq
+            is_groq = True
+            selected_backend_choice = "Groq Cloud (Hosted)"
         settings.llm_backend = "groq" if is_groq else "ollama"
 
         if is_groq:
@@ -403,17 +419,11 @@ def _handle_query(
             token_stream = stream_answer(query, chunks, model=model)
             answer = st.write_stream(token_stream)
         except Exception as exc:
-            err_str = str(exc)
-            if "localhost:11434" in err_str or "Cannot assign requested address" in err_str or "Connection refused" in err_str:
-                st.warning(
-                    "⚠️ **Local Ollama server is unreachable.**\n\n"
-                    "If you are viewing this on Streamlit Cloud, Ollama is not hosted here. "
-                    "Please switch to **Groq Cloud (Hosted)** in the sidebar settings for fast cloud inference!\n\n"
-                    "_Running locally? Make sure Ollama is running in your terminal (`ollama serve`)._"
-                )
-            else:
-                hint = "Please check your GROQ_API_KEY in Streamlit Secrets." if settings.llm_backend == "groq" else "Is Ollama running? Run `ollama serve` in a terminal."
-                st.error(f"❌ **Generation failed**: {exc}\n\n💡 {hint}")
+            hint = "Check Ollama (local) or your GROQ_API_KEY in Streamlit Secrets." if settings.llm_backend == "groq" else "Is Ollama running? `ollama serve` in a terminal."
+            st.error(
+                f"❌ Generation failed: {exc}\n\n"
+                f"💡 {hint}"
+            )
             return
 
         generation_ms = (time.perf_counter() - generation_start) * 1000
