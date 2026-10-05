@@ -93,10 +93,20 @@ def _get_ollama_models() -> list[str]:
 
 @st.cache_data(ttl=60)
 def _is_ollama_available() -> bool:
-    """Return True if the local Ollama server is reachable (local dev only)."""
+    """Return True if running locally AND local Ollama server is reachable."""
+    import os
+    # If running on Streamlit Cloud or containerized hosting, Ollama is never available
+    is_cloud = (
+        bool(os.environ.get("STREAMLIT_SERVER_PORT"))
+        or bool(os.environ.get("STREAMLIT_SHARING_MODE"))
+        or (hasattr(st, "secrets") and len(st.secrets) > 0)
+    )
+    if is_cloud:
+        return False
+
     try:
         import urllib.request
-        urllib.request.urlopen(settings.ollama_base_url, timeout=2)
+        urllib.request.urlopen(settings.ollama_base_url, timeout=1.5)
         return True
     except Exception:
         return False
@@ -168,7 +178,7 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
     with st.sidebar:
         st.title("⚙️ Settings")
 
-        # Backend selector — Ollama option only shown when locally reachable
+        # Backend selector — Ollama option only shown when running locally with Ollama active
         ollama_available = _is_ollama_available()
         if ollama_available:
             backend_options = ["Groq Cloud (Hosted)", "Ollama (Local)"]
@@ -180,16 +190,16 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
                 help="Choose between Groq Cloud (fast hosted inference) or Ollama (local dev server).",
             )
             is_groq = "Groq" in selected_backend_choice
+            settings.llm_backend = "groq" if is_groq else "ollama"
+            if is_groq:
+                st.success("⚡ Backend: **Groq Cloud**", icon="☁️")
+            else:
+                st.info("🖥️ Backend: **Ollama Local**", icon="💻")
         else:
-            # Streamlit Cloud / Ollama not running — lock silently to Groq
+            # Streamlit Cloud / Deployed — lock completely to Groq
             is_groq = True
-            selected_backend_choice = "Groq Cloud (Hosted)"
-        settings.llm_backend = "groq" if is_groq else "ollama"
-
-        if is_groq:
+            settings.llm_backend = "groq"
             st.success("⚡ Backend: **Groq Cloud**", icon="☁️")
-        else:
-            st.info("🖥️ Backend: **Ollama Local**", icon="💻")
 
         # Model selector
         available_models = _get_available_models()
