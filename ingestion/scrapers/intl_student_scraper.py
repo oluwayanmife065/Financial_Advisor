@@ -36,37 +36,19 @@ from pathlib import Path
 from typing import Optional
 from urllib.parse import urljoin, urlparse
 
-try:
-    import requests
-except ImportError:
-    requests = None
-
-try:
-    from bs4 import BeautifulSoup
-except ImportError:
-    BeautifulSoup = None
-
-try:
-    from loguru import logger
-except ImportError:
-    import logging
-    logger = logging.getLogger("IntlStudentScraper")
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-
-import urllib.request
-import html
-from html.parser import HTMLParser
+import requests
+from bs4 import BeautifulSoup
+from loguru import logger
 
 from ingestion.document import Document
 from ingestion.scrapers.base import BaseScraper
-
 
 # ---------------------------------------------------------------------------
 # Target URL catalogue
 # ---------------------------------------------------------------------------
 
 INTL_STUDENT_SOURCES: list[dict] = [
-    # --- DHS Study in the States ---
+    # --- DHS Study in the States (Immigration & Status Boundaries) ---
     {
         "source": "DHS/StudyInTheStates",
         "section": "Working in the US (CPT/OPT)",
@@ -82,34 +64,44 @@ INTL_STUDENT_SOURCES: list[dict] = [
         "section": "OPT Overview",
         "url": "https://studyinthestates.dhs.gov/students/work/optional-practical-training-opt",
     },
-    # --- IRS international students ---
+    # --- IRS (Taxation, Pub 519, Nonresident Alien Investing Rules) ---
     {
         "source": "IRS",
-        "section": "Taxation of International Students",
+        "section": "Taxation of Nonresident Aliens (Pub 519 Overview)",
         "url": "https://www.irs.gov/individuals/international-taxpayers/taxation-of-nonresident-aliens",
     },
     {
         "source": "IRS",
-        "section": "ITIN Application",
+        "section": "ITIN Application & Eligibility",
         "url": "https://www.irs.gov/individuals/individual-taxpayer-identification-number",
     },
     {
         "source": "IRS",
-        "section": "Tax Treaties",
+        "section": "Tax Treaties and Nonresident Withholding",
         "url": "https://www.irs.gov/individuals/international-taxpayers/tax-treaties",
     },
     {
         "source": "IRS",
-        "section": "Foreign Students and Scholars",
+        "section": "Foreign Students and Scholars Exemption",
         "url": "https://www.irs.gov/individuals/international-taxpayers/foreign-students-and-exchange-visitors",
+    },
+    {
+        "source": "IRS",
+        "section": "Investment Income of Nonresident Aliens & 30% Withholding",
+        "url": "https://www.irs.gov/individuals/international-taxpayers/nontaxable-types-of-interest-income-for-nonresident-aliens",
+    },
+    {
+        "source": "IRS",
+        "section": "Capital Gains of Nonresident Aliens (183-Day Rule)",
+        "url": "https://www.irs.gov/individuals/international-taxpayers/the-taxation-of-capital-gains-of-nonresident-alien-students-scholars-and-employees-of-foreign-governments",
     },
     # --- Social Security Administration ---
     {
         "source": "SSA",
-        "section": "SSN for Non-Citizens",
+        "section": "SSN for Non-Citizens & Student Employment",
         "url": "https://www.ssa.gov/ssnumber/ss5doc.htm",
     },
-    # --- USCIS ---
+    # --- USCIS (Work Authorization vs Passive Investing) ---
     {
         "source": "USCIS",
         "section": "OPT for F-1 Students",
@@ -117,7 +109,7 @@ INTL_STUDENT_SOURCES: list[dict] = [
     },
     {
         "source": "USCIS",
-        "section": "STEM OPT Extension",
+        "section": "STEM OPT Extension Regulations",
         "url": "https://www.uscis.gov/working-in-the-united-states/students-and-exchange-visitors/optional-practical-training-extension-for-stem-students-stem-opt",
     },
     {
@@ -125,29 +117,52 @@ INTL_STUDENT_SOURCES: list[dict] = [
         "section": "Changing Nonimmigrant Status",
         "url": "https://www.uscis.gov/visit-the-united-states/extend-your-stay/change-my-nonimmigrant-status",
     },
-    # --- CFPB newcomer banking ---
+    # --- CFPB (Banking, High-Yield Savings, CD, Credit) ---
     {
         "source": "CFPB",
-        "section": "Banking Basics",
+        "section": "Banking Basics & Savings Accounts",
         "url": "https://www.consumerfinance.gov/consumer-tools/money-as-you-grow/",
     },
     {
         "source": "CFPB",
-        "section": "Building Credit",
+        "section": "Building Credit Without US Credit History",
         "url": "https://www.consumerfinance.gov/ask-cfpb/how-do-i-get-a-credit-card-if-i-dont-have-a-credit-history-en-1175/",
     },
-    # --- SEC / Investor.gov ---
+    # --- SEC / Investor.gov (Permitted Investments & Risk) ---
     {
         "source": "SEC/Investor.gov",
-        "section": "Investing Basics for Everyone",
+        "section": "Introduction to Investing: Stocks, Bonds, Mutual Funds",
         "url": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins/how-0",
     },
     {
         "source": "SEC/Investor.gov",
-        "section": "Compound Interest Calculator",
+        "section": "Compound Interest & Long-Term Growth",
         "url": "https://www.investor.gov/financial-tools-calculators/calculators/compound-interest-calculator",
     },
+    {
+        "source": "SEC/Investor.gov",
+        "section": "Opening a Brokerage Account & Non-Citizen W-8BEN",
+        "url": "https://www.investor.gov/introduction-investing/investing-basics/how-stock-markets-work",
+    },
+    # --- FINRA (Investor Protection, Margin & Day Trading Warnings) ---
+    {
+        "source": "FINRA",
+        "section": "Day Trading Margin Requirements and Risk Alerts",
+        "url": "https://www.finra.org/investors/learn-to-invest/advanced-investing/day-trading-margin-requirements",
+    },
+    {
+        "source": "FINRA",
+        "section": "Mutual Funds, Index Funds and ETFs",
+        "url": "https://www.finra.org/investors/investing/investment-products",
+    },
+    # --- US TreasuryDirect (US Savings Bonds, Treasury Bills) ---
+    {
+        "source": "US TreasuryDirect",
+        "section": "Treasury Bills, Notes and Non-Citizen Eligibility",
+        "url": "https://www.treasurydirect.gov/indiv/research/indepth/tbills/res_tbill.htm",
+    },
 ]
+
 
 
 # ---------------------------------------------------------------------------
@@ -227,30 +242,15 @@ class IntlStudentScraper(BaseScraper):
         Returns:
             A ``Document`` on success, or ``None`` on any error.
         """
-        html_content = None
-        if requests is not None:
-            try:
-                resp = requests.get(url, headers=self.headers, timeout=self.timeout)
-                resp.raise_for_status()
-                html_content = resp.text
-            except Exception as exc:
-                logger.warning(f"⚠️  Could not fetch {url} via requests: {exc}")
-        
-        if html_content is None:
-            try:
-                req = urllib.request.Request(url, headers=self.headers)
-                with urllib.request.urlopen(req, timeout=self.timeout) as response:
-                    charset = response.headers.get_content_charset() or "utf-8"
-                    html_content = response.read().decode(charset, errors="ignore")
-            except Exception as exc:
-                logger.warning(f"⚠️  Could not fetch {url} via urllib: {exc}")
-                return None
+        try:
+            resp = requests.get(url, headers=self.headers, timeout=self.timeout)
+            resp.raise_for_status()
+        except requests.RequestException as exc:
+            logger.warning(f"⚠️  Could not fetch {url}: {exc}")
+            return None
 
-        if BeautifulSoup is not None:
-            soup = BeautifulSoup(html_content, "html.parser")
-            text = self._extract_text(soup)
-        else:
-            text = self._extract_text_stdlib(html_content)
+        soup = BeautifulSoup(resp.text, "html.parser")
+        text = self._extract_text(soup)
 
         if len(text.strip()) < 100:
             logger.warning(f"⚠️  Almost no text extracted from {url} — skipping.")
@@ -264,9 +264,15 @@ class IntlStudentScraper(BaseScraper):
         )
 
     @staticmethod
-    def _extract_text(soup) -> str:
+    def _extract_text(soup: BeautifulSoup) -> str:
         """
         Strip navigation, scripts, and boilerplate; return readable body text.
+
+        Args:
+            soup: Parsed BeautifulSoup tree.
+
+        Returns:
+            Clean multi-line string of body text.
         """
         # Remove noise tags
         for tag in soup(["script", "style", "nav", "footer", "header",
@@ -285,21 +291,8 @@ class IntlStudentScraper(BaseScraper):
             main = soup
 
         lines = [line.strip() for line in main.get_text(separator="\n").splitlines()]
+        # Collapse excessive blank lines
         text = "\n".join(line for line in lines if line)
-        text = re.sub(r"\n{3,}", "\n\n", text)
-        return text.strip()
-
-    @staticmethod
-    def _extract_text_stdlib(raw_html: str) -> str:
-        """Fallback HTML stripper using standard library regex & html unescape."""
-        # Strip script and style tags
-        cleaned = re.sub(r"<(script|style|nav|footer|header|aside)[^>]*>.*?</\1>", " ", raw_html, flags=re.DOTALL | re.IGNORECASE)
-        # Strip HTML tags
-        cleaned = re.sub(r"<[^>]+>", " ", cleaned)
-        cleaned = html.unescape(cleaned)
-        lines = [line.strip() for line in cleaned.splitlines()]
-        text = "\n".join(line for line in lines if line)
-        text = re.sub(r"[ \t]+", " ", text)
         text = re.sub(r"\n{3,}", "\n\n", text)
         return text.strip()
 
@@ -310,11 +303,12 @@ class IntlStudentScraper(BaseScraper):
     def export_pdf(
         self,
         documents: list[Document],
-        output_path: str | Path = "output/intl_student_sources.pdf",
+        output_path: str | Path = "intl_student_sources.pdf",
     ) -> Path:
         """
-        Compile all scraped documents into a single PDF.
-        Supports fpdf2 if available, or falls back to a robust built-in minimal PDF generator.
+        Compile all scraped documents into a single, bookmarked PDF.
+
+        Requires: ``fpdf2`` (``pip install fpdf2``).
 
         Args:
             documents: List of Document objects to render.
@@ -323,180 +317,64 @@ class IntlStudentScraper(BaseScraper):
         Returns:
             The resolved Path of the written PDF file.
         """
+        try:
+            from fpdf import FPDF  # type: ignore
+        except ImportError:
+            raise ImportError(
+                "fpdf2 is required for PDF export. Install it with:\n"
+                "  pip install fpdf2"
+            )
+
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        try:
-            from fpdf import FPDF  # type: ignore
+        pdf = FPDF()
+        pdf.set_auto_page_break(auto=True, margin=15)
+        pdf.set_margins(left=20, top=20, right=20)
 
-            pdf = FPDF()
-            pdf.set_auto_page_break(auto=True, margin=15)
-            pdf.set_margins(left=20, top=20, right=20)
+        # --- Cover page ---
+        pdf.add_page()
+        pdf.set_font("Helvetica", style="B", size=22)
+        pdf.cell(0, 15, "International Student Finance Guide", new_x="LMARGIN", new_y="NEXT", align="C")
+        pdf.set_font("Helvetica", size=12)
+        pdf.cell(0, 8, "Auto-compiled from trusted US government sources", new_x="LMARGIN", new_y="NEXT", align="C")
+        pdf.ln(5)
 
-            # Cover page
+        # Table of contents stub
+        pdf.set_font("Helvetica", style="B", size=13)
+        pdf.cell(0, 10, "Sources included:", new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("Helvetica", size=11)
+        for doc in documents:
+            pdf.cell(0, 7, f"  [{doc.source}]  {doc.section}", new_x="LMARGIN", new_y="NEXT")
+
+        # --- One section per document ---
+        for doc in documents:
             pdf.add_page()
-            pdf.set_font("Helvetica", style="B", size=22)
-            pdf.cell(0, 15, "International Student Finance Guide", new_x="LMARGIN", new_y="NEXT", align="C")
-            pdf.set_font("Helvetica", size=12)
-            pdf.cell(0, 8, "Auto-compiled from trusted US government & regulatory sources", new_x="LMARGIN", new_y="NEXT", align="C")
-            pdf.ln(5)
 
-            # Table of contents
-            pdf.set_font("Helvetica", style="B", size=13)
-            pdf.cell(0, 10, "Sources included:", new_x="LMARGIN", new_y="NEXT")
-            pdf.set_font("Helvetica", size=11)
-            for doc in documents:
-                pdf.cell(0, 7, f"  [{doc.source}]  {doc.section}", new_x="LMARGIN", new_y="NEXT")
+            # Section header
+            pdf.set_font("Helvetica", style="B", size=15)
+            header = f"{doc.source}  —  {doc.section}"
+            pdf.cell(0, 12, header[:90], new_x="LMARGIN", new_y="NEXT")
 
-            # Document pages
-            for doc in documents:
-                pdf.add_page()
-                pdf.set_font("Helvetica", style="B", size=15)
-                header = f"{doc.source}  -  {doc.section}"
-                pdf.cell(0, 12, header[:90], new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("Helvetica", style="I", size=9)
+            pdf.set_text_color(100, 100, 100)
+            pdf.cell(0, 6, f"URL: {doc.url}", new_x="LMARGIN", new_y="NEXT")
+            pdf.set_text_color(0, 0, 0)
+            pdf.ln(3)
 
-                pdf.set_font("Helvetica", style="I", size=9)
-                pdf.set_text_color(100, 100, 100)
-                pdf.cell(0, 6, f"URL: {doc.url}", new_x="LMARGIN", new_y="NEXT")
-                pdf.set_text_color(0, 0, 0)
+            # Body text — split into paragraphs
+            pdf.set_font("Helvetica", size=10)
+            for para in doc.text.split("\n\n"):
+                para = para.strip()
+                if not para:
+                    continue
+                # Encode to latin-1 safely
+                safe = para.encode("latin-1", errors="replace").decode("latin-1")
+                pdf.multi_cell(0, 6, safe)
                 pdf.ln(3)
 
-                pdf.set_font("Helvetica", size=10)
-                for para in doc.text.split("\n\n"):
-                    para = para.strip()
-                    if not para:
-                        continue
-                    safe = para.encode("latin-1", errors="replace").decode("latin-1")
-                    pdf.multi_cell(0, 6, safe)
-                    pdf.ln(3)
-
-            pdf.output(str(output_path))
-            logger.info(f"PDF written via fpdf2 -> {output_path.resolve()}")
-            return output_path.resolve()
-
-        except ImportError:
-            # Pure Python standard fallback PDF compiler
-            logger.info("fpdf2 not detected. Using built-in minimal PDF writer...")
-            return self._export_minimal_pdf(documents, output_path)
-
-    def _export_minimal_pdf(self, documents: list[Document], output_path: Path) -> Path:
-        """
-        Pure-python standards-compliant minimal PDF writer without external C/pip dependencies.
-        """
-        def escape_pdf_str(s: str) -> str:
-            clean = s.encode("latin-1", errors="replace").decode("latin-1")
-            clean = clean.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
-            return clean
-
-        pages_content = []
-        # Page 1: Cover
-        cover_stream = [
-            "BT",
-            "/F1 22 Tf",
-            "50 720 Td",
-            "(International Student Financial Literacy Guide) Tj",
-            "/F1 12 Tf",
-            "0 -30 Td",
-            "(Curated Regulatory & Advisory Knowledge Base) Tj",
-            "0 -25 Td",
-            f"(Documents Compiled: {len(documents)}) Tj",
-            "0 -40 Td",
-            "/F1 14 Tf",
-            "(Table of Contents:) Tj",
-            "/F1 10 Tf",
-        ]
-        y_offset = -20
-        for i, doc in enumerate(documents[:25], 1):
-            title = f"{i}. [{doc.source}] {doc.section}"
-            title = escape_pdf_str(title[:75])
-            cover_stream.append(f"0 {y_offset} Td")
-            cover_stream.append(f"({title}) Tj")
-            y_offset = -16
-        cover_stream.append("ET")
-        pages_content.append("\n".join(cover_stream))
-
-        # Doc pages
-        for doc in documents:
-            lines = doc.text.splitlines()
-            wrapped_lines = []
-            for line in lines:
-                line = line.strip()
-                if not line:
-                    wrapped_lines.append("")
-                    continue
-                while len(line) > 85:
-                    split_idx = line.rfind(" ", 0, 85)
-                    if split_idx == -1:
-                        split_idx = 85
-                    wrapped_lines.append(line[:split_idx])
-                    line = line[split_idx:].strip()
-                if line:
-                    wrapped_lines.append(line)
-
-            # Split into chunks of 45 lines per PDF page
-            page_size = 45
-            for page_idx in range(0, max(1, len(wrapped_lines)), page_size):
-                sub_lines = wrapped_lines[page_idx:page_idx + page_size]
-                stream = [
-                    "BT",
-                    "/F1 14 Tf",
-                    "40 750 Td",
-                    f"({escape_pdf_str(doc.source)} - {escape_pdf_str(doc.section[:45])}) Tj",
-                    "/F1 8 Tf",
-                    "0 -16 Td",
-                    f"(URL: {escape_pdf_str(doc.url[:85])}) Tj",
-                    "/F1 9 Tf",
-                    "0 -20 Td",
-                ]
-                for l in sub_lines:
-                    safe_l = escape_pdf_str(l)
-                    stream.append(f"({safe_l}) Tj")
-                    stream.append("0 -13 Td")
-                stream.append("ET")
-                pages_content.append("\n".join(stream))
-
-        # Build PDF object hierarchy
-        objects = []
-        objects.append("<< /Type /Catalog /Pages 2 0 R >>")  # Obj 1: Catalog
-        
-        # Obj 2: Pages list (will fill kids later)
-        page_obj_ids = [3 + i * 2 for i in range(len(pages_content))]
-        kids_str = " ".join(f"{pid} 0 R" for pid in page_obj_ids)
-        objects.append(f"<< /Type /Pages /Kids [{kids_str}] /Count {len(pages_content)} >>")
-
-        for idx, p_stream in enumerate(pages_content):
-            p_obj_id = 3 + idx * 2
-            c_obj_id = p_obj_id + 1
-            # Page object
-            objects.append(
-                f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
-                f"/Contents {c_obj_id} 0 R "
-                f"/Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> >>"
-            )
-            # Content Stream object
-            stream_bytes = p_stream.encode("latin-1", errors="replace")
-            objects.append(
-                f"<< /Length {len(stream_bytes)} >>\nstream\n{p_stream}\nendstream"
-            )
-
-        # Assemble PDF file
-        pdf_bytes = bytearray(b"%PDF-1.4\n")
-        xref_offsets = [0]
-        for i, obj in enumerate(objects, 1):
-            xref_offsets.append(len(pdf_bytes))
-            pdf_bytes.extend(f"{i} 0 obj\n{obj}\nendobj\n".encode("latin-1"))
-
-        xref_start = len(pdf_bytes)
-        pdf_bytes.extend(f"xref\n0 {len(objects) + 1}\n0000000000 65535 f \n".encode("latin-1"))
-        for off in xref_offsets[1:]:
-            pdf_bytes.extend(f"{off:010d} 00000 n \n".encode("latin-1"))
-
-        pdf_bytes.extend(
-            f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref_start}\n%%EOF\n".encode("latin-1")
-        )
-
-        output_path.write_bytes(pdf_bytes)
-        logger.info(f"Minimal PDF compiled successfully -> {output_path.resolve()}")
+        pdf.output(str(output_path))
+        logger.info(f"📄  PDF written → {output_path.resolve()}")
         return output_path.resolve()
 
 

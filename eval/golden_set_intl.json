@@ -91,5 +91,81 @@
       "tax treaty"
     ],
     "reference_answer": "Yes, non-citizens and nonresident aliens can legally open brokerage accounts (subject to individual broker policy) by providing Form W-8BEN certifying foreign tax status. US dividends paid to nonresident aliens are typically subject to a 30% statutory withholding tax unless reduced by an applicable bilateral tax treaty. Capital gains on portfolio stocks are generally not taxable under US rules unless the student was physically present in the US for 183 days or more in that tax year."
+  },
+  {
+    "id": "intl_07",
+    "source": "USCIS / SEC",
+    "category": "Permitted vs Prohibited Investments",
+    "question": "Can an F-1 international student engage in active day trading or pattern day trading in the US stock market?",
+    "relevant_keywords": [
+      "day trading",
+      "pattern day trader",
+      "unauthorized employment",
+      "passive investing",
+      "F-1 status violation",
+      "active trading"
+    ],
+    "reference_answer": "F-1 students are strictly prohibited from unauthorized employment under immigration law. While passive investing (buy-and-hold investing in stocks, mutual funds, or index ETFs) is completely legal as passive income, active day trading (such as making frequent intraday trades, scalping, or qualifying as a FINRA Pattern Day Trader) can be deemed by USCIS and immigration authorities as active trade or business conduct, risking a severe violation of F-1 nonimmigrant status."
+  },
+  {
+    "id": "intl_08",
+    "source": "IRS / CFPB",
+    "category": "Permitted vs Prohibited Investments",
+    "question": "Can an international student on an F-1 visa open a Roth IRA or Traditional IRA?",
+    "relevant_keywords": [
+      "Roth IRA",
+      "Traditional IRA",
+      "earned income",
+      "taxable compensation",
+      "nonresident alien",
+      "Form 1040-NR"
+    ],
+    "reference_answer": "An international student can contribute to a Roth IRA or Traditional IRA ONLY if they have US earned income (taxable compensation from authorized on-campus jobs, CPT, or OPT). Passive investment income, stipends not subject to earned income tax, or money sent from abroad do not qualify. Furthermore, nonresidents who use tax treaty exemptions to exclude all income from US taxation cannot contribute because their taxable earned compensation is effectively zero."
+  },
+  {
+    "id": "intl_09",
+    "source": "US TreasuryDirect / CFPB",
+    "category": "Permitted Investments",
+    "question": "Are international students allowed to buy US Treasury Bills, Notes, or High-Yield Savings Accounts (HYSA)?",
+    "relevant_keywords": [
+      "Treasury bills",
+      "T-bills",
+      "HYSA",
+      "portfolio interest",
+      "SSN or ITIN",
+      "tax-exempt interest"
+    ],
+    "reference_answer": "Yes. F-1 international students can invest in US Treasury Bills (T-Bills) and High-Yield Savings Accounts (HYSA) or Certificates of Deposit (CDs). For nonresident aliens, interest earned on US bank deposits and qualified portfolio interest (like short-term US Treasury obligations) is generally exempt from US federal withholding tax under IRS Code Section 871(i) and 871(h), provided an accurate Form W-8BEN is filed with the financial institution."
+  },
+  {
+    "id": "intl_10",
+    "source": "IRS / FinCEN",
+    "category": "Permitted vs Prohibited Investments",
+    "question": "Can international students buy, hold, or trade cryptocurrency in the United States, and what are the compliance rules?",
+    "relevant_keywords": [
+      "cryptocurrency",
+      "Bitcoin",
+      "crypto exchange",
+      "Form 8843",
+      "taxable capital event",
+      "staking rewards"
+    ],
+    "reference_answer": "Buying and passively holding cryptocurrency is legally permitted for international students in the US. However, crypto exchanges require identity verification (often requiring an SSN, ITIN, or foreign passport). Selling, trading one coin for another, or using crypto for purchases are taxable events. Moreover, running a commercial crypto mining operation, running high-frequency trading bots, or providing paid node infrastructure can be classified by USCIS as unauthorized self-employment or business operation."
+  },
+  {
+    "id": "intl_11",
+    "source": "USCIS / SEC",
+    "category": "Permitted vs Prohibited Investments",
+    "question": "Can an F-1 international student purchase real estate in the US, and can they actively manage rental properties?",
+    "relevant_keywords": [
+      "real estate",
+      "rental property",
+      "property manager",
+      "passive investment",
+      "active management",
+      "FIRPTA"
+    ],
+    "reference_answer": "F-1 students can legally purchase real estate in the United States as an investment. However, to remain compliant with visa laws, the student cannot actively manage the property (such as advertising, screening tenants, performing repairs, or collecting rent directly), as this constitutes unauthorized active employment. The student must hire a third-party professional property management firm so the investment remains strictly passive."
   }
 ]
+
