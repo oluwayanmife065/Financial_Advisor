@@ -106,8 +106,9 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 - Full coverage of `parse_pdf`, `parse_pdf_folder`, `infer_source_label`, and `_clean_text`
 - Tests for edge cases: missing files, empty folders, pages below content threshold
 ### Retrieval & Grounded Generation (`retrieval/`, `generation/`, `main.py`)
-- Embedded vector search via LanceDB
-- Grounded generation using local Ollama LLMs with strict anti-hallucination system prompt
+- Embedded vector search via LanceDB (local) and Pinecone (cloud)
+- Grounded generation using Groq Cloud API or local Ollama LLMs with strict anti-hallucination system prompt
+- **Multi-turn conversational context window** (`CONTEXT_WINDOW_TURNS = 3`): keeps up to the last 3 Q&A dialogue turns (6 messages) in the prompt so users can ask contextual follow-ups ("Can you explain that more?", "Does this rule apply to OPT?") without losing grounding
 - CLI interactive chat loop (`python3.11 main.py`) with real-time latency reporting and source citations
 - Structured observability: JSON Lines query logger (`query_logging/query_logger.py`)
 
@@ -204,8 +205,9 @@ streamlit run app.py
 ```
 
 The app opens at **http://localhost:8501** with:
-- 💬 **Streaming chat** — tokens appear live as Ollama generates
-- 📚 **Source expanders** — see exactly which SEC/CFPB/Fed chunks grounded each answer
+- 💬 **Streaming chat** — tokens appear live as Ollama or Groq generates
+- 🧠 **Multi-turn conversation context** — retains the last 3 Q&A exchanges in the context window for natural, conversational follow-ups
+- 📚 **Source expanders** — see exactly which SEC/CFPB/Fed/IRS chunks grounded each answer
 - ⏱️ **Latency badges** — retrieval ms + generation s + total s per response
 - ⚙️ **Sidebar** — model selector, top-k slider, corpus stats, live eval KPI badges, query log viewer
 
@@ -224,6 +226,7 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
 | `v0.5.0-polish` | Phase 5 complete — Streamlit streaming chat UI, source citation expanders, sidebar eval badges |
 | `v1.0.0` | Production deployment — Groq Cloud auto-fallback, Pinecone serverless cloud index, Streamlit Cloud ready |
 | `v1.1.0-intl-student-rag` | International student finetuning — 36-source scraper, 349-page regulatory guide PDF, 1,157 chunks indexed, 11-question evaluation benchmark |
+| `v1.2.0-conversation-context` | Multi-turn conversational memory — context window keeping the last 3 Q&A turns (6 messages) for natural follow-up queries |
 
 
 ---

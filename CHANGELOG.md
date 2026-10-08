@@ -10,6 +10,18 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ---
 
+## [v1.2.0-conversation-context] — 2026-10-08
+
+### Added
+- **Multi-Turn Conversational Memory & Context Window** (`generation/llm.py`, `app.py`):
+  - Configurable conversational context window (`CONTEXT_WINDOW_TURNS = 3`) that maintains the last 3 complete dialogue exchanges (up to 6 user/assistant messages) in the prompt before the current RAG-grounded question.
+  - Updated `_build_messages()` to ingest `chat_history`, filtering to valid `user` and `assistant` turns so the model can resolve conversational references and handle follow-up inquiries (e.g., "Can you elaborate on that?", "Does this apply to OPT as well?").
+  - Threaded `chat_history` through all generation backends: Groq cloud (`_groq_generate`, `_groq_stream`) and Ollama local (`_ollama_generate`, `_ollama_stream`).
+  - Added optional `chat_history` parameter to public APIs `generate_answer()` and `stream_answer()` with backward-compatible defaults (`None`).
+  - Updated Streamlit chat application (`app.py`) to snapshot prior conversation state before appending current user input, streaming responses with conversational memory without re-fetching RAG context for past turns.
+
+---
+
 ## [v1.1.0-intl-student-rag] — 2026-10-08
 
 ### Added
