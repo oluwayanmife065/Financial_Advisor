@@ -45,7 +45,9 @@ PDF_SOURCES = {
     "cfpb":  "CFPB",
     "finra": "FINRA",
     "fed":   "Federal Reserve",
+    "intl":  "International Student Regulatory Guide",
 }
+
 
 
 def _read_lancedb_chunks() -> list:

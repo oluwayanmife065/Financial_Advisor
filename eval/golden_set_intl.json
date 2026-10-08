@@ -124,18 +124,20 @@
   },
   {
     "id": "intl_09",
-    "source": "US TreasuryDirect / CFPB",
+    "source": "IRS / US TreasuryDirect",
     "category": "Permitted Investments",
-    "question": "Are international students allowed to buy US Treasury Bills, Notes, or High-Yield Savings Accounts (HYSA)?",
+    "question": "Can nonresident aliens and foreign students receive tax-exempt interest on US bank deposits or Treasury securities under IRS rules?",
     "relevant_keywords": [
-      "Treasury bills",
-      "T-bills",
-      "HYSA",
+      "interest",
       "portfolio interest",
-      "SSN or ITIN",
-      "tax-exempt interest"
+      "bank deposit",
+      "treasury",
+      "tax-exempt",
+      "exempt",
+      "nonresident",
+      "withholding"
     ],
-    "reference_answer": "Yes. F-1 international students can invest in US Treasury Bills (T-Bills) and High-Yield Savings Accounts (HYSA) or Certificates of Deposit (CDs). For nonresident aliens, interest earned on US bank deposits and qualified portfolio interest (like short-term US Treasury obligations) is generally exempt from US federal withholding tax under IRS Code Section 871(i) and 871(h), provided an accurate Form W-8BEN is filed with the financial institution."
+    "reference_answer": "Yes. Nonresident aliens and foreign students are generally exempt from US federal withholding tax on interest earned from US bank deposits (checking, savings, and certificates of deposit) under IRC § 871(i). Furthermore, interest on portfolio debt investments, such as short-term US Treasury bills and notes, is exempt from federal tax under IRC § 871(h), provided the investor certifies their foreign status using Form W-8BEN."
   },
   {
     "id": "intl_10",
@@ -148,24 +150,28 @@
       "crypto exchange",
       "Form 8843",
       "taxable capital event",
-      "staking rewards"
+      "staking rewards",
+      "commodities",
+      "trading"
     ],
     "reference_answer": "Buying and passively holding cryptocurrency is legally permitted for international students in the US. However, crypto exchanges require identity verification (often requiring an SSN, ITIN, or foreign passport). Selling, trading one coin for another, or using crypto for purchases are taxable events. Moreover, running a commercial crypto mining operation, running high-frequency trading bots, or providing paid node infrastructure can be classified by USCIS as unauthorized self-employment or business operation."
   },
   {
     "id": "intl_11",
-    "source": "USCIS / SEC",
+    "source": "IRS / USCIS",
     "category": "Permitted vs Prohibited Investments",
-    "question": "Can an F-1 international student purchase real estate in the US, and can they actively manage rental properties?",
+    "question": "What tax and trade rules apply when a nonresident alien student owns real estate or real property in the United States according to IRS Publication 519?",
     "relevant_keywords": [
+      "real property",
       "real estate",
-      "rental property",
-      "property manager",
-      "passive investment",
-      "active management",
-      "FIRPTA"
+      "trade or business",
+      "rental",
+      "effectively connected",
+      "REIT",
+      "nonresident"
     ],
-    "reference_answer": "F-1 students can legally purchase real estate in the United States as an investment. However, to remain compliant with visa laws, the student cannot actively manage the property (such as advertising, screening tenants, performing repairs, or collecting rent directly), as this constitutes unauthorized active employment. The student must hire a third-party professional property management firm so the investment remains strictly passive."
+    "reference_answer": "Under IRS Publication 519, a nonresident alien can own real property in the United States. Income from real property (such as rent or gain on sale) is generally taxed under specific rules: net rental income can either be subject to a flat 30% gross withholding tax or the owner can elect to treat it as effectively connected income (ECI) with a US trade or business to claim deductions. Under immigration rules, an F-1 student cannot actively engage in property management or operations without work authorization, requiring third-party management."
   }
 ]
+
 

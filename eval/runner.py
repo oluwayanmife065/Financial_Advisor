@@ -160,11 +160,17 @@ def evaluate_single_query(
     rr = reciprocal_rank(retrieved_chunks, relevant_keywords)
     hit = hit_rate(retrieved_chunks, relevant_keywords)
 
-    # 3. Generation
+    # 3. Generation (only required if judge is enabled or network is available)
     generation_start = time.perf_counter()
-    answer = generator_fn(question, retrieved_chunks)
+    answer = ""
+    try:
+        if judge_enabled or generator_fn is not None:
+            answer = generator_fn(question, retrieved_chunks)
+    except Exception as exc:
+        answer = f"[Generation skipped or failed: {exc}]"
     generation_ms = (time.perf_counter() - generation_start) * 1000.0
     total_ms = retrieval_ms + generation_ms
+
 
     # 4. Generation Metrics (LLM Judge)
     relevance_score = None
