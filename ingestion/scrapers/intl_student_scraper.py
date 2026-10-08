@@ -1,50 +1,71 @@
 """
 International Student Finance Scraper
 ======================================
-Scrapes trusted government / university sources that are specifically
+Scrapes trusted government, regulatory, and university sources specifically
 relevant to international students in the USA:
 
-  - DHS / Study in the States   (visa, work-authorization, CPT/OPT)
-  - IRS                          (tax filing, ITIN, treaty benefits)
+  - DHS / Study in the States   (visa status, work-authorization, CPT/OPT)
+  - IRS                          (tax filing, ITIN, 30% dividend withholding,
+                                 capital gains 183-day rule, portfolio interest)
   - SSA                          (SSN eligibility for F-1/J-1)
-  - CFPB                         (banking, credit building for newcomers)
-  - USCIS                        (status changes, work permits)
-  - Investor.gov / SEC           (investing basics for non-citizens)
-  - FinAid.org-style pages       (scholarships, loans for international)
+  - CFPB                         (banking, HYSA, credit building without SSN)
+  - USCIS                        (OPT, STEM extensions, passive vs active work)
+  - SEC / Investor.gov           (investing basics, W-8BEN, compound growth)
+  - FINRA                        (day trading warnings, margin rules, ETFs)
+  - US TreasuryDirect            (Treasury bills, notes, interest exemptions)
 
-Each URL is scraped with `requests` + `BeautifulSoup`, then the clean
-text is wrapped in the project's `Document` dataclass and optionally
-compiled into a PDF via `fpdf2`.
+Features:
+  - Zero required 3rd-party dependencies: uses standard library urllib/re/html
+    with graceful upgrades if requests/BeautifulSoup are installed.
+  - Built-in PDF compiler: outputs a formatted PDF with cover page and table
+    of contents using standard library binary writer (or fpdf2 if available).
 
-Usage (standalone):
-    python -m ingestion.scrapers.intl_student_scraper --pdf out/intl_student_docs.pdf
+Usage (standalone CLI):
+    python3 -m ingestion.scrapers.intl_student_scraper --pdf output/intl_student_financial_guide.pdf
 
 Usage (as module):
     from ingestion.scrapers.intl_student_scraper import IntlStudentScraper
     scraper = IntlStudentScraper()
     documents = scraper.scrape_all()
-    pdf_path  = scraper.export_pdf(documents, "output.pdf")
+    pdf_path  = scraper.export_pdf(documents, "output/intl_student_financial_guide.pdf")
 """
 
 from __future__ import annotations
 
 import argparse
+import html
 import re
 import time
 from dataclasses import dataclass, field
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Optional
-from urllib.parse import urljoin, urlparse
+import urllib.request
 
-import requests
-from bs4 import BeautifulSoup
-from loguru import logger
+# Optional 3rd party imports with graceful standard library fallback
+try:
+    import requests
+except ImportError:
+    requests = None
+
+try:
+    from bs4 import BeautifulSoup
+except ImportError:
+    BeautifulSoup = None
+
+try:
+    from loguru import logger
+except ImportError:
+    import logging
+    logger = logging.getLogger("IntlStudentScraper")
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
 from ingestion.document import Document
 from ingestion.scrapers.base import BaseScraper
 
+
 # ---------------------------------------------------------------------------
-# Target URL catalogue
+# Target URL catalogue — Immigration, Taxes, & Financial Investments
 # ---------------------------------------------------------------------------
 
 INTL_STUDENT_SOURCES: list[dict] = [
@@ -64,7 +85,7 @@ INTL_STUDENT_SOURCES: list[dict] = [
         "section": "OPT Overview",
         "url": "https://studyinthestates.dhs.gov/students/work/optional-practical-training-opt",
     },
-    # --- IRS (Taxation, Pub 519, Nonresident Alien Investing Rules) ---
+    # --- IRS (Taxation, Nonresident Alien Investing & Exemption Rules) ---
     {
         "source": "IRS",
         "section": "Taxation of Nonresident Aliens (Pub 519 Overview)",
@@ -164,36 +185,35 @@ INTL_STUDENT_SOURCES: list[dict] = [
 ]
 
 
-
 # ---------------------------------------------------------------------------
 # Scraper implementation
 # ---------------------------------------------------------------------------
 
-
 class IntlStudentScraper(BaseScraper):
     """
-    Scrapes finance and immigration-adjacent web pages that are directly
-    useful to international students (F-1, J-1, OPT, CPT, taxes, banking).
+    Scrapes finance, investing, tax, and immigration web pages relevant to
+    international students (F-1, J-1, OPT, CPT, taxes, banking, investing).
 
     Attributes:
         sources: List of dicts with keys ``source``, ``section``, ``url``.
-        request_delay: Seconds to sleep between requests (be polite).
+        request_delay: Seconds to sleep between requests.
         timeout: HTTP request timeout in seconds.
         headers: HTTP headers sent with every request.
     """
 
     DEFAULT_HEADERS = {
         "User-Agent": (
-            "Mozilla/5.0 (compatible; IntlStudentRAGBot/1.0; "
-            "+https://github.com/your-repo/financial-advisor)"
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         ),
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
     }
 
     def __init__(
         self,
         sources: Optional[list[dict]] = None,
-        request_delay: float = 1.5,
+        request_delay: float = 1.0,
         timeout: int = 15,
     ) -> None:
         self.sources = sources or INTL_STUDENT_SOURCES
@@ -211,7 +231,6 @@ class IntlStudentScraper(BaseScraper):
 
         Returns:
             List of Document objects, one per successfully scraped URL.
-            Failed URLs are logged and skipped (never crash the pipeline).
         """
         documents: list[Document] = []
         for entry in self.sources:
@@ -219,7 +238,7 @@ class IntlStudentScraper(BaseScraper):
             if doc:
                 documents.append(doc)
                 logger.info(
-                    f"✅  Scraped [{entry['source']}] {entry['section']} "
+                    f"✅ Scraped [{entry['source']}] {entry['section']} "
                     f"({len(doc.text)} chars)"
                 )
             time.sleep(self.request_delay)
@@ -233,27 +252,36 @@ class IntlStudentScraper(BaseScraper):
     def _scrape_one(self, url: str, source: str, section: str) -> Optional[Document]:
         """
         Fetch a single URL, extract clean body text, and wrap in a Document.
-
-        Args:
-            url: The page URL to fetch.
-            source: Human-readable source label (e.g. ``"IRS"``).
-            section: Sub-section label (e.g. ``"ITIN Application"``).
-
-        Returns:
-            A ``Document`` on success, or ``None`` on any error.
+        Tries `requests` if available, otherwise falls back to `urllib.request`.
         """
-        try:
-            resp = requests.get(url, headers=self.headers, timeout=self.timeout)
-            resp.raise_for_status()
-        except requests.RequestException as exc:
-            logger.warning(f"⚠️  Could not fetch {url}: {exc}")
-            return None
+        html_content = None
 
-        soup = BeautifulSoup(resp.text, "html.parser")
-        text = self._extract_text(soup)
+        if requests is not None:
+            try:
+                resp = requests.get(url, headers=self.headers, timeout=self.timeout)
+                resp.raise_for_status()
+                html_content = resp.text
+            except Exception as exc:
+                logger.warning(f"⚠️ Could not fetch {url} via requests: {exc}")
+
+        if html_content is None:
+            try:
+                req = urllib.request.Request(url, headers=self.headers)
+                with urllib.request.urlopen(req, timeout=self.timeout) as response:
+                    charset = response.headers.get_content_charset() or "utf-8"
+                    html_content = response.read().decode(charset, errors="ignore")
+            except Exception as exc:
+                logger.warning(f"⚠️ Could not fetch {url} via urllib: {exc}")
+                return None
+
+        if BeautifulSoup is not None:
+            soup = BeautifulSoup(html_content, "html.parser")
+            text = self._extract_text(soup)
+        else:
+            text = self._extract_text_stdlib(html_content)
 
         if len(text.strip()) < 100:
-            logger.warning(f"⚠️  Almost no text extracted from {url} — skipping.")
+            logger.warning(f"⚠️ Almost no text extracted from {url} — skipping.")
             return None
 
         return Document(
@@ -264,22 +292,12 @@ class IntlStudentScraper(BaseScraper):
         )
 
     @staticmethod
-    def _extract_text(soup: BeautifulSoup) -> str:
-        """
-        Strip navigation, scripts, and boilerplate; return readable body text.
-
-        Args:
-            soup: Parsed BeautifulSoup tree.
-
-        Returns:
-            Clean multi-line string of body text.
-        """
-        # Remove noise tags
+    def _extract_text(soup) -> str:
+        """Strip navigation, scripts, and boilerplate using BeautifulSoup."""
         for tag in soup(["script", "style", "nav", "footer", "header",
                           "aside", "form", "noscript", "iframe"]):
             tag.decompose()
 
-        # Prefer main content containers
         main = (
             soup.find("main")
             or soup.find("article")
@@ -291,97 +309,210 @@ class IntlStudentScraper(BaseScraper):
             main = soup
 
         lines = [line.strip() for line in main.get_text(separator="\n").splitlines()]
-        # Collapse excessive blank lines
         text = "\n".join(line for line in lines if line)
         text = re.sub(r"\n{3,}", "\n\n", text)
         return text.strip()
 
+    @staticmethod
+    def _extract_text_stdlib(raw_html: str) -> str:
+        """Fallback HTML stripper using standard library regex & html unescape."""
+        cleaned = re.sub(
+            r"<(script|style|nav|footer|header|aside)[^>]*>.*?</\1>",
+            " ",
+            raw_html,
+            flags=re.DOTALL | re.IGNORECASE,
+        )
+        cleaned = re.sub(r"<[^>]+>", " ", cleaned)
+        cleaned = html.unescape(cleaned)
+        lines = [line.strip() for line in cleaned.splitlines()]
+        text = "\n".join(line for line in lines if line)
+        text = re.sub(r"[ \t]+", " ", text)
+        text = re.sub(r"\n{3,}", "\n\n", text)
+        return text.strip()
+
     # ------------------------------------------------------------------
-    # PDF export
+    # PDF export (supports fpdf2 or pure-Python fallback)
     # ------------------------------------------------------------------
 
     def export_pdf(
         self,
         documents: list[Document],
-        output_path: str | Path = "intl_student_sources.pdf",
+        output_path: str | Path = "output/intl_student_financial_guide.pdf",
     ) -> Path:
         """
-        Compile all scraped documents into a single, bookmarked PDF.
-
-        Requires: ``fpdf2`` (``pip install fpdf2``).
-
-        Args:
-            documents: List of Document objects to render.
-            output_path: Destination path for the generated PDF.
-
-        Returns:
-            The resolved Path of the written PDF file.
+        Compile all scraped documents into a single PDF.
+        Supports fpdf2 if available, or falls back to standard library PDF compilation.
         """
-        try:
-            from fpdf import FPDF  # type: ignore
-        except ImportError:
-            raise ImportError(
-                "fpdf2 is required for PDF export. Install it with:\n"
-                "  pip install fpdf2"
-            )
-
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
-        pdf = FPDF()
-        pdf.set_auto_page_break(auto=True, margin=15)
-        pdf.set_margins(left=20, top=20, right=20)
+        try:
+            from fpdf import FPDF  # type: ignore
 
-        # --- Cover page ---
-        pdf.add_page()
-        pdf.set_font("Helvetica", style="B", size=22)
-        pdf.cell(0, 15, "International Student Finance Guide", new_x="LMARGIN", new_y="NEXT", align="C")
-        pdf.set_font("Helvetica", size=12)
-        pdf.cell(0, 8, "Auto-compiled from trusted US government sources", new_x="LMARGIN", new_y="NEXT", align="C")
-        pdf.ln(5)
+            pdf = FPDF()
+            pdf.set_auto_page_break(auto=True, margin=15)
+            pdf.set_margins(left=20, top=20, right=20)
 
-        # Table of contents stub
-        pdf.set_font("Helvetica", style="B", size=13)
-        pdf.cell(0, 10, "Sources included:", new_x="LMARGIN", new_y="NEXT")
-        pdf.set_font("Helvetica", size=11)
-        for doc in documents:
-            pdf.cell(0, 7, f"  [{doc.source}]  {doc.section}", new_x="LMARGIN", new_y="NEXT")
-
-        # --- One section per document ---
-        for doc in documents:
+            # Cover page
             pdf.add_page()
+            pdf.set_font("Helvetica", style="B", size=22)
+            pdf.cell(0, 15, "International Student Financial Guide", new_x="LMARGIN", new_y="NEXT", align="C")
+            pdf.set_font("Helvetica", size=12)
+            pdf.cell(0, 8, "Auto-compiled from trusted US government & regulatory sources", new_x="LMARGIN", new_y="NEXT", align="C")
+            pdf.ln(5)
 
-            # Section header
-            pdf.set_font("Helvetica", style="B", size=15)
-            header = f"{doc.source}  —  {doc.section}"
-            pdf.cell(0, 12, header[:90], new_x="LMARGIN", new_y="NEXT")
+            # Table of contents
+            pdf.set_font("Helvetica", style="B", size=13)
+            pdf.cell(0, 10, "Sources included:", new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("Helvetica", size=11)
+            for doc in documents:
+                pdf.cell(0, 7, f"  [{doc.source}]  {doc.section}", new_x="LMARGIN", new_y="NEXT")
 
-            pdf.set_font("Helvetica", style="I", size=9)
-            pdf.set_text_color(100, 100, 100)
-            pdf.cell(0, 6, f"URL: {doc.url}", new_x="LMARGIN", new_y="NEXT")
-            pdf.set_text_color(0, 0, 0)
-            pdf.ln(3)
+            # Document pages
+            for doc in documents:
+                pdf.add_page()
+                pdf.set_font("Helvetica", style="B", size=15)
+                header = f"{doc.source}  -  {doc.section}"
+                pdf.cell(0, 12, header[:90], new_x="LMARGIN", new_y="NEXT")
 
-            # Body text — split into paragraphs
-            pdf.set_font("Helvetica", size=10)
-            for para in doc.text.split("\n\n"):
-                para = para.strip()
-                if not para:
-                    continue
-                # Encode to latin-1 safely
-                safe = para.encode("latin-1", errors="replace").decode("latin-1")
-                pdf.multi_cell(0, 6, safe)
+                pdf.set_font("Helvetica", style="I", size=9)
+                pdf.set_text_color(100, 100, 100)
+                pdf.cell(0, 6, f"URL: {doc.url}", new_x="LMARGIN", new_y="NEXT")
+                pdf.set_text_color(0, 0, 0)
                 pdf.ln(3)
 
-        pdf.output(str(output_path))
-        logger.info(f"📄  PDF written → {output_path.resolve()}")
+                pdf.set_font("Helvetica", size=10)
+                for para in doc.text.split("\n\n"):
+                    para = para.strip()
+                    if not para:
+                        continue
+                    safe = para.encode("latin-1", errors="replace").decode("latin-1")
+                    pdf.multi_cell(0, 6, safe)
+                    pdf.ln(3)
+
+            pdf.output(str(output_path))
+            logger.info(f"📄 PDF written via fpdf2 -> {output_path.resolve()}")
+            return output_path.resolve()
+
+        except ImportError:
+            logger.info("fpdf2 not detected. Compiling PDF using built-in minimal PDF generator...")
+            return self._export_minimal_pdf(documents, output_path)
+
+    def _export_minimal_pdf(self, documents: list[Document], output_path: Path) -> Path:
+        """Pure-python standards-compliant minimal PDF writer without external dependencies."""
+        def escape_pdf_str(s: str) -> str:
+            clean = s.encode("latin-1", errors="replace").decode("latin-1")
+            clean = clean.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
+            return clean
+
+        pages_content = []
+
+        # Cover page
+        cover_stream = [
+            "BT",
+            "/F1 20 Tf",
+            "50 720 Td",
+            "(International Student Financial Literacy Guide) Tj",
+            "/F1 11 Tf",
+            "0 -28 Td",
+            "(Regulatory Guidance: Taxes, Banking, & Investments for Non-Citizens) Tj",
+            "0 -22 Td",
+            f"(Total Documents Compiled: {len(documents)}) Tj",
+            "0 -36 Td",
+            "/F1 13 Tf",
+            "(Table of Contents:) Tj",
+            "/F1 10 Tf",
+        ]
+        y_offset = -18
+        for i, doc in enumerate(documents[:25], 1):
+            title = f"{i}. [{doc.source}] {doc.section}"
+            title = escape_pdf_str(title[:72])
+            cover_stream.append(f"0 {y_offset} Td")
+            cover_stream.append(f"({title}) Tj")
+            y_offset = -15
+        cover_stream.append("ET")
+        pages_content.append("\n".join(cover_stream))
+
+        # Content pages
+        for doc in documents:
+            lines = doc.text.splitlines()
+            wrapped_lines = []
+            for line in lines:
+                line = line.strip()
+                if not line:
+                    wrapped_lines.append("")
+                    continue
+                while len(line) > 85:
+                    split_idx = line.rfind(" ", 0, 85)
+                    if split_idx == -1:
+                        split_idx = 85
+                    wrapped_lines.append(line[:split_idx])
+                    line = line[split_idx:].strip()
+                if line:
+                    wrapped_lines.append(line)
+
+            page_size = 45
+            for page_idx in range(0, max(1, len(wrapped_lines)), page_size):
+                sub_lines = wrapped_lines[page_idx:page_idx + page_size]
+                stream = [
+                    "BT",
+                    "/F1 13 Tf",
+                    "40 750 Td",
+                    f"({escape_pdf_str(doc.source)} - {escape_pdf_str(doc.section[:45])}) Tj",
+                    "/F1 8 Tf",
+                    "0 -15 Td",
+                    f"(URL: {escape_pdf_str(doc.url[:85])}) Tj",
+                    "/F1 9 Tf",
+                    "0 -18 Td",
+                ]
+                for l in sub_lines:
+                    safe_l = escape_pdf_str(l)
+                    stream.append(f"({safe_l}) Tj")
+                    stream.append("0 -13 Td")
+                stream.append("ET")
+                pages_content.append("\n".join(stream))
+
+        # Build PDF object tree
+        objects = []
+        objects.append("<< /Type /Catalog /Pages 2 0 R >>")
+        page_obj_ids = [3 + i * 2 for i in range(len(pages_content))]
+        kids_str = " ".join(f"{pid} 0 R" for pid in page_obj_ids)
+        objects.append(f"<< /Type /Pages /Kids [{kids_str}] /Count {len(pages_content)} >>")
+
+        for idx, p_stream in enumerate(pages_content):
+            p_obj_id = 3 + idx * 2
+            c_obj_id = p_obj_id + 1
+            objects.append(
+                f"<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] "
+                f"/Contents {c_obj_id} 0 R "
+                f"/Resources << /Font << /F1 << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> >> >> >>"
+            )
+            stream_bytes = p_stream.encode("latin-1", errors="replace")
+            objects.append(f"<< /Length {len(stream_bytes)} >>\nstream\n{p_stream}\nendstream")
+
+        pdf_bytes = bytearray(b"%PDF-1.4\n")
+        xref_offsets = [0]
+        for i, obj in enumerate(objects, 1):
+            xref_offsets.append(len(pdf_bytes))
+            pdf_bytes.extend(f"{i} 0 obj\n{obj}\nendobj\n".encode("latin-1"))
+
+        xref_start = len(pdf_bytes)
+        pdf_bytes.extend(f"xref\n0 {len(objects) + 1}\n0000000000 65535 f \n".encode("latin-1"))
+        for off in xref_offsets[1:]:
+            pdf_bytes.extend(f"{off:010d} 00000 n \n".encode("latin-1"))
+
+        pdf_bytes.extend(
+            f"trailer\n<< /Size {len(objects) + 1} /Root 1 0 R >>\nstartxref\n{xref_start}\n%%EOF\n".encode("latin-1")
+        )
+
+        output_path.write_bytes(pdf_bytes)
+        logger.info(f"📄 Minimal PDF compiled successfully -> {output_path.resolve()}")
         return output_path.resolve()
 
 
 # ---------------------------------------------------------------------------
 # CLI entry point
 # ---------------------------------------------------------------------------
-
 
 def _parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -390,19 +521,19 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--pdf",
         metavar="PATH",
-        default="output/intl_student_sources.pdf",
-        help="Output PDF path (default: output/intl_student_sources.pdf)",
+        default="output/intl_student_financial_guide.pdf",
+        help="Output PDF path (default: output/intl_student_financial_guide.pdf)",
     )
     parser.add_argument(
         "--delay",
         type=float,
-        default=1.5,
-        help="Seconds between HTTP requests (default: 1.5)",
+        default=1.0,
+        help="Seconds between HTTP requests (default: 1.0)",
     )
     parser.add_argument(
         "--no-pdf",
         action="store_true",
-        help="Scrape only — skip PDF generation (useful for pipeline use)",
+        help="Scrape only — skip PDF generation",
     )
     return parser.parse_args()
 
@@ -412,8 +543,8 @@ if __name__ == "__main__":
     scraper = IntlStudentScraper(request_delay=args.delay)
     docs = scraper.scrape_all()
 
-    if not args.no_pdf:
+    if not args.no_pdf and docs:
         pdf_path = scraper.export_pdf(docs, output_path=args.pdf)
-        print(f"\n✅  PDF saved to: {pdf_path}")
+        print(f"\n✅ PDF saved to: {pdf_path}")
     else:
-        print(f"\n✅  Scraped {len(docs)} documents (no PDF requested).")
+        print(f"\n✅ Scraped {len(docs)} documents.")
