@@ -1,0 +1,177 @@
+[
+  {
+    "id": "intl_01",
+    "source": "IRS",
+    "category": "Tax Filing Status",
+    "question": "What is the tax residency status of an F-1 international student during their first five calendar years in the United States?",
+    "relevant_keywords": [
+      "nonresident alien",
+      "substantial presence test",
+      "exempt individual",
+      "Form 8843",
+      "1040-NR"
+    ],
+    "reference_answer": "Under IRS regulations, F-1 international students are considered 'exempt individuals' from the Substantial Presence Test during their first five calendar years in the United States. Consequently, they are classified as nonresident aliens for federal tax purposes and must file Form 8843 every year, along with Form 1040-NR if they earned US-sourced income."
+  },
+  {
+    "id": "intl_02",
+    "source": "DHS/StudyInTheStates",
+    "category": "Employment & Work Authorization",
+    "question": "What are the core differences between CPT and OPT work authorizations for F-1 students?",
+    "relevant_keywords": [
+      "CPT",
+      "OPT",
+      "Curricular Practical Training",
+      "Optional Practical Training",
+      "DSO",
+      "EAD",
+      "USCIS"
+    ],
+    "reference_answer": "Curricular Practical Training (CPT) is integral to an established curriculum and authorized directly by the school's Designated School Official (DSO) on the Form I-20 before graduation. Optional Practical Training (OPT) is temporary employment directly related to the student's major field of study, provides up to 12 months (or a 24-month STEM extension), and requires both DSO recommendation and formal approval by USCIS with an Employment Authorization Document (EAD)."
+  },
+  {
+    "id": "intl_03",
+    "source": "SSA",
+    "category": "Social Security & Identification",
+    "question": "When is an F-1 student eligible to apply for a Social Security Number (SSN)?",
+    "relevant_keywords": [
+      "SSN",
+      "Social Security Number",
+      "on-campus employment",
+      "CPT",
+      "OPT",
+      "job offer letter",
+      "DSO"
+    ],
+    "reference_answer": "An F-1 student is eligible for a Social Security Number (SSN) only if they have authorized employment in the United States, such as an on-campus job, authorized CPT, or an approved OPT Employment Authorization Document (EAD). An SSN is not granted purely for opening a bank account or credit card; an ITIN can be obtained for tax reporting if an SSN cannot be issued."
+  },
+  {
+    "id": "intl_04",
+    "source": "CFPB",
+    "category": "Banking & Credit Building",
+    "question": "Can an international student open a US bank account without an SSN, and how can they build US credit history?",
+    "relevant_keywords": [
+      "bank account",
+      "passport",
+      "Form I-20",
+      "secured credit card",
+      "credit history",
+      "ITIN"
+    ],
+    "reference_answer": "Yes, many US financial institutions allow international students to open checking and savings accounts using a foreign passport, Form I-20, proof of student status, and US residential address. To build a US credit history without an established credit record or SSN, students can obtain an ITIN and apply for a secured credit card or student-oriented credit cards that evaluate alternative data, making sure to pay off balances in full each month."
+  },
+  {
+    "id": "intl_05",
+    "source": "IRS",
+    "category": "FICA Tax Exemption",
+    "question": "Are international students on F-1 visas exempt from Social Security and Medicare taxes (FICA)?",
+    "relevant_keywords": [
+      "FICA",
+      "Social Security tax",
+      "Medicare tax",
+      "nonresident alien",
+      "on-campus",
+      "CPT",
+      "OPT",
+      "Form 843"
+    ],
+    "reference_answer": "Yes. F-1 students classified as nonresident aliens are generally exempt from FICA (Social Security and Medicare) withholding taxes on compensation paid for on-campus employment, CPT, and OPT, provided the work is permitted under their student status. If an employer mistakenly withholds FICA taxes, the student should first request a refund from the employer or file IRS Forms 843 and 8316."
+  },
+  {
+    "id": "intl_06",
+    "source": "SEC/Investor.gov",
+    "category": "Investing for Non-Citizens",
+    "question": "Can international students invest in US stocks and ETFs, and what tax implications apply?",
+    "relevant_keywords": [
+      "Form W-8BEN",
+      "capital gains",
+      "dividends",
+      "brokerage account",
+      "30% withholding",
+      "tax treaty"
+    ],
+    "reference_answer": "Yes, non-citizens and nonresident aliens can legally open brokerage accounts (subject to individual broker policy) by providing Form W-8BEN certifying foreign tax status. US dividends paid to nonresident aliens are typically subject to a 30% statutory withholding tax unless reduced by an applicable bilateral tax treaty. Capital gains on portfolio stocks are generally not taxable under US rules unless the student was physically present in the US for 183 days or more in that tax year."
+  },
+  {
+    "id": "intl_07",
+    "source": "USCIS / SEC",
+    "category": "Permitted vs Prohibited Investments",
+    "question": "Can an F-1 international student engage in active day trading or pattern day trading in the US stock market?",
+    "relevant_keywords": [
+      "day trading",
+      "pattern day trader",
+      "unauthorized employment",
+      "passive investing",
+      "F-1 status violation",
+      "active trading"
+    ],
+    "reference_answer": "F-1 students are strictly prohibited from unauthorized employment under immigration law. While passive investing (buy-and-hold investing in stocks, mutual funds, or index ETFs) is completely legal as passive income, active day trading (such as making frequent intraday trades, scalping, or qualifying as a FINRA Pattern Day Trader) can be deemed by USCIS and immigration authorities as active trade or business conduct, risking a severe violation of F-1 nonimmigrant status."
+  },
+  {
+    "id": "intl_08",
+    "source": "IRS / CFPB",
+    "category": "Permitted vs Prohibited Investments",
+    "question": "Can an international student on an F-1 visa open a Roth IRA or Traditional IRA?",
+    "relevant_keywords": [
+      "Roth IRA",
+      "Traditional IRA",
+      "earned income",
+      "taxable compensation",
+      "nonresident alien",
+      "Form 1040-NR"
+    ],
+    "reference_answer": "An international student can contribute to a Roth IRA or Traditional IRA ONLY if they have US earned income (taxable compensation from authorized on-campus jobs, CPT, or OPT). Passive investment income, stipends not subject to earned income tax, or money sent from abroad do not qualify. Furthermore, nonresidents who use tax treaty exemptions to exclude all income from US taxation cannot contribute because their taxable earned compensation is effectively zero."
+  },
+  {
+    "id": "intl_09",
+    "source": "IRS / US TreasuryDirect",
+    "category": "Permitted Investments",
+    "question": "Can nonresident aliens and foreign students receive tax-exempt interest on US bank deposits or Treasury securities under IRS rules?",
+    "relevant_keywords": [
+      "interest",
+      "portfolio interest",
+      "bank deposit",
+      "treasury",
+      "tax-exempt",
+      "exempt",
+      "nonresident",
+      "withholding"
+    ],
+    "reference_answer": "Yes. Nonresident aliens and foreign students are generally exempt from US federal withholding tax on interest earned from US bank deposits (checking, savings, and certificates of deposit) under IRC § 871(i). Furthermore, interest on portfolio debt investments, such as short-term US Treasury bills and notes, is exempt from federal tax under IRC § 871(h), provided the investor certifies their foreign status using Form W-8BEN."
+  },
+  {
+    "id": "intl_10",
+    "source": "IRS / FinCEN",
+    "category": "Permitted vs Prohibited Investments",
+    "question": "Can international students buy, hold, or trade cryptocurrency in the United States, and what are the compliance rules?",
+    "relevant_keywords": [
+      "cryptocurrency",
+      "Bitcoin",
+      "crypto exchange",
+      "Form 8843",
+      "taxable capital event",
+      "staking rewards",
+      "commodities",
+      "trading"
+    ],
+    "reference_answer": "Buying and passively holding cryptocurrency is legally permitted for international students in the US. However, crypto exchanges require identity verification (often requiring an SSN, ITIN, or foreign passport). Selling, trading one coin for another, or using crypto for purchases are taxable events. Moreover, running a commercial crypto mining operation, running high-frequency trading bots, or providing paid node infrastructure can be classified by USCIS as unauthorized self-employment or business operation."
+  },
+  {
+    "id": "intl_11",
+    "source": "IRS / USCIS",
+    "category": "Permitted vs Prohibited Investments",
+    "question": "What tax and trade rules apply when a nonresident alien student owns real estate or real property in the United States according to IRS Publication 519?",
+    "relevant_keywords": [
+      "real property",
+      "real estate",
+      "trade or business",
+      "rental",
+      "effectively connected",
+      "REIT",
+      "nonresident"
+    ],
+    "reference_answer": "Under IRS Publication 519, a nonresident alien can own real property in the United States. Income from real property (such as rent or gain on sale) is generally taxed under specific rules: net rental income can either be subject to a flat 30% gross withholding tax or the owner can elect to treat it as effectively connected income (ECI) with a US trade or business to claim deductions. Under immigration rules, an F-1 student cannot actively engage in property management or operations without work authorization, requiring third-party management."
+  }
+]
+
+

@@ -17,7 +17,9 @@ SOURCE_LABELS = {
     "cfpb": "CFPB",
     "finra": "FINRA",
     "fed": "Federal Reserve",
+    "intl": "International Student Regulatory Guide",
 }
+
 
 
 def parse_pdf(pdf_path: str, source: str) -> list[Document]:

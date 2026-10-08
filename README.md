@@ -1,6 +1,6 @@
-# 📊 Personal Finance Literacy RAG Assistant
+# 📊 Personal Finance & International Student RAG Assistant
 
-A private, production-grade Retrieval-Augmented Generation (RAG) system for learning personal finance concepts from trusted regulatory sources (SEC, CFPB, Federal Reserve).
+A private, production-grade Retrieval-Augmented Generation (RAG) system for learning personal finance, tax compliance, and investing concepts from trusted regulatory sources (SEC, CFPB, Federal Reserve, IRS, DHS, USCIS, FDIC, and US TreasuryDirect).
 
 > Built as an end-to-end ML engineering portfolio project demonstrating ingestion pipelines, vector retrieval, evaluation harnesses, and full observability.
 
@@ -9,20 +9,21 @@ A private, production-grade Retrieval-Augmented Generation (RAG) system for lear
 ## 🏗️ Architecture
 
 ```
-Source PDFs (SEC, CFPB, Federal Reserve)
+Source PDFs (SEC, CFPB, Federal Reserve, International Student Regulatory Guide)
     ↓
-Ingestion Pipeline (parse → clean → chunk → embed)
+Ingestion Pipeline (scrape → clean → chunk → embed)
     ↓
 Vector Store: LanceDB (local) | Pinecone (cloud)
     ↓
 Retrieval Engine (semantic search + metadata filters)
     ↓
-LLM Layer (Ollama — local inference)
+LLM Layer (Groq Cloud / Ollama Local)
     ↓
 Chat Interface (CLI → Streamlit)
     ↓
 Eval Harness (golden Q&A set, precision/recall/MRR)
 ```
+
 
 ---
 
@@ -116,7 +117,7 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 - **LLM Judge (`eval/llm_judge.py`)**: Independent scoring of Answer Relevance and Context Faithfulness using OpenAI GPT-4o-mini with retry logic and JSON code-fence stripping.
 - **Eval Runner CLI (`eval/runner.py`)**: Orchestrator executing the benchmark, computing p50/p95 latency percentiles, rendering terminal summary tables, and exporting `eval_report.json`.
 
-#### 📊 Live Benchmark Results (25-Question Test Set)
+#### 📊 Live Benchmark Results (Base 25-Question Test Set)
 | Metric | System Score | Project Target | Status |
 |---|---|---|---|
 | **Precision@3** | **0.8400** | $\ge 0.70$ | **✅ PASSED** (+14% above target) |
@@ -124,30 +125,41 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 | **Mean Reciprocal Rank (MRR)** | **0.9800** | $\ge 0.75$ | **✅ PASSED** (Relevant chunk almost always #1) |
 | **Hit Rate** | **1.0000** | $\ge 0.85$ | **✅ PASSED** (100% hit rate) |
 | **Retrieval Latency (p50 / p95)** | **313 ms / 1,020 ms** | $< 100\text{ ms} / < 300\text{ ms}$ | Fast local LanceDB vector search |
-| **End-to-End Latency (p50 / p95)** | **13.0 s / 18.2 s** | $< 10\text{ s}$ | Local 7B LLM on Mac hardware |
+
+#### 🎓 International Student Domain Benchmark (11 Questions — `eval/golden_set_intl.json`)
+| Metric | System Score | Project Target | Status |
+|---|---|---|---|
+| **Precision@3** | **0.8182** | $\ge 0.70$ | **✅ PASSED** |
+| **Recall@5** | **1.0000** | $\ge 0.80$ | **✅ PASSED** (100% recall) |
+| **Mean Reciprocal Rank (MRR)** | **0.8864** | $\ge 0.75$ | **✅ PASSED** |
+| **Hit Rate** | **1.0000** | $\ge 0.85$ | **✅ PASSED** (11/11 queries matched) |
+| **Retrieval Latency (p50 / p95)** | **176.1 ms / 1,570 ms** | $< 100\text{ ms} / < 300\text{ ms}$ | LanceDB embedded vector search |
 
 ### Test Suite (`tests/`)
-- **111 unit tests passing** across parsers, chunker, embedder, pipeline, retrievers, query logger, retrieval metrics, LLM judge, and runner harness.
+- **114 unit tests passing** across parsers, scrapers, chunker, embedder, pipeline, retrievers, query logger, retrieval metrics, LLM judge, and runner harness.
 
 ---
 
 ## 📚 Source Documents
 
-Source PDFs are **not tracked in Git** (excluded via `.gitignore`). To set up locally, create the following folder structure and download the documents:
+Source PDFs are organized into folders under `ingestion/sources/pdfs/`:
 
 ```
 ingestion/sources/pdfs/
 ├── cfpb/       # Consumer Financial Protection Bureau publications
 ├── fed/        # Federal Reserve financial literacy curriculum
-└── sec/        # SEC/Investor.gov investor education materials
+├── sec/        # SEC/Investor.gov investor education materials
+└── intl/       # International Student Regulatory & Financial Guide (349 pages)
 ```
 
-### Sources
-| Folder | Source | Content |
+### Sources & Regulatory Scope
+| Folder | Source | Content & Regulatory Scope |
 |---|---|---|
-| `cfpb/` | [CFPB](https://www.consumerfinance.gov/) | Your Money Your Goals — Financial Empowerment Toolkit |
+| `cfpb/` | [CFPB](https://www.consumerfinance.gov/) | Your Money Your Goals — Financial Empowerment Toolkit, building credit without SSN |
 | `fed/` | [Federal Reserve](https://www.federalreserveeducation.org/) | Building Wealth curriculum, investment & risk lessons |
-| `sec/` | [Investor.gov](https://www.investor.gov/) | Saving & investing fundamentals |
+| `sec/` | [Investor.gov](https://www.investor.gov/) | Saving & investing fundamentals, index funds, compound growth |
+| `intl/` | **IRS, DHS, USCIS, SEC, Treasury, FDIC** | Nonresident alien taxes (Pub 519, Form 8843, 1040-NR), FICA exemption, CPT/OPT work limits, permitted passive investing (stocks, ETFs, T-Bills, HYSAs), and prohibited active trading (pattern day trading, crypto mining) |
+
 
 ---
 
@@ -210,6 +222,9 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
 | `v0.2.0-retrieval` | Phase 2 complete — Ollama LLM wrapper, CLI chat loop, query logger, tests |
 | `v0.3.0-eval` | Phase 3 complete — Golden Q&A benchmark (25 questions), retrieval metrics, LLM judge, eval runner, 111 tests |
 | `v0.5.0-polish` | Phase 5 complete — Streamlit streaming chat UI, source citation expanders, sidebar eval badges |
+| `v1.0.0` | Production deployment — Groq Cloud auto-fallback, Pinecone serverless cloud index, Streamlit Cloud ready |
+| `v1.1.0-intl-student-rag` | International student finetuning — 36-source scraper, 349-page regulatory guide PDF, 1,157 chunks indexed, 11-question evaluation benchmark |
+
 
 ---
 

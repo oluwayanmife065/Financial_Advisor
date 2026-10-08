@@ -51,8 +51,9 @@ from query_logging.query_logger import log_query
 # Constants
 # ─────────────────────────────────────────────────────────────────────────────
 
-APP_TITLE = "📊 Personal Finance Literacy Assistant"
-APP_SUBTITLE = "Grounded answers from SEC, CFPB, and Federal Reserve documents."
+APP_TITLE = "📊 Personal Finance & International Student RAG Assistant"
+APP_SUBTITLE = "Grounded answers from IRS (Pub 519), DHS, USCIS, SEC, CFPB, and Federal Reserve documents."
+
 GROQ_MODELS = [
     "qwen/qwen3.8-27b",
     "allam-2-7b",
@@ -124,12 +125,14 @@ def _read_report_cached(path_str: str, mtime: float) -> dict | None:
 
 
 def _load_eval_report() -> dict | None:
-    """Load latest eval report, falling back to pinecone/lancedb reports if present."""
+    """Load latest eval report, falling back to intl/pinecone/lancedb reports if present."""
     candidate_paths = [
+        Path("eval/eval_report_intl_lancedb.json"),
         Path(settings.eval_report_path),
         Path("eval/eval_report_pinecone.json"),
         Path("eval/eval_report_lancedb.json"),
     ]
+
     for p in candidate_paths:
         if p.exists():
             try:
@@ -492,11 +495,12 @@ def main():
     if not st.session_state.messages:
         st.markdown("#### 💡 Try asking:")
         example_questions = [
-            "What is the difference between a stock and a bond?",
-            "How does compound interest work?",
-            "What is a 401(k) and how much should I contribute?",
-            "What are the risks of investing in individual stocks?",
-            "How do I build an emergency fund?",
+            "What is the tax residency status of an F-1 student in their first 5 years?",
+            "Can an F-1 student invest in US stocks or Treasury Bills?",
+            "What are the differences between CPT and OPT work authorizations?",
+            "Can international students engage in active day trading or crypto mining?",
+            "Are F-1 students exempt from Social Security and Medicare taxes (FICA)?",
+            "Can I open a US bank account or build credit without an SSN?",
         ]
         cols = st.columns(2)
         for i, q in enumerate(example_questions):
@@ -509,6 +513,7 @@ def main():
                     retriever_choice=selected_retriever,
                 )
                 st.rerun()
+
 
     # ── Chat input ──
     if prompt := st.chat_input("Ask a personal finance question…"):
