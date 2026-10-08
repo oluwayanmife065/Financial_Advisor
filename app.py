@@ -390,9 +390,16 @@ def _handle_query(
       1. embed_query()                 → 384-dim vector
       2. Pinecone or LanceDB search()  → top-k Chunks
       3. stream_answer()               → token generator → st.write_stream()
+                                         (includes last CONTEXT_WINDOW_TURNS Q&A
+                                          pairs so the model can answer follow-ups)
       4. log_query()                   → append to query_log.jsonl
       5. Append to session state (user + assistant turns)
     """
+    # ── Snapshot history BEFORE adding the new user turn ──
+    # This is what we'll pass to the LLM so it has prior context but
+    # not the question it's currently answering.
+    prior_history = list(st.session_state.messages)
+
     # ── 1. Append user message to chat ──
     st.session_state.messages.append({"role": "user", "content": query})
     with st.chat_message("user"):
@@ -415,11 +422,16 @@ def _handle_query(
             return
         retrieval_ms = (time.perf_counter() - retrieval_start) * 1000
 
-    # ── 3. Streaming generation ──
+    # ── 3. Streaming generation (with conversation history) ──
     generation_start = time.perf_counter()
     with st.chat_message("assistant"):
         try:
-            token_stream = stream_answer(query, chunks, model=model)
+            token_stream = stream_answer(
+                query,
+                chunks,
+                model=model,
+                chat_history=prior_history,
+            )
             answer = st.write_stream(token_stream)
         except Exception as exc:
             hint = "Check Ollama (local) or your GROQ_API_KEY in Streamlit Secrets." if settings.llm_backend == "groq" else "Is Ollama running? `ollama serve` in a terminal."
