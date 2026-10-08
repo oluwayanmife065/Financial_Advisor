@@ -10,7 +10,39 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ---
 
+## [v1.1.0-intl-student-rag] — 2026-10-08
+
+### Added
+- **International Student Knowledge Base & Regulatory Scraper** (`ingestion/scrapers/intl_student_scraper.py`):
+  - Targets 36 live-verified government and regulatory portals across IRS, DHS (Study in the States), USCIS, SEC Investor.gov, US TreasuryDirect, FDIC, and CFPB.
+  - Zero-dependency runtime fallback using standard library (`urllib.request`, `re`, `html`, `ssl`) with auto-upgrade if `requests` and `bs4` are installed.
+  - Built-in PDF compiler generating a unified 349-page reference guide (`output/intl_student_financial_guide.pdf`, 1.2 MB).
+- **Expanded Ingestion Pipeline** (`ingestion/pipeline.py` & `ingestion/parsers/pdf_parser.py`):
+  - Added `intl` source mapping pointing to the International Student Regulatory Guide.
+  - Ingested **1,157 chunks** (698 total pages across SEC, CFPB, Federal Reserve, and International Student guides) into local LanceDB (`data/lancedb`) and cloud Pinecone (`fin-rag`).
+- **Domain-Specific Evaluation Benchmark** (`eval/golden_set_intl.json` & `eval/golden_set_combined.json`):
+  - 11 dedicated golden Q&A pairs covering F-1/J-1 tax residency (Form 8843 / 1040-NR), Substantial Presence Test, CPT vs OPT boundaries, SSN eligibility, FICA exemptions, permitted passive investing (stocks, ETFs, T-Bills, HYSAs), and prohibited active trading (pattern day trading, crypto mining, active property management).
+  - Benchmark evaluation results on LanceDB: **Precision@3: 0.8182**, **Recall@5: 1.0000**, **MRR: 0.8864**, **Hit Rate: 1.0000** (all KPI targets passed).
+- **Streamlit UI Enhancements** (`app.py`):
+  - Updated title and subtitle to highlight international student financial topics.
+  - Added one-click example prompt buttons for F-1 tax residency, CPT/OPT differences, investing in T-Bills/stocks, and SSN/banking.
+  - Added support for loading international student evaluation reports in the sidebar KPI drawer.
+
+### Fixed
+- **`eval/runner.py`**: Added graceful error handling during generation when LLM judge is disabled, preventing connection dropouts from aborting retrieval evaluation.
+- **`ingestion/scrapers/intl_student_scraper.py`**: Added 30-second request timeout, connection retries, and unverified SSL context handling for strict government servers.
+
+---
+
+## [v1.0.0] — 2026-10-05
+
+### Added
+- Full production release with hosted Groq cloud LLM fallback, Pinecone cloud vector database, and Streamlit Community Cloud deployment.
+
+---
+
 ## [v0.6.1-hosting] — 2026-10-05
+
 
 ### Fixed
 - **`generation/llm.py`** — increased `max_tokens` from `1000` → `4096` in both `_groq_stream` and `_groq_generate`; `qwen/qwen3.8-27b` is a thinking model that burns tokens on internal reasoning before answering, silently exhausting the budget and returning an empty response on Streamlit Cloud
