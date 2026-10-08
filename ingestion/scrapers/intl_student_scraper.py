@@ -297,7 +297,7 @@ class IntlStudentScraper(BaseScraper):
         self,
         sources: Optional[list[dict]] = None,
         request_delay: float = 0.8,
-        timeout: int = 15,
+        timeout: int = 30,
     ) -> None:
         self.sources = sources or INTL_STUDENT_SOURCES
         self.request_delay = request_delay
@@ -336,16 +336,21 @@ class IntlStudentScraper(BaseScraper):
         """
         Fetch a single URL, extract clean body text, and wrap in a Document.
         Tries `requests` if available, otherwise falls back to `urllib.request`.
+        Includes automatic retry for transient network hiccups or slow gov servers.
         """
         html_content = None
 
         if requests is not None:
-            try:
-                resp = requests.get(url, headers=self.headers, timeout=self.timeout)
-                resp.raise_for_status()
-                html_content = resp.text
-            except Exception as exc:
-                logger.warning(f"⚠️ Could not fetch {url} via requests: {exc}")
+            for attempt in range(2):
+                try:
+                    resp = requests.get(url, headers=self.headers, timeout=self.timeout)
+                    resp.raise_for_status()
+                    html_content = resp.text
+                    break
+                except Exception as exc:
+                    if attempt == 1:
+                        logger.warning(f"⚠️ Could not fetch {url} via requests: {exc}")
+                    time.sleep(1.0)
 
         if html_content is None:
             import ssl
@@ -353,14 +358,20 @@ class IntlStudentScraper(BaseScraper):
             ssl_ctx.check_hostname = False
             ssl_ctx.verify_mode = ssl.CERT_NONE
 
-            try:
-                req = urllib.request.Request(url, headers=self.headers)
-                with urllib.request.urlopen(req, timeout=self.timeout, context=ssl_ctx) as response:
-                    charset = response.headers.get_content_charset() or "utf-8"
-                    html_content = response.read().decode(charset, errors="ignore")
-            except Exception as exc:
-                logger.warning(f"⚠️ Could not fetch {url} via urllib: {exc}")
-                return None
+            for attempt in range(2):
+                try:
+                    req = urllib.request.Request(url, headers=self.headers)
+                    with urllib.request.urlopen(req, timeout=self.timeout, context=ssl_ctx) as response:
+                        charset = response.headers.get_content_charset() or "utf-8"
+                        html_content = response.read().decode(charset, errors="ignore")
+                    break
+                except Exception as exc:
+                    if attempt == 1:
+                        logger.warning(f"⚠️ Could not fetch {url} via urllib: {exc}")
+                    time.sleep(1.0)
+
+        if html_content is None:
+            return None
 
         if BeautifulSoup is not None:
             soup = BeautifulSoup(html_content, "html.parser")
