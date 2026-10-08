@@ -82,12 +82,50 @@ def build_user_message(query: str, chunks: list[Chunk]) -> str:
     )
 
 
-def _build_messages(query: str, chunks: list[Chunk]) -> list[dict]:
-    """Build the standard messages list for either backend."""
-    return [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": build_user_message(query, chunks)},
-    ]
+def _build_messages(
+    query: str,
+    chunks: list[Chunk],
+    chat_history: list[dict] | None = None,
+) -> list[dict]:
+    """
+    Build the messages list for either backend.
+
+    Injects up to the last ``CONTEXT_WINDOW_TURNS`` Q&A pairs from
+    *chat_history* (alternating user/assistant) before the current user
+    turn so the model can reference previous responses in multi-turn
+    conversations.
+
+    Args:
+        query: The current user question.
+        chunks: Retrieved context chunks for this turn.
+        chat_history: Optional list of prior message dicts (each with
+            ``role`` and ``content`` keys) from session state.  Only
+            "user" and "assistant" roles are forwarded; system messages
+            are skipped.  Defaults to an empty history when None.
+
+    Returns:
+        Ordered list of chat message dicts ready to send to any
+        OpenAI-compatible completions endpoint.
+    """
+    messages: list[dict] = [{"role": "system", "content": SYSTEM_PROMPT}]
+
+    # ── Inject conversation history (last N complete Q&A turns) ──
+    if chat_history:
+        # Filter to user/assistant only, take the last CONTEXT_WINDOW_TURNS * 2 messages
+        history_turns = [
+            m for m in chat_history if m.get("role") in ("user", "assistant")
+        ]
+        window = history_turns[-(CONTEXT_WINDOW_TURNS * 2):]
+        for turn in window:
+            messages.append({"role": turn["role"], "content": turn["content"]})
+
+    # ── Current user turn (with RAG context) ──
+    messages.append({"role": "user", "content": build_user_message(query, chunks)})
+    return messages
+
+
+# Number of prior Q&A pairs to keep in the model's context window
+CONTEXT_WINDOW_TURNS = 3
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -99,6 +137,7 @@ def _groq_generate(
     chunks: list[Chunk],
     model: str,
     temperature: float,
+    chat_history: list[dict] | None = None,
 ) -> str:
     """Generate a full answer via the Groq cloud API."""
     try:
@@ -120,7 +159,7 @@ def _groq_generate(
         try:
             response = client.chat.completions.create(
                 model=model,
-                messages=_build_messages(query, chunks),
+                messages=_build_messages(query, chunks, chat_history),
                 temperature=temperature,
                 max_tokens=4096,
             )
@@ -142,6 +181,7 @@ def _groq_stream(
     chunks: list[Chunk],
     model: str,
     temperature: float,
+    chat_history: list[dict] | None = None,
 ):
     """Stream tokens from the Groq cloud API."""
     try:
@@ -158,7 +198,7 @@ def _groq_stream(
     try:
         stream = client.chat.completions.create(
             model=model,
-            messages=_build_messages(query, chunks),
+            messages=_build_messages(query, chunks, chat_history),
             temperature=temperature,
             max_tokens=4096,   # Increased: qwen3 thinking models consume tokens before answering
             stream=True,
@@ -190,6 +230,7 @@ def _ollama_generate(
     chunks: list[Chunk],
     model: str,
     temperature: float,
+    chat_history: list[dict] | None = None,
 ) -> str:
     """Generate a full answer via the local Ollama server."""
     try:
@@ -201,7 +242,7 @@ def _ollama_generate(
         client = ollama.Client(host=settings.ollama_base_url)
         response = client.chat(
             model=model,
-            messages=_build_messages(query, chunks),
+            messages=_build_messages(query, chunks, chat_history),
             options={"temperature": temperature},
         )
         if hasattr(response, "message") and hasattr(response.message, "content"):
@@ -220,6 +261,7 @@ def _ollama_stream(
     chunks: list[Chunk],
     model: str,
     temperature: float,
+    chat_history: list[dict] | None = None,
 ):
     """Stream tokens from the local Ollama server."""
     try:
@@ -231,7 +273,7 @@ def _ollama_stream(
         client = ollama.Client(host=settings.ollama_base_url)
         stream = client.chat(
             model=model,
-            messages=_build_messages(query, chunks),
+            messages=_build_messages(query, chunks, chat_history),
             options={"temperature": temperature},
             stream=True,
         )
@@ -259,6 +301,7 @@ def generate_answer(
     chunks: list[Chunk],
     model: str | None = None,
     temperature: float = 0.1,
+    chat_history: list[dict] | None = None,
 ) -> str:
     """
     Generate an answer to the query given retrieved context chunks.
@@ -270,6 +313,9 @@ def generate_answer(
         chunks: List of retrieved Chunk objects to ground the answer.
         model: Optional model name override. Defaults to the active backend's default model.
         temperature: Sampling temperature. Defaults to 0.1 for consistent, grounded output.
+        chat_history: Optional list of prior session message dicts (role + content) to
+            inject as conversation history.  The last ``CONTEXT_WINDOW_TURNS`` Q&A pairs
+            are forwarded to the model so it can answer follow-up questions correctly.
 
     Returns:
         The generated answer string.
@@ -281,10 +327,10 @@ def generate_answer(
 
     if backend == "groq":
         selected_model = model or settings.groq_model
-        return _groq_generate(query, chunks, selected_model, temperature)
+        return _groq_generate(query, chunks, selected_model, temperature, chat_history)
     elif backend == "ollama":
         selected_model = model or settings.ollama_model
-        return _ollama_generate(query, chunks, selected_model, temperature)
+        return _ollama_generate(query, chunks, selected_model, temperature, chat_history)
     else:
         raise RuntimeError(
             f"Unknown LLM_BACKEND '{backend}'. Set to 'groq' or 'ollama' in your .env file."
@@ -296,6 +342,7 @@ def stream_answer(
     chunks: list[Chunk],
     model: str | None = None,
     temperature: float = 0.1,
+    chat_history: list[dict] | None = None,
 ):
     """
     Stream an answer token-by-token for the given query and context.
@@ -308,6 +355,9 @@ def stream_answer(
         chunks: List of retrieved Chunk objects to ground the answer.
         model: Optional model name override. Defaults to the active backend's default model.
         temperature: Sampling temperature. Defaults to 0.1.
+        chat_history: Optional list of prior session message dicts (role + content) to
+            inject as conversation history.  The last ``CONTEXT_WINDOW_TURNS`` Q&A pairs
+            are forwarded to the model so it can answer follow-up questions correctly.
 
     Yields:
         str: Individual token strings from the model response stream.
@@ -318,17 +368,18 @@ def stream_answer(
     Example:
         # In Streamlit:
         with st.chat_message("assistant"):
-            answer = st.write_stream(stream_answer(query, chunks))
+            answer = st.write_stream(stream_answer(query, chunks, chat_history=history))
     """
     backend = settings.llm_backend.lower()
 
     if backend == "groq":
         selected_model = model or settings.groq_model
-        yield from _groq_stream(query, chunks, selected_model, temperature)
+        yield from _groq_stream(query, chunks, selected_model, temperature, chat_history)
     elif backend == "ollama":
         selected_model = model or settings.ollama_model
-        yield from _ollama_stream(query, chunks, selected_model, temperature)
+        yield from _ollama_stream(query, chunks, selected_model, temperature, chat_history)
     else:
         raise RuntimeError(
             f"Unknown LLM_BACKEND '{backend}'. Set to 'groq' or 'ollama' in your .env file."
         )
+
