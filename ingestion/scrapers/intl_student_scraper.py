@@ -69,118 +69,201 @@ from ingestion.scrapers.base import BaseScraper
 # ---------------------------------------------------------------------------
 
 INTL_STUDENT_SOURCES: list[dict] = [
-    # --- DHS Study in the States (Immigration & Status Boundaries) ---
+    # ── DHS Study in the States (Immigration, Status & Work Limits) ──
     {
         "source": "DHS/StudyInTheStates",
-        "section": "Working in the US (CPT/OPT)",
+        "section": "Working in the United States (CPT/OPT Overview)",
         "url": "https://studyinthestates.dhs.gov/students/work/working-in-the-united-states",
     },
     {
         "source": "DHS/StudyInTheStates",
-        "section": "Maintaining Status",
+        "section": "Maintaining F-1 Nonimmigrant Status",
         "url": "https://studyinthestates.dhs.gov/students/maintain-your-status",
     },
     {
         "source": "DHS/StudyInTheStates",
-        "section": "OPT Overview",
-        "url": "https://studyinthestates.dhs.gov/students/work/optional-practical-training-opt",
+        "section": "Training Opportunities in the United States",
+        "url": "https://studyinthestates.dhs.gov/students/training-opportunities-in-the-united-states",
     },
-    # --- IRS (Taxation, Nonresident Alien Investing & Exemption Rules) ---
+    {
+        "source": "DHS/StudyInTheStates",
+        "section": "Curricular Practical Training (CPT) Regulatory Rules",
+        "url": "https://studyinthestates.dhs.gov/sevis-help-hub/student-records/fm-student-employment/f-1-curricular-practical-training-cpt",
+    },
+    {
+        "source": "DHS/StudyInTheStates",
+        "section": "STEM OPT Practical Training Extension Rules",
+        "url": "https://studyinthestates.dhs.gov/sevis-help-hub/student-records/fm-student-employment/f-1-stem-optional-practical-training-opt-extension",
+    },
+
+    # ── IRS (Publication 519, Nonresident Taxes, & Investment Taxation) ──
     {
         "source": "IRS",
-        "section": "Taxation of Nonresident Aliens (Pub 519 Overview)",
+        "section": "Publication 519: U.S. Tax Guide for Aliens (Master Guide)",
+        "url": "https://www.irs.gov/publications/p519",
+    },
+    {
+        "source": "IRS",
+        "section": "Taxation of Nonresident Aliens (Core Rules)",
         "url": "https://www.irs.gov/individuals/international-taxpayers/taxation-of-nonresident-aliens",
     },
     {
         "source": "IRS",
-        "section": "ITIN Application & Eligibility",
+        "section": "Foreign Students, Scholars, Teachers and Exchange Visitors",
+        "url": "https://www.irs.gov/individuals/international-taxpayers/foreign-students-scholars-teachers-researchers-and-exchange-visitors",
+    },
+    {
+        "source": "IRS",
+        "section": "Substantial Presence Test (5-Year Exemption for F-1)",
+        "url": "https://www.irs.gov/individuals/international-taxpayers/substantial-presence-test",
+    },
+    {
+        "source": "IRS",
+        "section": "Form 8843 Statement for Exempt Individuals",
+        "url": "https://www.irs.gov/forms-pubs/about-form-8843",
+    },
+    {
+        "source": "IRS",
+        "section": "Form 1040-NR: U.S. Nonresident Alien Income Tax Return",
+        "url": "https://www.irs.gov/forms-pubs/about-form-1040-nr",
+    },
+    {
+        "source": "IRS",
+        "section": "Individual Taxpayer Identification Number (ITIN) Guidance",
         "url": "https://www.irs.gov/individuals/individual-taxpayer-identification-number",
     },
     {
         "source": "IRS",
-        "section": "Tax Treaties and Nonresident Withholding",
+        "section": "United States Income Tax Treaties Overview",
         "url": "https://www.irs.gov/individuals/international-taxpayers/tax-treaties",
     },
     {
         "source": "IRS",
-        "section": "Foreign Students and Scholars Exemption",
-        "url": "https://www.irs.gov/individuals/international-taxpayers/foreign-students-and-exchange-visitors",
+        "section": "Claiming Tax Treaty Benefits for Foreign Students",
+        "url": "https://www.irs.gov/individuals/international-taxpayers/claiming-tax-treaty-benefits",
     },
     {
         "source": "IRS",
-        "section": "Investment Income of Nonresident Aliens & 30% Withholding",
+        "section": "Foreign Student Liability for Social Security & Medicare (FICA)",
+        "url": "https://www.irs.gov/individuals/international-taxpayers/foreign-student-liability-for-social-security-and-medicare-taxes",
+    },
+    {
+        "source": "IRS",
+        "section": "Nontaxable Types of Interest Income for Nonresident Aliens",
         "url": "https://www.irs.gov/individuals/international-taxpayers/nontaxable-types-of-interest-income-for-nonresident-aliens",
     },
     {
         "source": "IRS",
-        "section": "Capital Gains of Nonresident Aliens (183-Day Rule)",
+        "section": "Taxation of Capital Gains for Nonresident Alien Students (183-Day Rule)",
         "url": "https://www.irs.gov/individuals/international-taxpayers/the-taxation-of-capital-gains-of-nonresident-alien-students-scholars-and-employees-of-foreign-governments",
     },
-    # --- Social Security Administration ---
-    {
-        "source": "SSA",
-        "section": "SSN for Non-Citizens & Student Employment",
-        "url": "https://www.ssa.gov/ssnumber/ss5doc.htm",
-    },
-    # --- USCIS (Work Authorization vs Passive Investing) ---
+
+    # ── USCIS (Work Permissions, OPT, & Visa Maintenance) ──
     {
         "source": "USCIS",
-        "section": "OPT for F-1 Students",
+        "section": "Optional Practical Training (OPT) for F-1 Students",
         "url": "https://www.uscis.gov/working-in-the-united-states/students-and-exchange-visitors/optional-practical-training-opt-for-f-1-students",
     },
     {
         "source": "USCIS",
-        "section": "STEM OPT Extension Regulations",
+        "section": "STEM OPT 24-Month Extension Requirements",
         "url": "https://www.uscis.gov/working-in-the-united-states/students-and-exchange-visitors/optional-practical-training-extension-for-stem-students-stem-opt",
     },
     {
         "source": "USCIS",
-        "section": "Changing Nonimmigrant Status",
-        "url": "https://www.uscis.gov/visit-the-united-states/extend-your-stay/change-my-nonimmigrant-status",
-    },
-    # --- CFPB (Banking, High-Yield Savings, CD, Credit) ---
-    {
-        "source": "CFPB",
-        "section": "Banking Basics & Savings Accounts",
-        "url": "https://www.consumerfinance.gov/consumer-tools/money-as-you-grow/",
+        "section": "Form I-765: Application for Employment Authorization (EAD)",
+        "url": "https://www.uscis.gov/i-765",
     },
     {
-        "source": "CFPB",
-        "section": "Building Credit Without US Credit History",
-        "url": "https://www.consumerfinance.gov/ask-cfpb/how-do-i-get-a-credit-card-if-i-dont-have-a-credit-history-en-1175/",
+        "source": "USCIS",
+        "section": "Changing Nonimmigrant Status Within the US",
+        "url": "https://www.uscis.gov/visit-the-united-states/change-my-nonimmigrant-status",
     },
-    # --- SEC / Investor.gov (Permitted Investments & Risk) ---
     {
-        "source": "SEC/Investor.gov",
-        "section": "Introduction to Investing: Stocks, Bonds, Mutual Funds",
-        "url": "https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins/how-0",
+        "source": "USCIS",
+        "section": "Students and Exchange Visitors Comprehensive Overview",
+        "url": "https://www.uscis.gov/working-in-the-united-states/students-and-exchange-visitors",
     },
+
+    # ── SEC / Investor.gov (Permitted Investments, Stocks, ETFs, Compound Growth) ──
     {
         "source": "SEC/Investor.gov",
-        "section": "Compound Interest & Long-Term Growth",
+        "section": "Stocks: Investment Products, Risks & Returns",
+        "url": "https://www.investor.gov/introduction-investing/investing-basics/investment-products/stocks",
+    },
+    {
+        "source": "SEC/Investor.gov",
+        "section": "How Stock Markets Work and Execution Basics",
+        "url": "https://www.investor.gov/introduction-investing/investing-basics/how-stock-markets-work",
+    },
+    {
+        "source": "SEC/Investor.gov",
+        "section": "Mutual Funds and Exchange-Traded Funds (ETFs)",
+        "url": "https://www.investor.gov/introduction-investing/investing-basics/investment-products/mutual-funds-and-exchange-traded-funds",
+    },
+    {
+        "source": "SEC/Investor.gov",
+        "section": "Bonds and Fixed Income Investment Products",
+        "url": "https://www.investor.gov/introduction-investing/investing-basics/investment-products/bonds-or-fixed-income-products",
+    },
+    {
+        "source": "SEC/Investor.gov",
+        "section": "Compound Interest and Long-Term Growth Mechanics",
         "url": "https://www.investor.gov/financial-tools-calculators/calculators/compound-interest-calculator",
     },
     {
         "source": "SEC/Investor.gov",
-        "section": "Opening a Brokerage Account & Non-Citizen W-8BEN",
-        "url": "https://www.investor.gov/introduction-investing/investing-basics/how-stock-markets-work",
-    },
-    # --- FINRA (Investor Protection, Margin & Day Trading Warnings) ---
-    {
-        "source": "FINRA",
-        "section": "Day Trading Margin Requirements and Risk Alerts",
-        "url": "https://www.finra.org/investors/learn-to-invest/advanced-investing/day-trading-margin-requirements",
+        "section": "The Role of the Securities and Exchange Commission (SEC)",
+        "url": "https://www.investor.gov/introduction-investing/investing-basics/role-sec",
     },
     {
-        "source": "FINRA",
-        "section": "Mutual Funds, Index Funds and ETFs",
-        "url": "https://www.finra.org/investors/investing/investment-products",
+        "source": "SEC/Investor.gov",
+        "section": "Financial and Investment Terms Comprehensive Glossary",
+        "url": "https://www.investor.gov/introduction-investing/investing-basics/glossary",
     },
-    # --- US TreasuryDirect (US Savings Bonds, Treasury Bills) ---
+
+    # ── US TreasuryDirect (Safe Sovereign Debt, T-Bills, Notes) ──
     {
         "source": "US TreasuryDirect",
-        "section": "Treasury Bills, Notes and Non-Citizen Eligibility",
-        "url": "https://www.treasurydirect.gov/indiv/research/indepth/tbills/res_tbill.htm",
+        "section": "Treasury Bills (T-Bills): Terms, Maturities, and Exemptions",
+        "url": "https://www.treasurydirect.gov/marketable-securities/treasury-bills/",
+    },
+    {
+        "source": "US TreasuryDirect",
+        "section": "Treasury Notes: Fixed Principal Investment Mechanics",
+        "url": "https://www.treasurydirect.gov/marketable-securities/treasury-notes/",
+    },
+
+    # ── FDIC & CFPB (Safe Banking, Deposit Insurance, Credit Building) ──
+    {
+        "source": "FDIC",
+        "section": "Money Smart: Consumer Financial Education",
+        "url": "https://www.fdic.gov/resources/consumers/money-smart/index.html",
+    },
+    {
+        "source": "FDIC",
+        "section": "Understanding FDIC Deposit Insurance for Bank Accounts",
+        "url": "https://www.fdic.gov/resources/deposit-insurance/understanding-deposit-insurance/index.html",
+    },
+    {
+        "source": "CFPB",
+        "section": "Money As You Grow: Building Financial Capability",
+        "url": "https://www.consumerfinance.gov/consumer-tools/money-as-you-grow/",
+    },
+    {
+        "source": "CFPB",
+        "section": "Credit Cards: Key Features, Rates, and How to Apply",
+        "url": "https://www.consumerfinance.gov/ask-cfpb/how-do-i-get-a-credit-card-en-42/",
+    },
+    {
+        "source": "CFPB",
+        "section": "Building and Maintaining a Strong Credit Score",
+        "url": "https://www.consumerfinance.gov/ask-cfpb/how-do-i-get-and-keep-a-good-credit-score-en-318/",
+    },
+    {
+        "source": "CFPB",
+        "section": "Consumer Protection and Financial Fraud Prevention",
+        "url": "https://www.consumerfinance.gov/consumer-tools/fraud/",
     },
 ]
 
@@ -204,16 +287,16 @@ class IntlStudentScraper(BaseScraper):
     DEFAULT_HEADERS = {
         "User-Agent": (
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+            "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
         ),
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
     }
 
     def __init__(
         self,
         sources: Optional[list[dict]] = None,
-        request_delay: float = 1.0,
+        request_delay: float = 0.8,
         timeout: int = 15,
     ) -> None:
         self.sources = sources or INTL_STUDENT_SOURCES
@@ -265,9 +348,14 @@ class IntlStudentScraper(BaseScraper):
                 logger.warning(f"⚠️ Could not fetch {url} via requests: {exc}")
 
         if html_content is None:
+            import ssl
+            ssl_ctx = ssl.create_default_context()
+            ssl_ctx.check_hostname = False
+            ssl_ctx.verify_mode = ssl.CERT_NONE
+
             try:
                 req = urllib.request.Request(url, headers=self.headers)
-                with urllib.request.urlopen(req, timeout=self.timeout) as response:
+                with urllib.request.urlopen(req, timeout=self.timeout, context=ssl_ctx) as response:
                     charset = response.headers.get_content_charset() or "utf-8"
                     html_content = response.read().decode(charset, errors="ignore")
             except Exception as exc:
