@@ -235,3 +235,57 @@ class TestGroqLive:
         full_answer = "".join(tokens)
         assert len(full_answer) > 10
         assert "401" in full_answer or "retirement" in full_answer.lower()
+
+
+class TestReformulateQuery:
+    def test_empty_history_returns_original_query(self):
+        from generation.llm import reformulate_query
+        assert reformulate_query("What is a 401(k)?", chat_history=None) == "What is a 401(k)?"
+        assert reformulate_query("What is a 401(k)?", chat_history=[]) == "What is a 401(k)?"
+
+    def test_empty_query_returns_as_is(self):
+        from generation.llm import reformulate_query
+        assert reformulate_query("", chat_history=[{"role": "user", "content": "hi"}]) == ""
+
+    def test_no_valid_turns_returns_original_query(self):
+        from generation.llm import reformulate_query
+        assert reformulate_query("What about taxes?", chat_history=[{"role": "system", "content": "prompt"}]) == "What about taxes?"
+
+    def test_reformulate_query_groq_mocked(self):
+        from generation.llm import reformulate_query
+        with patch("groq.Groq") as mock_groq_cls:
+            mock_client = MagicMock()
+            mock_groq_cls.return_value = mock_client
+            mock_resp = MagicMock()
+            mock_resp.choices[0].message.content = "What is the filing deadline for Form 8843 for F-1 students?"
+            mock_client.chat.completions.create.return_value = mock_resp
+
+            with patch.object(settings, "llm_backend", "groq"), \
+                 patch.object(settings, "groq_api_key", "gsk_test_key"):
+                result = reformulate_query(
+                    query="When is the deadline to file it?",
+                    chat_history=[
+                        {"role": "user", "content": "What is Form 8843 for F-1 visa holders?"},
+                        {"role": "assistant", "content": "Form 8843 is a Statement for Exempt Individuals."},
+                    ],
+                )
+
+            assert result == "What is the filing deadline for Form 8843 for F-1 students?"
+            mock_client.chat.completions.create.assert_called_once()
+
+    def test_reformulate_query_falls_back_on_exception(self):
+        from generation.llm import reformulate_query
+        with patch("groq.Groq") as mock_groq_cls:
+            mock_client = MagicMock()
+            mock_groq_cls.return_value = mock_client
+            mock_client.chat.completions.create.side_effect = Exception("API connection error")
+
+            with patch.object(settings, "llm_backend", "groq"), \
+                 patch.object(settings, "groq_api_key", "gsk_test_key"):
+                result = reformulate_query(
+                    query="When is the deadline?",
+                    chat_history=[{"role": "user", "content": "What is Form 8843?"}],
+                )
+
+            assert result == "When is the deadline?"
+

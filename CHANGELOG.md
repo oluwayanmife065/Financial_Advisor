@@ -16,8 +16,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 - **Educational & Legal Compliance Disclaimer Banner** (`app.py`):
   - Prominent UI header disclaimer clarifying that the assistant is an academic & portfolio demonstration synthesizing official US government documents (IRS Pub 519, DHS, USCIS, SEC, CFPB, Federal Reserve).
   - Explicitly states that the tool does not provide certified financial, legal, tax, or immigration advice, and directs users to consult a DSO or licensed professional.
-- **Safety & Regulatory Guardrails in System Prompt** (`generation/llm.py`):
-  - Enhanced system prompt with explicit boundaries against assisting with unlawful actions (e.g., intentional tax evasion or unauthorized employment under student visa status).
+- **Conversational Query Reformulation for Multi-Turn RAG Retrieval** (`generation/llm.py`, `app.py`, `tests/test_llm.py`):
+  - Added `reformulate_query(query, chat_history, model)`: When prior conversation turns exist, the model automatically condenses conversational follow-ups (e.g. "When is the deadline to file it?") into self-contained semantic search queries (e.g. "What is the filing deadline for Form 8843 for F-1 students?") before vector embedding.
+  - Fixes the classic multi-turn retrieval disconnect where follow-up queries lack the entities needed for vector search.
+  - Added latency badge telemetry in Streamlit UI displaying the reformulated query when rewriting occurs.
+  - Added full unit test suite `TestReformulateQuery` covering empty history, non-valid turns, mocked Groq response, and graceful error fallback.
 
 
 ### Added

@@ -43,7 +43,7 @@ except Exception:
 
 from ingestion.embedder import embed_query
 from retrieval import lancedb_retriever, pinecone_retriever
-from generation.llm import stream_answer
+from generation.llm import stream_answer, reformulate_query
 from query_logging.query_logger import log_query
 
 
@@ -356,6 +356,10 @@ def _render_latency_badges(latency: dict):
         f"Generation **{g_ms / 1000:.2f} s** · "
         f"Total **{t_ms / 1000:.2f} s**{retriever_tag}"
     )
+    rewritten_query = latency.get("search_query")
+    if rewritten_query:
+        st.caption(f"🔄 **Query reformulated for retrieval**: *\"{rewritten_query}\"*")
+
 
 
 def _render_source_expander(chunks):
@@ -412,7 +416,8 @@ def _handle_query(
     with st.spinner(f"🔍 Searching {retriever_name.title()} knowledge base…"):
         retrieval_start = time.perf_counter()
         try:
-            query_vector = embed_query(query)
+            search_query = reformulate_query(query, chat_history=prior_history, model=model)
+            query_vector = embed_query(search_query)
             if is_pinecone:
                 chunks = pinecone_retriever.search(query_vector, k=top_k)
             else:
@@ -449,6 +454,7 @@ def _handle_query(
             "generation_ms": round(generation_ms, 1),
             "total_ms": round(total_ms, 1),
             "retriever": retriever_name,
+            "search_query": search_query if search_query != query else None,
         }
 
         _render_latency_badges(latency)

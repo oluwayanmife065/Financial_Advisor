@@ -207,9 +207,10 @@ streamlit run app.py
 The app opens at **http://localhost:8501** with:
 - 💬 **Streaming chat** — tokens appear live as Ollama or Groq generates
 - 🧠 **Multi-turn conversation context** — retains the last 3 Q&A exchanges in the context window for natural, conversational follow-ups
+- 🔄 **Conversational query reformulation** — automatically rewrites follow-up questions into standalone semantic search queries before vector embedding
 - ⚖️ **Educational disclaimer banner** — prominent compliance notification clarifying educational purpose and directing specific questions to a DSO or CPA
 - 📚 **Source expanders** — see exactly which SEC/CFPB/Fed/IRS chunks grounded each answer
-- ⏱️ **Latency badges** — retrieval ms + generation s + total s per response
+- ⏱️ **Latency badges** — retrieval ms + generation s + total s per response, plus query rewrite telemetry
 - ⚙️ **Sidebar** — model selector, top-k slider, corpus stats, live eval KPI badges, query log viewer
 
 ---
@@ -228,7 +229,8 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
 | `v1.0.0` | Production deployment — Groq Cloud auto-fallback, Pinecone serverless cloud index, Streamlit Cloud ready |
 | `v1.1.0-intl-student-rag` | International student finetuning — 36-source scraper, 349-page regulatory guide PDF, 1,157 chunks indexed, 11-question evaluation benchmark |
 | `v1.2.0-conversation-context` | Multi-turn conversational memory — context window keeping the last 3 Q&A turns (6 messages) for natural follow-up queries |
-| `v1.3.0-deploy-readiness` | Deployment & demo readiness — educational compliance disclaimer banner, safety & regulatory refusal guardrails |
+| `v1.3.0-deploy-readiness` | Deployment & demo readiness — educational compliance banner, safety refusal guardrails, conversational query reformulation |
+
 
 
 ---
