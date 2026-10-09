@@ -10,7 +10,15 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ---
 
-## [v1.2.0-conversation-context] — 2026-10-08
+## [v1.3.0-deploy-readiness] — 2026-10-09
+
+### Added
+- **Educational & Legal Compliance Disclaimer Banner** (`app.py`):
+  - Prominent UI header disclaimer clarifying that the assistant is an academic & portfolio demonstration synthesizing official US government documents (IRS Pub 519, DHS, USCIS, SEC, CFPB, Federal Reserve).
+  - Explicitly states that the tool does not provide certified financial, legal, tax, or immigration advice, and directs users to consult a DSO or licensed professional.
+- **Safety & Regulatory Guardrails in System Prompt** (`generation/llm.py`):
+  - Enhanced system prompt with explicit boundaries against assisting with unlawful actions (e.g., intentional tax evasion or unauthorized employment under student visa status).
+
 
 ### Added
 - **Multi-Turn Conversational Memory & Context Window** (`generation/llm.py`, `app.py`):

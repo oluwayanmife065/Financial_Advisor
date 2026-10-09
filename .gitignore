@@ -69,3 +69,6 @@ logs/
 eval/eval_report_*.json
 eval/eval_results_*.json
 
+# ── Generated PDF artifacts ────────────────────────────────────
+output/
+

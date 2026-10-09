@@ -495,6 +495,16 @@ def main():
     # ── Header ──
     st.title(APP_TITLE)
     st.caption(APP_SUBTITLE)
+
+    # ── Educational / Portfolio Disclaimer ──
+    st.info(
+        "💡 **Academic & Portfolio Demonstration**: This system synthesizes official US government documentation "
+        "(IRS Pub 519, DHS Study in the States, USCIS, SEC Investor.gov, CFPB, Federal Reserve) for financial literacy education. "
+        "It is **not** an accredited financial advisor, CPA, or immigration attorney and does **not** provide "
+        "personalized legal, tax, or investment advice. Always verify individual circumstances with your Designated "
+        "School Official (DSO) or an accredited professional.",
+        icon="⚖️",
+    )
     st.divider()
 
     # ── Sidebar ──
