@@ -298,8 +298,9 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
             st.session_state.messages = []
             st.rerun()
 
-        # ── Query log viewer ──
-        with st.expander("📋 Query Log (latest 5)"):
+        # ── Observability & Query Trace Viewer ──
+        with st.expander("📋 Observability & Trace Log (Latest 5)"):
+            st.caption("Live telemetry tracking per-query latency, vector store, and model.")
             log_path = Path(settings.log_file)
             if log_path.exists():
                 lines = log_path.read_text(encoding="utf-8").strip().splitlines()
@@ -308,9 +309,12 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
                     try:
                         entry = json.loads(raw)
                         st.json({
+                            "timestamp": entry.get("timestamp", "")[:19],
                             "query": entry.get("query", ""),
+                            "retriever": entry.get("retriever", ""),
                             "retrieval_ms": entry.get("retrieval_latency_ms"),
                             "generation_ms": entry.get("generation_latency_ms"),
+                            "total_ms": entry.get("total_latency_ms"),
                             "model": entry.get("model"),
                             "k": entry.get("k"),
                         })

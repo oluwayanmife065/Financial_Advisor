@@ -21,6 +21,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
   - Fixes the classic multi-turn retrieval disconnect where follow-up queries lack the entities needed for vector search.
   - Added latency badge telemetry in Streamlit UI displaying the reformulated query when rewriting occurs.
   - Added full unit test suite `TestReformulateQuery` covering empty history, non-valid turns, mocked Groq response, and graceful error fallback.
+- **Observability & Trace Viewer Polish** (`app.py`):
+  - Refined sidebar query log expander into a dedicated ML Engineering Telemetry & Observability Drawer displaying live query traces, retrieval store (`pinecone` vs `lancedb`), granular retrieval/generation/total latency timings, active model, and `k` parameters.
+
 
 
 ### Added
