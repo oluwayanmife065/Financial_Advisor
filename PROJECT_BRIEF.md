@@ -77,6 +77,21 @@ Logging & Observability (latency, chunk traces, query logs)
 - Full `README.md` case study writeup
 - Streamlit UI (`app.py`)
 
+### Phase 6 — International Student Finetuning & Multi-Store Ingestion
+- Regulatory scraper covering 36 official portals (IRS Pub 519, DHS Study in the States, USCIS, SEC)
+- Generated unified 349-page PDF guide (`output/intl_student_financial_guide.pdf`)
+- Ingested 1,157 chunks across local LanceDB and cloud Pinecone
+- Domain evaluation benchmark (`eval/golden_set_intl.json`) achieving 100% Hit Rate and Recall@5
+
+### Phase 7 — Multi-Turn Memory & Contextual Query Reformulation
+- Conversational context window tracking the last 3 Q&A turns (6 messages)
+- Query reformulation engine (`reformulate_query`): rewrites follow-up inquiries into self-contained search queries before vector embedding
+
+### Phase 8 — Deployment & Demo Readiness
+- Academic and portfolio disclaimer banner in Streamlit UI
+- Domain-specific AI safety refusal guardrails in generation prompt
+- Observability and trace telemetry drawer for latency, retriever, and model tracking
+
 ---
 
 ## 🎯 KPIs & Success Metrics
@@ -199,13 +214,15 @@ financial_advisor/
 4. **What I did**: Built a golden Q&A eval harness, benchmarked LanceDB vs Pinecone, measured latency at p50/p95
 5. **Results**: [your actual numbers — precision, recall, latency]
 6. **Tradeoffs**: LanceDB (embedded, zero infra, fast local dev) vs Pinecone (managed, production feel, higher latency)
-7. **What I'd do next**: Reranking (ColBERT), query expansion, RAGAS with GPT-4o-mini judge
+7. **What I did next**: Implemented conversational memory and query reformulation to prevent follow-up retrieval blindspots, and added disclaimer & refusal safety guardrails for regulatory compliance
+8. **Future directions**: Cross-encoder reranking (ColBERT / BGE-Reranker), hybrid dense/sparse search (BM25 + BGE)
 
 ### Key Interview Phrases
 - *"I defined a golden test set to measure retrieval precision/recall before relying on qualitative impressions"*
 - *"I abstracted the retriever behind an interface so I could benchmark LanceDB vs Pinecone without changing the application layer"*
-- *"Every query is logged with chunk traces and latency so I can debug retrieval failures and track regression"*
-- *"I measured p95 latency specifically because p50 hides tail latency problems that users actually feel"*
+- *"I noticed standard RAG breaks on conversational follow-ups because the second question lacks entity context, so I implemented a query reformulation step before vector embedding"*
+- *"Every query is logged with chunk traces and latency so I can debug retrieval failures and track regression in real time"*
+- *"I implemented prompt-level safety refusal guardrails and UI disclaimers to clearly delineate educational literacy from licensed legal/tax advice"*
 
 ---
 
@@ -215,14 +232,16 @@ financial_advisor/
 sentence-transformers>=2.7    # Embeddings (bge-small-en-v1.5)
 lancedb>=0.10                 # Local vector store
 pinecone-client>=3.0          # Cloud vector store
+groq>=0.9                     # Cloud LLM inference
 ollama>=0.3                   # Local LLM inference
 pydantic-settings>=2.0        # Config management
 loguru>=0.7                   # Structured logging
 pytest>=8.0                   # Testing
-streamlit>=1.35               # UI (Phase 5)
+streamlit>=1.35               # UI
 ```
 
 ---
 
-*Last updated: 2026-09-12*
+*Last updated: 2026-10-09*
+
 
