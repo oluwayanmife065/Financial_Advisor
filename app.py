@@ -43,7 +43,7 @@ except Exception:
 
 from ingestion.embedder import embed_query
 from retrieval import lancedb_retriever, pinecone_retriever
-from generation.llm import stream_answer
+from generation.llm import stream_answer, reformulate_query
 from query_logging.query_logger import log_query
 
 
@@ -298,8 +298,9 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
             st.session_state.messages = []
             st.rerun()
 
-        # ── Query log viewer ──
-        with st.expander("📋 Query Log (latest 5)"):
+        # ── Observability & Query Trace Viewer ──
+        with st.expander("📋 Observability & Trace Log (Latest 5)"):
+            st.caption("Live telemetry tracking per-query latency, vector store, and model.")
             log_path = Path(settings.log_file)
             if log_path.exists():
                 lines = log_path.read_text(encoding="utf-8").strip().splitlines()
@@ -308,9 +309,12 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
                     try:
                         entry = json.loads(raw)
                         st.json({
+                            "timestamp": entry.get("timestamp", "")[:19],
                             "query": entry.get("query", ""),
+                            "retriever": entry.get("retriever", ""),
                             "retrieval_ms": entry.get("retrieval_latency_ms"),
                             "generation_ms": entry.get("generation_latency_ms"),
+                            "total_ms": entry.get("total_latency_ms"),
                             "model": entry.get("model"),
                             "k": entry.get("k"),
                         })
@@ -356,6 +360,10 @@ def _render_latency_badges(latency: dict):
         f"Generation **{g_ms / 1000:.2f} s** · "
         f"Total **{t_ms / 1000:.2f} s**{retriever_tag}"
     )
+    rewritten_query = latency.get("search_query")
+    if rewritten_query:
+        st.caption(f"🔄 **Query reformulated for retrieval**: *\"{rewritten_query}\"*")
+
 
 
 def _render_source_expander(chunks):
@@ -412,7 +420,8 @@ def _handle_query(
     with st.spinner(f"🔍 Searching {retriever_name.title()} knowledge base…"):
         retrieval_start = time.perf_counter()
         try:
-            query_vector = embed_query(query)
+            search_query = reformulate_query(query, chat_history=prior_history, model=model)
+            query_vector = embed_query(search_query)
             if is_pinecone:
                 chunks = pinecone_retriever.search(query_vector, k=top_k)
             else:
@@ -449,6 +458,7 @@ def _handle_query(
             "generation_ms": round(generation_ms, 1),
             "total_ms": round(total_ms, 1),
             "retriever": retriever_name,
+            "search_query": search_query if search_query != query else None,
         }
 
         _render_latency_badges(latency)
@@ -495,6 +505,16 @@ def main():
     # ── Header ──
     st.title(APP_TITLE)
     st.caption(APP_SUBTITLE)
+
+    # ── Educational / Portfolio Disclaimer ──
+    st.info(
+        "💡 **Academic & Portfolio Demonstration**: This system synthesizes official US government documentation "
+        "(IRS Pub 519, DHS Study in the States, USCIS, SEC Investor.gov, CFPB, Federal Reserve) for financial literacy education. "
+        "It is **not** an accredited financial advisor, CPA, or immigration attorney and does **not** provide "
+        "personalized legal, tax, or investment advice. Always verify individual circumstances with your Designated "
+        "School Official (DSO) or an accredited professional.",
+        icon="⚖️",
+    )
     st.divider()
 
     # ── Sidebar ──

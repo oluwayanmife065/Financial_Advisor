@@ -16,15 +16,16 @@ from ingestion.document import Chunk
 from config import settings
 
 
-SYSTEM_PROMPT = """You are a knowledgeable, objective personal finance literacy assistant.
-Your goal is to help the user understand financial concepts and build financial capability.
+SYSTEM_PROMPT = """You are a knowledgeable, objective personal finance and regulatory literacy assistant.
+Your goal is to help the user understand financial concepts, tax rules, and immigration-related financial regulations for educational purposes.
 
 CRITICAL INSTRUCTIONS:
 1. Base your answer STRICTLY on the provided Context Chunks. Do not introduce outside information or fabricate facts.
 2. If the provided context does not contain enough information to answer the question, clearly state: "I do not have enough information in the provided documents to answer this question."
 3. Be direct, clear, and educational in your explanation.
-4. Where helpful, reference the source and section (e.g. "According to CFPB...") so the user knows where the information originated.
-5. Provide educational context only; do not provide personalized financial, legal, or investment advice.
+4. Where helpful, reference the source and section (e.g. "According to IRS Pub 519...", "According to CFPB...") so the user knows where the information originated.
+5. Provide educational context only; do not provide personalized financial, legal, tax, or investment advice.
+6. Refuse to assist with unlawful actions (such as intentional tax evasion or unauthorized employment under student visa status), and advise users to verify case-specific determinations with a DSO or licensed professional.
 """
 
 # ── Groq models available on current key ──
@@ -382,4 +383,112 @@ def stream_answer(
         raise RuntimeError(
             f"Unknown LLM_BACKEND '{backend}'. Set to 'groq' or 'ollama' in your .env file."
         )
+
+
+REFORMULATE_PROMPT = """You are an expert query reformulation assistant for a semantic search engine.
+Given a conversation history between a user and an assistant, and the user's latest follow-up question, rewrite the question into a single, self-contained search query.
+
+CRITICAL RULES:
+1. Include all necessary domain entities, acronyms, and context from previous turns (e.g., F-1 visa, Form 8843, CPT, OPT, 1040-NR, Roth IRA).
+2. Do NOT answer the question.
+3. Output ONLY the rewritten search query with NO quotes, preamble, or explanation.
+4. If the question is already fully standalone and self-contained, output it unchanged.
+"""
+
+
+def reformulate_query(
+    query: str,
+    chat_history: list[dict] | None = None,
+    model: str | None = None,
+) -> str:
+    """
+    Reformulate a conversational follow-up question into a standalone retrieval query.
+
+    When multi-turn conversation history is present, follow-up queries (such as
+    "When is the deadline to file it?" or "Does this apply to OPT?") often lack
+    the entities and keywords required for accurate semantic search. This function
+    uses the LLM to rewrite the query incorporating prior conversational context.
+
+    If history is empty or reformulation fails, returns the original query unchanged.
+
+    Args:
+        query: The user's latest raw question.
+        chat_history: Optional list of previous message dicts (role + content).
+        model: Optional model override. Defaults to active backend's default.
+
+    Returns:
+        A standalone search query string for embedding and vector retrieval.
+    """
+    if not query or not query.strip():
+        return query
+
+    if not chat_history:
+        return query.strip()
+
+    valid_turns = [
+        m for m in chat_history if m.get("role") in ("user", "assistant") and m.get("content")
+    ]
+    if not valid_turns:
+        return query.strip()
+
+    # Use the last 2 complete Q&A turns (up to 4 messages) for context
+    context_turns = valid_turns[-4:]
+    formatted_convo = "\n".join([
+        f"{m['role'].capitalize()}: {m['content'][:300]}" for m in context_turns
+    ])
+
+    user_prompt = (
+        f"Conversation History:\n{formatted_convo}\n\n"
+        f"Latest User Question: {query.strip()}\n\n"
+        f"Standalone Search Query:"
+    )
+
+    backend = settings.llm_backend.lower()
+    selected_model = model or (settings.groq_model if backend == "groq" else settings.ollama_model)
+
+    try:
+        if backend == "groq":
+            if not settings.groq_api_key:
+                return query.strip()
+            from groq import Groq
+            client = Groq(api_key=settings.groq_api_key)
+            response = client.chat.completions.create(
+                model=selected_model,
+                messages=[
+                    {"role": "system", "content": REFORMULATE_PROMPT},
+                    {"role": "user", "content": user_prompt},
+                ],
+                temperature=0.0,
+                max_tokens=150,
+            )
+            rewritten = response.choices[0].message.content.strip()
+        elif backend == "ollama":
+            import ollama
+            client = ollama.Client(host=settings.ollama_base_url)
+            response = client.chat(
+                model=selected_model,
+                messages=[
+                    {"role": "system", "content": REFORMULATE_PROMPT},
+                    {"role": "user", "content": user_prompt},
+                ],
+                options={"temperature": 0.0},
+            )
+            if hasattr(response, "message") and hasattr(response.message, "content"):
+                rewritten = response.message.content.strip()
+            elif isinstance(response, dict) and "message" in response:
+                rewritten = response["message"].get("content", "").strip()
+            else:
+                rewritten = str(response).strip()
+        else:
+            return query.strip()
+
+        # Clean surrounding quotes or preamble tags
+        rewritten = rewritten.strip('"`\'')
+        if rewritten.lower().startswith("standalone search query:"):
+            rewritten = rewritten[len("standalone search query:"):].strip()
+        return rewritten if rewritten else query.strip()
+    except Exception:
+        # Fall back to original query gracefully on any error
+        return query.strip()
+
 
