@@ -75,11 +75,8 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 | **Phase 0** — Scaffolding | Project structure, config, data models | ✅ Complete |
 | **Phase 1** — Ingestion | Parsers, scrapers, chunker, embedder, LanceDB pipeline | ✅ Complete |
 | **Phase 2** — Retrieval + Chat | BaseRetriever interface, LanceDB retriever, CLI chat loop | ✅ Complete |
-| **Phase 3** — Eval Harness | Golden Q&A set, retrieval & generation metrics, LLM judge | 🔧 In Progress |
-| **Phase 4** — Pinecone Benchmark | Pinecone retriever, side-by-side benchmark vs LanceDB | ⬚ Planned |
 | **Phase 3** — Eval Harness | Golden Q&A set, retrieval & generation metrics, LLM judge | ✅ Complete |
-| **Phase 4** — Pinecone Benchmark | Pinecone retriever, side-by-side benchmark vs LanceDB | ⬚ Next Phase |
-| **Phase 5** — Polish + UI | Streamlit app, full README case study | ⬚ Planned |
+| **Phase 4** — Pinecone Benchmark | Pinecone retriever, side-by-side benchmark vs LanceDB | ✅ Complete |
 | **Phase 5** — Polish + UI | Streamlit app, streaming chat, source citations, eval badges | ✅ Complete |
 
 ---
@@ -91,7 +88,6 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 - `Chunk` dataclass — represents an embeddable text chunk with parent lineage
 - Deterministic `doc_id` via `sha256(url + date_ingested)` — prevents duplicate ingestion
 
-### PDF Parser (`ingestion/parsers/pdf_parser.py`)
 ### PDF Parser & Ingestion Pipeline (`ingestion/`)
 - Extracts clean text from PDFs using PyMuPDF (`fitz`)
 - One `Document` per non-empty page (skips pages with < 50 characters)
@@ -102,9 +98,6 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 - `bge-small-en-v1.5` embeddings via SentenceTransformers
 - Automated pipeline indexing 488 chunks into LanceDB across SEC, CFPB, and Federal Reserve
 
-### Test Suite (`tests/test_pdf_parser.py`)
-- Full coverage of `parse_pdf`, `parse_pdf_folder`, `infer_source_label`, and `_clean_text`
-- Tests for edge cases: missing files, empty folders, pages below content threshold
 ### Retrieval & Grounded Generation (`retrieval/`, `generation/`, `main.py`)
 - Embedded vector search via LanceDB (local) and Pinecone (cloud)
 - Grounded generation using Groq Cloud API or local Ollama LLMs with strict anti-hallucination system prompt
@@ -118,14 +111,14 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 - **LLM Judge (`eval/llm_judge.py`)**: Independent scoring of Answer Relevance and Context Faithfulness using OpenAI GPT-4o-mini with retry logic and JSON code-fence stripping.
 - **Eval Runner CLI (`eval/runner.py`)**: Orchestrator executing the benchmark, computing p50/p95 latency percentiles, rendering terminal summary tables, and exporting `eval_report.json`.
 
-#### 📊 Live Benchmark Results (Base 25-Question Test Set)
+#### 📊 Live Benchmark Results — LanceDB (Base 25-Question Test Set)
 | Metric | System Score | Project Target | Status |
 |---|---|---|---|
 | **Precision@3** | **0.8400** | $\ge 0.70$ | **✅ PASSED** (+14% above target) |
 | **Recall@5** | **1.0000** | $\ge 0.80$ | **✅ PASSED** (100% recall) |
 | **Mean Reciprocal Rank (MRR)** | **0.9800** | $\ge 0.75$ | **✅ PASSED** (Relevant chunk almost always #1) |
 | **Hit Rate** | **1.0000** | $\ge 0.85$ | **✅ PASSED** (100% hit rate) |
-| **Retrieval Latency (p50 / p95)** | **313 ms / 1,020 ms** | $< 100\text{ ms} / < 300\text{ ms}$ | Fast local LanceDB vector search |
+| **Retrieval Latency (p50 / p95)** | **355 ms / 829 ms** | $< 100\text{ ms} / < 300\text{ ms}$ | **⚠️ ABOVE TARGET** — embedded scan on full corpus |
 
 #### 🎓 International Student Domain Benchmark (11 Questions — `eval/golden_set_intl.json`)
 | Metric | System Score | Project Target | Status |
@@ -134,7 +127,20 @@ Eval Harness (golden Q&A set, precision/recall/MRR)
 | **Recall@5** | **1.0000** | $\ge 0.80$ | **✅ PASSED** (100% recall) |
 | **Mean Reciprocal Rank (MRR)** | **0.8864** | $\ge 0.75$ | **✅ PASSED** |
 | **Hit Rate** | **1.0000** | $\ge 0.85$ | **✅ PASSED** (11/11 queries matched) |
-| **Retrieval Latency (p50 / p95)** | **176.1 ms / 1,570 ms** | $< 100\text{ ms} / < 300\text{ ms}$ | LanceDB embedded vector search |
+| **Retrieval Latency (p50 / p95)** | **176 ms / 1,571 ms** | $< 100\text{ ms} / < 300\text{ ms}$ | **⚠️ ABOVE TARGET** — LanceDB embedded scan |
+
+#### ⚡ LanceDB vs Pinecone — Side-by-Side Retrieval Benchmark (25 Questions)
+| Metric | LanceDB (local) | Pinecone (cloud) |
+|---|---|---|
+| **Precision@3** | 0.84 | 0.84 |
+| **Recall@5** | 1.00 | 1.00 |
+| **MRR** | 0.98 | 0.96 |
+| **Hit Rate** | 1.00 | 1.00 |
+| **Retrieval Latency p50** | 355 ms | 814 ms |
+| **Retrieval Latency p95** | 829 ms | 1,103 ms |
+| **Generation Latency p50** | 17.3 s | 12.5 s |
+
+> LanceDB and Pinecone produce identical retrieval quality (same Precision, Recall, Hit Rate). LanceDB edges ahead on MRR (0.98 vs 0.96) and retrieval latency (2.3× faster at p50). Generation latency differs because the two runs used different Ollama concurrency conditions, not the vector store itself.
 
 ### Test Suite (`tests/`)
 - **114 unit tests passing** across parsers, scrapers, chunker, embedder, pipeline, retrievers, query logger, retrieval metrics, LLM judge, and runner harness.
@@ -168,20 +174,14 @@ ingestion/sources/pdfs/
 
 | Component | Technology | Rationale |
 |---|---|---|
-| **Embeddings** | `bge-small-en-v1.5` (SentenceTransformers) | Strong MTEB retrieval scores, lightweight |
-| **Vector DB (local)** | LanceDB | Embedded, zero-infra, fast local dev |
-| **Vector DB (cloud)** | Pinecone | Managed, production feel, benchmark comparison |
-| **LLM** | Ollama (`llama3.2:3b` / `mistral:7b`) | Fully local, private, no API cost |
-| **Config** | Pydantic Settings | Type-safe env var management |
-| **Testing** | pytest | Standard Python test framework |
-| **PDF Parsing** | PyMuPDF (`fitz`) | Fast, reliable text extraction |
 | **Embeddings** | `bge-small-en-v1.5` (SentenceTransformers) | Strong MTEB retrieval scores, lightweight (384-dim) |
 | **Vector DB (local)** | LanceDB | Embedded, zero-infra, fast local vector search |
-| **Vector DB (cloud)** | Pinecone | Managed cloud vector DB for side-by-side benchmark (Phase 4) |
+| **Vector DB (cloud)** | Pinecone | Managed cloud vector DB for side-by-side benchmark |
 | **LLM (local)** | Ollama (`qwen2.5:7b` / `llama3.2:3b`) | Fully local, private, no inference cost |
+| **LLM (cloud)** | Groq Cloud | Hosted inference for deployment |
 | **Eval Judge** | OpenAI GPT-4o-mini | Independent judge avoids self-evaluation bias |
 | **Config** | Pydantic Settings | Type-safe env var management via `.env` |
-| **Testing** | pytest | 111 unit tests with full mocking and isolation |
+| **Testing** | pytest | 114 unit tests with full mocking and isolation |
 | **PDF Parsing** | PyMuPDF (`fitz`) | Fast, reliable text extraction and cleaning |
 
 ---

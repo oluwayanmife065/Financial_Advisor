@@ -130,14 +130,8 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ---
 
-## [v0.3.0-eval] — Phase 3 target
 ## [v0.3.0-eval] — 2026-09-22
 
-### Planned
-- Golden Q&A set (20–30 pairs)
-- Precision@k, Recall@k, MRR, Hit Rate metrics
-- Ollama LLM-as-judge (answer relevance + faithfulness)
-- `eval/runner.py` producing `eval_report.json`
 ### Added
 - Golden Q&A evaluation dataset with 25 hand-crafted test questions across SEC, CFPB, and Federal Reserve corpora (`eval/golden_set.json`)
 - Retrieval evaluation metrics: Precision@k, Recall@k, Mean Reciprocal Rank (MRR), and Hit Rate using keyword-based relevance matching (`eval/metrics.py`)
