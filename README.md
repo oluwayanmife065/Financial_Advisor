@@ -1,6 +1,8 @@
 # 📊 Personal Finance & International Student RAG Assistant
 
-A private, production-grade Retrieval-Augmented Generation (RAG) system for learning personal finance, tax compliance, and investing concepts from trusted regulatory sources (SEC, CFPB, Federal Reserve, IRS, DHS, USCIS, FDIC, and US TreasuryDirect).
+**🔗 Live demo:** https://international-financial-assistant.streamlit.app/
+
+A production-style Retrieval-Augmented Generation (RAG) system for learning personal finance, tax compliance, and investing concepts from trusted regulatory sources (SEC, CFPB, Federal Reserve, IRS, DHS, USCIS, FDIC, and US TreasuryDirect).
 
 > Built as an end-to-end ML engineering portfolio project demonstrating ingestion pipelines, vector retrieval, evaluation harnesses, and full observability.
 
@@ -224,7 +226,7 @@ See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
 | `v0.0.0-scaffold` | Phase 0 complete — project structure, data models, PDF parser + tests |
 | `v0.1.0-ingestion` | Phase 1 complete — chunker, embedder, pipeline, LanceDB retriever, tests |
 | `v0.2.0-retrieval` | Phase 2 complete — Ollama LLM wrapper, CLI chat loop, query logger, tests |
-| `v0.3.0-eval` | Phase 3 complete — Golden Q&A benchmark (25 questions), retrieval metrics, LLM judge, eval runner, 111 tests |
+| `v0.3.0-eval` | Phase 3 complete — Golden Q&A benchmark (25 questions), retrieval metrics, LLM judge, eval runner, 114 tests |
 | `v0.5.0-polish` | Phase 5 complete — Streamlit streaming chat UI, source citation expanders, sidebar eval badges |
 | `v1.0.0` | Production deployment — Groq Cloud auto-fallback, Pinecone serverless cloud index, Streamlit Cloud ready |
 | `v1.1.0-intl-student-rag` | International student finetuning — 36-source scraper, 349-page regulatory guide PDF, 1,157 chunks indexed, 11-question evaluation benchmark |
