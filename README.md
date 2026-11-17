@@ -210,7 +210,8 @@ The app opens at **http://localhost:8501** with:
 - 💬 **Streaming chat** — tokens appear live as Ollama or Groq generates
 - 🧠 **Multi-turn conversation context** — retains the last 3 Q&A exchanges in the context window for natural, conversational follow-ups
 - 🔄 **Conversational query reformulation** — automatically rewrites follow-up questions into standalone semantic search queries before vector embedding
-- ⚖️ **Educational disclaimer banner** — prominent compliance notification clarifying educational purpose and directing specific questions to a DSO or CPA
+- **Refreshed interface** — cream and forest theme, topic cards, responsive layout, and a focused conversation workspace
+- **Educational note** — expandable explanation of educational purpose and guidance to consult a DSO or qualified professional
 - 📚 **Source expanders** — see exactly which SEC/CFPB/Fed/IRS chunks grounded each answer
 - ⏱️ **Latency badges** — retrieval ms + generation s + total s per response, plus query rewrite telemetry
 - ⚙️ **Sidebar** — model selector, top-k slider, corpus stats, live eval KPI badges, and full query telemetry trace drawer

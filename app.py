@@ -51,7 +51,7 @@ from query_logging.query_logger import log_query
 # Constants
 # ─────────────────────────────────────────────────────────────────────────────
 
-APP_TITLE = "📊 Personal Finance & International Student RAG Assistant"
+APP_TITLE = "Finance, clearly"
 APP_SUBTITLE = "Grounded answers from IRS (Pub 519), DHS, USCIS, SEC, CFPB, and Federal Reserve documents."
 
 GROQ_MODELS = [
@@ -169,137 +169,146 @@ def _render_sidebar() -> tuple[str, int, bool, str]:
         Tuple of (selected_model, top_k, show_sources, selected_retriever).
     """
     with st.sidebar:
-        st.title("⚙️ Settings")
+        st.markdown('<div class="sidebar-brand">f<span>c</span> / Finance, clearly</div>', unsafe_allow_html=True)
+        st.caption("A little clarity goes a long way.")
+        if st.button("＋ New conversation", use_container_width=True):
+            st.session_state.messages = []
+            st.rerun()
+        st.divider()
+        st.markdown("**Your workspace**")
+        st.caption("Personal finance · International student life")
 
-        # Backend selector — Ollama option only shown when locally reachable
-        ollama_available = _is_ollama_available()
-        if ollama_available:
-            backend_options = ["Groq Cloud (Hosted)", "Ollama (Local)"]
-            default_backend_idx = 0 if (settings.llm_backend.lower() == "groq" or bool(settings.groq_api_key)) else 1
-            selected_backend_choice = st.radio(
-                "LLM Backend",
-                options=backend_options,
-                index=default_backend_idx,
-                help="Choose between Groq Cloud (fast hosted inference) or Ollama (local dev server).",
+        with st.expander("Answer settings", expanded=False):
+            # Backend selector — Ollama option only shown when locally reachable
+            ollama_available = _is_ollama_available()
+            if ollama_available:
+                backend_options = ["Groq Cloud (Hosted)", "Ollama (Local)"]
+                default_backend_idx = 0 if (settings.llm_backend.lower() == "groq" or bool(settings.groq_api_key)) else 1
+                selected_backend_choice = st.radio(
+                    "LLM Backend",
+                    options=backend_options,
+                    index=default_backend_idx,
+                    help="Choose between Groq Cloud (fast hosted inference) or Ollama (local dev server).",
+                )
+                is_groq = "Groq" in selected_backend_choice
+            else:
+                # Streamlit Cloud / Ollama not running — lock silently to Groq
+                is_groq = True
+                selected_backend_choice = "Groq Cloud (Hosted)"
+            settings.llm_backend = "groq" if is_groq else "ollama"
+
+            if is_groq:
+                st.success("⚡ Backend: **Groq Cloud**", icon="☁️")
+            else:
+                st.info("🖥️ Backend: **Ollama Local**", icon="💻")
+
+            # Model selector
+            available_models = _get_available_models()
+            model_label = "Groq Model" if is_groq else "Ollama Model"
+            selected_model = st.selectbox(
+                model_label,
+                options=available_models,
+                index=0,
+                help="Fast cloud inference" if is_groq else "Local Ollama model",
             )
-            is_groq = "Groq" in selected_backend_choice
-        else:
-            # Streamlit Cloud / Ollama not running — lock silently to Groq
-            is_groq = True
-            selected_backend_choice = "Groq Cloud (Hosted)"
-        settings.llm_backend = "groq" if is_groq else "ollama"
 
-        if is_groq:
-            st.success("⚡ Backend: **Groq Cloud**", icon="☁️")
-        else:
-            st.info("🖥️ Backend: **Ollama Local**", icon="💻")
+            # Retriever selector
+            retriever_options = ["Pinecone (Cloud)", "LanceDB (Local)"]
+            default_idx = 0 if bool(settings.pinecone_api_key) else 1
+            selected_retriever = st.radio(
+                "Vector Database",
+                options=retriever_options,
+                index=default_idx,
+                help="Choose between Pinecone (AWS serverless cloud) or LanceDB (local embedded vector store).",
+            )
 
-        # Model selector
-        available_models = _get_available_models()
-        model_label = "Groq Model" if is_groq else "Ollama Model"
-        selected_model = st.selectbox(
-            model_label,
-            options=available_models,
-            index=0,
-            help="Fast cloud inference" if is_groq else "Local Ollama model",
-        )
+            # Retrieval top-k
+            top_k = st.slider(
+                "Retrieved Chunks (top-k)",
+                min_value=1, max_value=10,
+                value=settings.top_k,
+                help=f"How many context chunks to retrieve from {selected_retriever.split()[0]} per query.",
+            )
 
-        # Retriever selector
-        retriever_options = ["Pinecone (Cloud)", "LanceDB (Local)"]
-        default_idx = 0 if bool(settings.pinecone_api_key) else 1
-        selected_retriever = st.radio(
-            "Vector Database",
-            options=retriever_options,
-            index=default_idx,
-            help="Choose between Pinecone (AWS serverless cloud) or LanceDB (local embedded vector store).",
-        )
-
-        # Retrieval top-k
-        top_k = st.slider(
-            "Retrieved Chunks (top-k)",
-            min_value=1, max_value=10,
-            value=settings.top_k,
-            help=f"How many context chunks to retrieve from {selected_retriever.split()[0]} per query.",
-        )
-
-        # Source citation toggle
-        show_sources = st.toggle(
-            "Show source citations",
-            value=st.session_state.show_sources,
-        )
-        st.session_state.show_sources = show_sources
+            # Source citation toggle
+            show_sources = st.toggle(
+                "Show source citations",
+                value=st.session_state.show_sources,
+            )
+            st.session_state.show_sources = show_sources
 
         st.divider()
 
-        # ── Corpus stats ──
-        st.subheader("🗄️ Vector Store")
-        is_pinecone = "Pinecone" in selected_retriever
-        try:
-            chunk_count = pinecone_retriever.count() if is_pinecone else lancedb_retriever.count()
-        except Exception:
-            chunk_count = 0
+        with st.expander("Knowledge base & benchmarks", expanded=False):
+            # ── Corpus stats ──
+            st.subheader("🗄️ Vector Store")
+            is_pinecone = "Pinecone" in selected_retriever
+            try:
+                chunk_count = pinecone_retriever.count() if is_pinecone else lancedb_retriever.count()
+            except Exception:
+                chunk_count = 0
 
-        if chunk_count > 0:
-            db_label = "Pinecone (Cloud AWS)" if is_pinecone else "LanceDB (Local)"
-            st.metric("Chunks indexed", f"{chunk_count:,}", help=db_label)
-        else:
-            target_flag = "--target pinecone --from-lancedb" if is_pinecone else "--target lancedb"
-            st.warning(
-                f"{selected_retriever.split()[0]} is empty.\n\n"
-                "Run the ingestion pipeline first:\n"
-                f"```\npython3.11 -m ingestion.pipeline {target_flag}\n```"
-            )
+            if chunk_count > 0:
+                db_label = "Pinecone (Cloud AWS)" if is_pinecone else "LanceDB (Local)"
+                st.metric("Chunks indexed", f"{chunk_count:,}", help=db_label)
+            else:
+                target_flag = "--target pinecone --from-lancedb" if is_pinecone else "--target lancedb"
+                st.warning(
+                    f"{selected_retriever.split()[0]} is empty.\n\n"
+                    "Run the ingestion pipeline first:\n"
+                    f"```\npython3.11 -m ingestion.pipeline {target_flag}\n```"
+                )
 
-        st.caption(f"Embedder: `{settings.embedding_model}`")
-        if is_pinecone:
-            st.caption(f"Pinecone: `{settings.pinecone_index_name}` ({settings.pinecone_cloud}/{settings.pinecone_region})")
-        else:
-            st.caption(f"DB path: `{settings.lancedb_path}`")
+            st.caption(f"Embedder: `{settings.embedding_model}`")
+            if is_pinecone:
+                st.caption(f"Pinecone: `{settings.pinecone_index_name}` ({settings.pinecone_cloud}/{settings.pinecone_region})")
+            else:
+                st.caption(f"DB path: `{settings.lancedb_path}`")
 
-        st.divider()
+            st.divider()
 
-        # ── Eval KPI badges ──
-        report = _load_eval_report()
-        if report:
-            st.subheader("📊 Eval Benchmark")
-            summary = report.get("aggregate", {}).get("summary_metrics", {})
-            kpi_map = {
-                "Precision@3": "precision_at_3",
-                "Recall@5": "recall_at_5",
-                "MRR": "mrr",
-                "Hit Rate": "hit_rate",
-            }
-            cols = st.columns(2)
-            for i, (label, key) in enumerate(kpi_map.items()):
-                info = summary.get(key, {})
-                score = info.get("score")
-                passed = info.get("passed", False)
-                if score is not None:
-                    delta_color = "normal" if passed else "inverse"
-                    cols[i % 2].metric(
-                        label=label,
-                        value=f"{score:.2f}",
-                        delta="✅ PASS" if passed else "❌ FAIL",
-                        delta_color=delta_color,
-                    )
-            cfg = report.get("configuration", {})
-            st.caption(
-                f"Run: {report.get('timestamp_end', '—')[:10]}  |  "
-                f"n={len(report.get('per_query_results', []))}  |  "
-                f"retriever={cfg.get('retriever', '—')}"
-            )
-        else:
-            st.caption("No eval report found. Run `python3.11 -m eval.runner` to generate one.")
+            # ── Eval KPI badges ──
+            report = _load_eval_report()
+            if report:
+                st.subheader("📊 Eval Benchmark")
+                summary = report.get("aggregate", {}).get("summary_metrics", {})
+                kpi_map = {
+                    "Precision@3": "precision_at_3",
+                    "Recall@5": "recall_at_5",
+                    "MRR": "mrr",
+                    "Hit Rate": "hit_rate",
+                }
+                cols = st.columns(2)
+                for i, (label, key) in enumerate(kpi_map.items()):
+                    info = summary.get(key, {})
+                    score = info.get("score")
+                    passed = info.get("passed", False)
+                    if score is not None:
+                        delta_color = "normal" if passed else "inverse"
+                        cols[i % 2].metric(
+                            label=label,
+                            value=f"{score:.2f}",
+                            delta="✅ PASS" if passed else "❌ FAIL",
+                            delta_color=delta_color,
+                        )
+                cfg = report.get("configuration", {})
+                st.caption(
+                    f"Run: {report.get('timestamp_end', '—')[:10]}  |  "
+                    f"n={len(report.get('per_query_results', []))}  |  "
+                    f"retriever={cfg.get('retriever', '—')}"
+                )
+            else:
+                st.caption("No eval report found. Run `python3.11 -m eval.runner` to generate one.")
 
-        st.divider()
+            st.divider()
 
         # ── Clear chat ──
-        if st.button("🗑️ Clear Chat", use_container_width=True):
+        if st.button("Clear conversation", use_container_width=True):
             st.session_state.messages = []
             st.rerun()
 
         # ── Observability & Query Trace Viewer ──
-        with st.expander("📋 Observability & Trace Log (Latest 5)"):
+        with st.expander("Developer · recent query logs"):
             st.caption("Live telemetry tracking per-query latency, vector store, and model.")
             log_path = Path(settings.log_file)
             if log_path.exists():
@@ -334,7 +343,7 @@ def _render_chat_history(show_sources: bool):
     """Render all previous messages from session state."""
     for msg in st.session_state.messages:
         role = msg["role"]
-        with st.chat_message(role):
+        with st.chat_message(role, avatar="▧" if role == "assistant" else "○"):
             st.markdown(msg["content"])
 
             # Source citations and latency — only on assistant turns
@@ -410,7 +419,7 @@ def _handle_query(
 
     # ── 1. Append user message to chat ──
     st.session_state.messages.append({"role": "user", "content": query})
-    with st.chat_message("user"):
+    with st.chat_message("user", avatar="○"):
         st.markdown(query)
 
     is_pinecone = "Pinecone" in retriever_choice
@@ -433,7 +442,7 @@ def _handle_query(
 
     # ── 3. Streaming generation (with conversation history) ──
     generation_start = time.perf_counter()
-    with st.chat_message("assistant"):
+    with st.chat_message("assistant", avatar="▧"):
         try:
             token_stream = stream_answer(
                 query,
@@ -495,27 +504,18 @@ def _handle_query(
 def main():
     st.set_page_config(
         page_title=APP_TITLE,
-        page_icon="📊",
+        page_icon="◈",
         layout="wide",
         initial_sidebar_state="expanded",
     )
 
     _init_session_state()
 
-    # ── Header ──
-    st.title(APP_TITLE)
-    st.caption(APP_SUBTITLE)
-
-    # ── Educational / Portfolio Disclaimer ──
-    st.info(
-        "💡 **Academic & Portfolio Demonstration**: This system synthesizes official US government documentation "
-        "(IRS Pub 519, DHS Study in the States, USCIS, SEC Investor.gov, CFPB, Federal Reserve) for financial literacy education. "
-        "It is **not** an accredited financial advisor, CPA, or immigration attorney and does **not** provide "
-        "personalized legal, tax, or investment advice. Always verify individual circumstances with your Designated "
-        "School Official (DSO) or an accredited professional.",
-        icon="⚖️",
+    st.markdown(f"<style>{(_PROJECT_ROOT / 'styles.css').read_text(encoding='utf-8')}</style>", unsafe_allow_html=True)
+    st.markdown(
+        '<div class="topline"><span>FINANCE, CLEARLY</span><span>A guide to your financial life</span></div>',
+        unsafe_allow_html=True,
     )
-    st.divider()
 
     # ── Sidebar ──
     selected_model, top_k, show_sources, selected_retriever = _render_sidebar()
@@ -525,30 +525,50 @@ def main():
 
     # ── Empty-state prompt suggestions ──
     if not st.session_state.messages:
-        st.markdown("#### 💡 Try asking:")
+        st.markdown(
+            '<section class="welcome"><div class="eyebrow">YOUR NEXT CHAPTER, WITH CONFIDENCE</div>'
+            '<h1>New country.<br>Clearer money decisions.</h1>'
+            '<p>Make sense of taxes, credit, investing, and life in the US.<br>'
+            'Ask a question. Get an explanation grounded in official sources.</p></section>',
+            unsafe_allow_html=True,
+        )
+        st.markdown('<div class="section-label">A GOOD PLACE TO START</div>', unsafe_allow_html=True)
         example_questions = [
-            "What is the tax residency status of an F-1 student in their first 5 years?",
-            "Can an F-1 student invest in US stocks or Treasury Bills?",
-            "What are the differences between CPT and OPT work authorizations?",
-            "Can international students engage in active day trading or crypto mining?",
-            "Are F-1 students exempt from Social Security and Medicare taxes (FICA)?",
-            "Can I open a US bank account or build credit without an SSN?",
+            ("01 / TAXES", "Understand your tax residency", "What is the tax residency status of an F-1 student in their first 5 years?"),
+            ("02 / INVESTING", "Explore investing in the US", "Can an F-1 student invest in US stocks or Treasury Bills?"),
+            ("03 / WORK & STUDY", "Make sense of CPT and OPT", "What are the differences between CPT and OPT work authorizations?"),
+            ("04 / EVERYDAY MONEY", "Start building your credit", "Can I open a US bank account or build credit without an SSN?"),
         ]
         cols = st.columns(2)
-        for i, q in enumerate(example_questions):
-            if cols[i % 2].button(q, use_container_width=True, key=f"suggestion_{i}"):
-                _handle_query(
-                    q,
-                    model=selected_model,
-                    top_k=top_k,
-                    show_sources=show_sources,
-                    retriever_choice=selected_retriever,
-                )
-                st.rerun()
+        for i, (topic, title, question) in enumerate(example_questions):
+            with cols[i % 2]:
+                with st.container(border=True):
+                    st.caption(topic)
+                    st.markdown(f"**{title}**")
+                    if st.button(question + "  →", use_container_width=True, key=f"suggestion_{i}"):
+                        st.session_state.pending_question = question
+                        st.rerun()
+        st.markdown(
+            '<div class="source-strip">GROUNDED IN OFFICIAL SOURCES'
+            '<div>IRS <span>·</span> USCIS <span>·</span> DHS <span>·</span> SEC '
+            '<span>·</span> CFPB <span>·</span> Federal Reserve</div></div>',
+            unsafe_allow_html=True,
+        )
+
+    with st.expander("For learning, with perspective"):
+        st.caption(
+            "An academic and portfolio demonstration for financial literacy education. "
+            "Answers synthesize official US government documents and may contain errors. "
+            "This is not personalized financial, tax, legal, or immigration advice. "
+            "Verify your circumstances with your DSO or a qualified professional."
+        )
+    if pending_question := st.session_state.pop("pending_question", None):
+        _handle_query(pending_question, selected_model, top_k, show_sources, selected_retriever)
+        st.rerun()
 
 
     # ── Chat input ──
-    if prompt := st.chat_input("Ask a personal finance question…"):
+    if prompt := st.chat_input("What would you like to understand?"):
         _handle_query(
             prompt,
             model=selected_model,

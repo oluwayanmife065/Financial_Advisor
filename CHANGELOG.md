@@ -8,6 +8,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/) and 
 
 ## [Unreleased]
 
+### Changed
+- Redesigned the Streamlit UI with a cream and forest theme, editorial welcome screen, four topic cards, and responsive styling in `styles.css`.
+- Grouped answer settings, knowledge-base benchmarks, and developer logs into sidebar expanders; added a new-conversation action.
+- Condensed the educational disclaimer into an expandable note while preserving chat streaming, citations, retrieval controls, and telemetry.
+
 ---
 
 ## [v1.3.0-deploy-readiness] — 2026-10-09

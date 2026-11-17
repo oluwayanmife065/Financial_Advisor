@@ -1,0 +1,37 @@
+/* Quiet editorial styling; native Streamlit widgets retain keyboard behavior. */
+:root { --ink: #183c32; --muted: #65736b; --line: #dce2d7; }
+.stApp { background: #f8f9f4; color: var(--ink); }
+[data-testid="stMainBlockContainer"] { max-width: 1080px; padding: 2rem 3rem 3rem; }
+[data-testid="stHeader"] { background: transparent; }
+[data-testid="stSidebar"] { background: #edf0e7; border-right: 1px solid var(--line); }
+[data-testid="stSidebar"] > div:first-child { padding-top: 2rem; }
+.sidebar-brand { font-size: 1.12rem; font-weight: 650; letter-spacing: -.04em; padding: .7rem 0; }
+.sidebar-brand span { color: #708568; }
+.topline { display: flex; justify-content: space-between; gap: 1rem; padding: .5rem 0 1.3rem; border-bottom: 1px solid var(--line); font-size: .7rem; letter-spacing: .13em; font-weight: 600; }
+.topline span:last-child { color: var(--muted); text-transform: none; letter-spacing: 0; font-weight: 400; }
+.welcome { padding: 3.5rem 0 2rem; }
+.eyebrow, .section-label { font-size: .68rem; font-weight: 650; letter-spacing: .15em; color: #6b7f60; }
+.welcome h1 { font-family: Georgia, 'Times New Roman', serif; font-size: clamp(2.6rem, 4.8vw, 4.3rem); line-height: 1.08; font-weight: 400; letter-spacing: -.045em; color: var(--ink); padding: 1rem 0 1.1rem; }
+.welcome p { color: var(--muted); font-size: 1rem; line-height: 1.8; }
+.section-label { margin-bottom: .9rem; }
+[data-testid="stVerticalBlockBorderWrapper"] > div { border-color: var(--line) !important; border-radius: 14px !important; }
+[data-testid="stMain"] [data-testid="stVerticalBlockBorderWrapper"] { background: #fffef9; border-radius: 14px; }
+.stButton > button { border: 1px solid #cdd8c8; border-radius: 9px; background: transparent; color: var(--ink); transition: background .15s, border-color .15s; }
+.stButton > button:hover { background: #e8eedf; border-color: #7a9270; color: var(--ink); }
+.stButton > button:focus-visible { outline: 3px solid #78926a; outline-offset: 3px; }
+[data-testid="stMain"] .stButton > button { text-align: left; justify-content: flex-start; font-size: .85rem; min-height: 4rem; border-color: transparent; padding: .5rem 0; }
+[data-testid="stMain"] .stButton > button:hover { padding-left: .5rem; }
+.source-strip { text-align: center; font-size: .6rem; letter-spacing: .14em; color: var(--muted); padding: 2rem 0 1.3rem; }
+.source-strip div { font-size: .85rem; letter-spacing: .01em; color: #4f6257; margin-top: .8rem; }
+.source-strip span { color: #a4b09b; padding: 0 .55rem; }
+[data-testid="stChatMessage"] { background: #fffef9; border: 1px solid var(--line); border-radius: 14px; padding: 1.3rem; }
+[data-testid="stChatInput"] { border-radius: 14px; border: 1px solid #becbb7; background: #fffef9; }
+[data-testid="stBottom"] > div { background: #f8f9f4; }
+[data-testid="stExpander"] { border-color: var(--line); border-radius: 10px; }
+@media (max-width: 640px) {
+  [data-testid="stMainBlockContainer"] { padding: 1rem 1.2rem 2rem; }
+  .welcome { padding-top: 2rem; }
+  .topline span:last-child { display: none; }
+  .source-strip span { padding: 0 .2rem; }
+}
+@media (prefers-reduced-motion: reduce) { .stButton > button { transition: none; } }
