@@ -343,7 +343,7 @@ def _render_chat_history(show_sources: bool):
     """Render all previous messages from session state."""
     for msg in st.session_state.messages:
         role = msg["role"]
-        with st.chat_message(role, avatar="🤖" if role == "assistant" else "👤"):
+        with st.chat_message(role):
             st.markdown(msg["content"])
 
             # Source citations and latency — only on assistant turns
@@ -419,7 +419,7 @@ def _handle_query(
 
     # ── 1. Append user message to chat ──
     st.session_state.messages.append({"role": "user", "content": query})
-    with st.chat_message("user", avatar="👤"):
+    with st.chat_message("user"):
         st.markdown(query)
 
     is_pinecone = "Pinecone" in retriever_choice
@@ -442,7 +442,7 @@ def _handle_query(
 
     # ── 3. Streaming generation (with conversation history) ──
     generation_start = time.perf_counter()
-    with st.chat_message("assistant", avatar="🤖"):
+    with st.chat_message("assistant"):
         try:
             token_stream = stream_answer(
                 query,
