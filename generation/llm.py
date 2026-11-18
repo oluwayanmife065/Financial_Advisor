@@ -30,10 +30,9 @@ CRITICAL INSTRUCTIONS:
 
 # ── Groq models available on current key ──
 GROQ_MODELS = [
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
     "qwen/qwen3.8-27b",
-    "allam-2-7b",
-    "openai/gpt-oss-20b",
-    "openai/gpt-oss-120b",
 ]
 
 
@@ -162,7 +161,7 @@ def _groq_generate(
                 model=model,
                 messages=_build_messages(query, chunks, chat_history),
                 temperature=temperature,
-                max_tokens=4096,
+                max_tokens=1024,
             )
             return response.choices[0].message.content.strip()
         except Exception as exc:
@@ -201,7 +200,7 @@ def _groq_stream(
             model=model,
             messages=_build_messages(query, chunks, chat_history),
             temperature=temperature,
-            max_tokens=4096,   # Increased: qwen3 thinking models consume tokens before answering
+            max_tokens=1024,
             stream=True,
         )
     except Exception as exc:

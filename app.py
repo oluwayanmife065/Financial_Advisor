@@ -55,10 +55,9 @@ APP_TITLE = "Finance, clearly"
 APP_SUBTITLE = "Grounded answers from IRS (Pub 519), DHS, USCIS, SEC, CFPB, and Federal Reserve documents."
 
 GROQ_MODELS = [
+    "llama-3.3-70b-versatile",
+    "llama-3.1-8b-instant",
     "qwen/qwen3.8-27b",
-    "allam-2-7b",
-    "openai/gpt-oss-20b",
-    "openai/gpt-oss-120b",
 ]
 OLLAMA_DEFAULT_MODELS = ["qwen2.5:7b", "llama3.2:3b", "mistral:7b", "gemma3:4b"]
 

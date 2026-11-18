@@ -31,7 +31,7 @@ class Settings(BaseSettings):
         description="Groq API key. Get one at console.groq.com."
     )
     groq_model: str = Field(
-        default="qwen/qwen3.8-27b",
+        default="llama-3.3-70b-versatile",
         description="Groq model name."
     )
 
